@@ -20,25 +20,30 @@
 #ifndef RDelphes_h
 #define RDelphes_h
 
+#include <ROOT/RDataFrame.hxx>
 #include <ROOT/RDataSource.hxx>
 
 #include <unordered_map>
 
 class Delphes;
+class DelphesLHEFReader;
 class ExRootConfReader;
 class ExRootTreeWriter;
 
 class RDelphes final : public ROOT::RDF::RDataSource
 {
 public:
-  explicit RDelphes(std::string_view configuration_file, std::string_view output_file);
+  explicit RDelphes(std::string_view configuration_file, std::string_view input_file, std::string_view output_file);
   ~RDelphes() override;
+
+  static ROOT::RDataFrame Make(std::string_view, std::string_view, std::string_view);
 
   const std::vector<std::string> &GetColumnNames() const override;
   bool HasColumn(std::string_view column_name) const override;
   std::string GetTypeName(std::string_view column_name) const override;
 
-  std::vector<std::pair<unsigned long long, unsigned long long> > GetEntryRanges() override;
+  using EntryRange = std::pair<unsigned long long, unsigned long long>;
+  std::vector<EntryRange> GetEntryRanges() override;
   bool SetEntry(unsigned int /*slot*/, unsigned long long entry) override;
 
   ROOT::RDF::RDataSource::Record_t GetColumnReadersImpl(std::string_view, const std::type_info &) override;
@@ -47,16 +52,19 @@ private:
   const std::unique_ptr<ExRootConfReader> conf_reader_{};
   const std::unique_ptr<ExRootTreeWriter> tree_writer_{}; //TODO: will eventually disappear to store in data source memory
   const std::unique_ptr<Delphes> delphes_{};
+  const std::unique_ptr<DelphesLHEFReader> file_reader_{}; //TODO: use polymorphism
 
-  //ExRootTreeBranch *branch_event_{nullptr}; //TODO: move to internal memory
-  //ExRootTreeBranch *branch_weight_{nullptr};
+  FILE *input_lhe_file_{nullptr};
+
   TObjArray *all_particle_output_array_{nullptr}; //TODO: move to internal memory
   TObjArray *stable_particle_output_array_{nullptr};
   TObjArray *parton_output_array_{nullptr};
 
-  unsigned long long current_entry_{0ull};
+  unsigned long long current_entry_{999ull}; //FIXME
 
   std::vector<std::string> columns_names_{};
+  std::unordered_map<std::string, void *> columns_collection_addresses_{};
+  std::unordered_map<std::string, void *> columns_first_object_addresses_{};
   std::unordered_map<std::string, std::string> columns_types_{};
 };
 

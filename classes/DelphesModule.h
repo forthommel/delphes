@@ -50,6 +50,7 @@ public:
   virtual void Process();
   virtual void Finish();
 
+  const TFolder *ExportFolder() const { return GetFolder(); }
   TObjArray *ImportArray(const char *name);
   TObjArray *ExportArray(const char *name);
 

@@ -18,10 +18,30 @@
  */
 
 #include "classes/RDelphes.h"
+#include <TCanvas.h>
 
-int main()
+int main(int argc, char *argv[])
 {
-  auto delphes = RDelphes{"../cards/delphes_card_LHeC.tcl", "test_rdelphes.root"};
+  if(argc < 3)
+    throw std::runtime_error(std::string{"Usage: "} + argv[0] + " [tcl card] [input LHEF file]");
+  const auto tcl_card = std::string{argv[1]}, input_lhef = std::string{argv[2]};
+
+  auto delphes_10_events =
+    RDelphes::Make(tcl_card, input_lhef, "test_rdelphes.root")
+      .Range(0, 1000)
+      .Alias("genElectrons", "ParticlePropagator__electrons")
+      .Alias("genMuons", "ParticlePropagator__muons")
+      .Define("firstElectronPt", "genElectrons.size() > 0 ? genElectrons[0].PT : -1.")
+      .Define("firstMuonPt", "genMuons.size() > 0 ? genMuons[0].PT : -1.");
+
+  delphes_10_events
+    .Display({"firstElectronPt", "firstMuonPt"}, 100)
+    ->Print();
+
+  auto first_muon_pt_hist = delphes_10_events.Histo1D("firstElectronPt");
+  TCanvas c;
+  first_muon_pt_hist->Draw();
+  c.SaveAs("test.png");
 
   return 0;
 }
