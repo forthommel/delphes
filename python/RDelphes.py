@@ -22,8 +22,8 @@ import argparse
 ROOT.gSystem.Load("libDelphes")
 
 parser = argparse.ArgumentParser()
-parser.add_argument('tcl-card', help="Path to the TCL card to use", type=str)
-parser.add_argument('input-lhef', help="Path to the LHEF input file to use", type=str)
+parser.add_argument('tcl_card', help="Path to the TCL card to use", type=str)
+parser.add_argument('input_lhef', help="Path to the LHEF input file to use", type=str)
 args = parser.parse_args()
 
 delphes_10_events = ROOT.RDelphes.Make(args.tcl_card, args.input_lhef, "test_rdelphes.root") \

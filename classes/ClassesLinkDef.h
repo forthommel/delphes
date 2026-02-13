@@ -27,6 +27,7 @@
 
 #include "classes/DelphesModule.h"
 #include "classes/DelphesFactory.h"
+#include "classes/RDelphes.h"
 
 #include "classes/SortableObject.h"
 #include "classes/DelphesClasses.h"
@@ -65,5 +66,7 @@
 #pragma link C++ class HectorHit+;
 
 #pragma link C++ class Candidate+;
+
+#pragma link C++ class RDelphes+;
 
 #endif
