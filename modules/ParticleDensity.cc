@@ -36,12 +36,12 @@
 #include "ExRootAnalysis/ExRootResult.h"
 
 #include "TFormula.h"
+#include "TH2F.h"
 #include "TLorentzVector.h"
 #include "TMath.h"
 #include "TObjArray.h"
 #include "TRandom3.h"
 #include "TString.h"
-#include "TH2F.h"
 
 #include <algorithm>
 #include <iostream>
@@ -52,28 +52,12 @@ using namespace std;
 
 //------------------------------------------------------------------------------
 
-ParticleDensity::ParticleDensity() :
-  fItInputArray(0)
-{}
-
-//------------------------------------------------------------------------------
-
-ParticleDensity::~ParticleDensity()
-{}
-
-//------------------------------------------------------------------------------
-
 void ParticleDensity::Init()
 {
-
-  // import input array(s)
-
-  fInputArray = ImportArray(GetString("InputArray", "FastJetFinder/jets"));
-  fItInputArray = fInputArray->MakeIterator();
-
-  // create output array(s)
-
-  fOutputArray = ExportArray(GetString("OutputArray", "tracks"));
+  // import input array
+  GetFactory()->EventModel()->Attach(GetString("InputArray", "FastJetFinder/jets"), fInputArray); // I/O
+  // create output array
+  GetFactory()->EventModel()->Book(fOutputArray, GetString("OutputArray", "tracks"));
 
   // create multiplicity histogram
 
@@ -85,7 +69,7 @@ void ParticleDensity::Init()
   {
     binsEta[i] = paramEta[i].GetDouble();
   }
-  
+
   ExRootConfParam paramPhi = GetParam("PhiBins");
   const Long_t sizePhi = paramPhi.GetSize();
   Int_t nbinsPhi = sizePhi - 1;
@@ -104,43 +88,44 @@ void ParticleDensity::Init()
 
 void ParticleDensity::Finish()
 {
-  if(fItInputArray) delete fItInputArray;
-  if (fHisto) delete fHisto;
+  if(fHisto) delete fHisto;
 }
 
 //------------------------------------------------------------------------------
 
 void ParticleDensity::Process()
 {
-  Candidate *candidate;
   fHisto->Reset();
-  
+
   // loop over all input candidates to fill histogram
-  fItInputArray->Reset();
-  while((candidate = static_cast<Candidate *>(fItInputArray->Next()))) {
-    if (fUseMomentumVector) fHisto->Fill(candidate->Momentum.Eta(), candidate->Momentum.Phi());
-    else                    fHisto->Fill(candidate->Position.Eta(), candidate->Position.Phi());
+  for(const auto &candidate : *fInputArray)
+  {
+    if(fUseMomentumVector)
+      fHisto->Fill(candidate.Momentum.Eta(), candidate.Momentum.Phi());
+    else
+      fHisto->Fill(candidate.Position.Eta(), candidate.Position.Phi());
   }
 
   // normalise by bin width
   fHisto->Scale(1., "width");
-  
-  // loop over all input candidates to assign multiplicity
-  fItInputArray->Reset();
-  while((candidate = static_cast<Candidate *>(fItInputArray->Next()))) {
-    Int_t ieta, iphi;
-    if (fUseMomentumVector) {
-      ieta = fHisto->GetXaxis()->FindBin(candidate->Momentum.Eta());
-      iphi = fHisto->GetYaxis()->FindBin(candidate->Momentum.Phi());
-    } else {
-      ieta = fHisto->GetXaxis()->FindBin(candidate->Position.Eta());
-      iphi = fHisto->GetYaxis()->FindBin(candidate->Position.Phi());
-    }
-    candidate->ParticleDensity = fHisto->GetBinContent(ieta, iphi);
-    fOutputArray->Add(candidate);
-  }
 
-  
+  // loop over all input candidates to assign multiplicity
+  for(auto &candidate : *fInputArray)
+  {
+    Int_t ieta, iphi;
+    if(fUseMomentumVector)
+    {
+      ieta = fHisto->GetXaxis()->FindBin(candidate.Momentum.Eta());
+      iphi = fHisto->GetYaxis()->FindBin(candidate.Momentum.Phi());
+    }
+    else
+    {
+      ieta = fHisto->GetXaxis()->FindBin(candidate.Position.Eta());
+      iphi = fHisto->GetYaxis()->FindBin(candidate.Position.Phi());
+    }
+    candidate.ParticleDensity = fHisto->GetBinContent(ieta, iphi);
+    fOutputArray->emplace_back(candidate);
+  }
 }
 
 //------------------------------------------------------------------------------
