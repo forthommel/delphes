@@ -117,7 +117,7 @@ void TreeWriter::Init()
       continue;
     }
 
-    GetFactory()->EventModel()->Attach(branchInputArray, input_collections.at(i));
+    ImportArray(branchInputArray, input_collections.at(i));
     branch = NewBranch(branchName, branchClass);
 
     fBranchMap.insert(make_pair(branch, make_pair(itClassMap->second, *input_collections.at(i))));
@@ -209,6 +209,7 @@ void TreeWriter::ProcessParticles(ExRootTreeBranch *branch, const CandidatesColl
     auto *entry = static_cast<GenParticle *>(branch->NewEntry());
 
     entry->SetBit(kIsReferenced);
+    std::cout << "entry created" << candidate.PID << "?" << candidate.Mass << std::endl;
     entry->SetUniqueID(candidate.GetUniqueID());
 
     pt = momentum.Pt();

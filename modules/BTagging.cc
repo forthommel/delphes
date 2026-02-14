@@ -80,7 +80,7 @@ void BTagging::Init()
   }
 
   // import input array(s)
-  GetFactory()->EventModel()->Attach(GetString("JetInputArray", "FastJetFinder/jets"), fJetInputArray);
+  ImportArray(GetString("JetInputArray", "FastJetFinder/jets"), fJetInputArray);
 }
 
 //------------------------------------------------------------------------------
