@@ -146,7 +146,7 @@ void VertexFinderDA4D::Finish()
 void VertexFinderDA4D::Process()
 {
   Candidate *track;
-  std::vector<Candidate> ClusterArray;
+  CandidatesCollection ClusterArray;
   Int_t ivtx = 0;
 
   //fInputArray->Sort();
@@ -279,7 +279,7 @@ void VertexFinderDA4D::Process()
 
 //------------------------------------------------------------------------------
 
-void VertexFinderDA4D::clusterize(const std::vector<Candidate> &tracks, std::vector<Candidate> &clusters)
+void VertexFinderDA4D::clusterize(const CandidatesCollection &tracks, CandidatesCollection &clusters)
 {
   if(fVerbose)
   {

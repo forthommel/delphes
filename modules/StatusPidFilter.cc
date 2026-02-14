@@ -113,7 +113,7 @@ bool hasBottom(int pdgCode)
   return false;
 }
 
-bool isTauDaughter(int pdgCode, int M1, const std::vector<Candidate> &fInputArray)
+bool isTauDaughter(int pdgCode, int M1, const CandidatesCollection &fInputArray)
 {
   //not needed, just to speed up the code - can be further refined but gives only negligible improvement:
   if(pdgCode == 15 || pdgCode < 11 || (pdgCode > 22 && pdgCode < 100) || pdgCode > 1000)
@@ -129,7 +129,7 @@ bool isTauDaughter(int pdgCode, int M1, const std::vector<Candidate> &fInputArra
   return false;
 }
 
-bool isWDaughter(int M1, const std::vector<Candidate> &fInputArray)
+bool isWDaughter(int M1, const CandidatesCollection &fInputArray)
 {
   if(M1 < 0) return false;
 

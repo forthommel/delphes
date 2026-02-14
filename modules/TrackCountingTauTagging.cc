@@ -43,14 +43,14 @@ using namespace std;
 class TrackCountingTauTaggingPartonClassifier : public ExRootClassifier
 {
 public:
-  explicit TrackCountingTauTaggingPartonClassifier(const std::vector<Candidate> &array) :
+  explicit TrackCountingTauTaggingPartonClassifier(const CandidatesCollection &array) :
     fParticleInputArray(array) {}
 
   Int_t GetCategory(TObject *object);
 
   Double_t fEtaMax, fPTMin;
 
-  const std::vector<Candidate> &fParticleInputArray;
+  const CandidatesCollection &fParticleInputArray;
 };
 
 //------------------------------------------------------------------------------

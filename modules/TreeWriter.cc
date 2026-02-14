@@ -96,7 +96,7 @@ void TreeWriter::Init()
   ExRootTreeBranch *branch;
 
   size = param.GetSize();
-  std::vector<InputHandle<std::vector<Candidate> > > input_collections(size / 3);
+  std::vector<InputHandle<CandidatesCollection> > input_collections(size / 3);
   for(i = 0; i < size / 3; ++i)
   {
     branchInputArray = param[i * 3].GetString();
@@ -195,7 +195,7 @@ void TreeWriter::FillParticles(const Candidate &candidate, TRefArray *array)
 
 //------------------------------------------------------------------------------
 
-void TreeWriter::ProcessParticles(ExRootTreeBranch *branch, const std::vector<Candidate> &array)
+void TreeWriter::ProcessParticles(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   Double_t pt, signPz, cosTheta, eta, rapidity;
 
@@ -253,7 +253,7 @@ void TreeWriter::ProcessParticles(ExRootTreeBranch *branch, const std::vector<Ca
 
 //------------------------------------------------------------------------------
 
-void TreeWriter::ProcessVertices(ExRootTreeBranch *branch, const std::vector<Candidate> &array)
+void TreeWriter::ProcessVertices(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   const Double_t c_light = 2.99792458E8;
 
@@ -320,7 +320,7 @@ void TreeWriter::ProcessVertices(ExRootTreeBranch *branch, const std::vector<Can
 
 //------------------------------------------------------------------------------
 
-void TreeWriter::ProcessTracks(ExRootTreeBranch *branch, const std::vector<Candidate> &array)
+void TreeWriter::ProcessTracks(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   Double_t pt, signz, cosTheta, eta, p, ctgTheta, phi, m;
   const Double_t c_light = 2.99792458E8;
@@ -430,7 +430,7 @@ void TreeWriter::ProcessTracks(ExRootTreeBranch *branch, const std::vector<Candi
 
 //------------------------------------------------------------------------------
 
-void TreeWriter::ProcessTowers(ExRootTreeBranch *branch, const std::vector<Candidate> &array)
+void TreeWriter::ProcessTowers(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   Double_t pt, signPz, cosTheta, eta;
   const Double_t c_light = 2.99792458E8;
@@ -481,7 +481,7 @@ void TreeWriter::ProcessTowers(ExRootTreeBranch *branch, const std::vector<Candi
 
 //------------------------------------------------------------------------------
 
-void TreeWriter::ProcessParticleFlowCandidates(ExRootTreeBranch *branch, const std::vector<Candidate> &array)
+void TreeWriter::ProcessParticleFlowCandidates(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   Double_t e, pt, signz, cosTheta, eta, p, ctgTheta, phi, m;
   const Double_t c_light = 2.99792458E8;
@@ -612,7 +612,7 @@ void TreeWriter::ProcessParticleFlowCandidates(ExRootTreeBranch *branch, const s
 
 //------------------------------------------------------------------------------
 
-void TreeWriter::ProcessPhotons(ExRootTreeBranch *branch, const std::vector<Candidate> &array)
+void TreeWriter::ProcessPhotons(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   Double_t pt, signPz, cosTheta, eta;
   const Double_t c_light = 2.99792458E8;
@@ -659,7 +659,7 @@ void TreeWriter::ProcessPhotons(ExRootTreeBranch *branch, const std::vector<Cand
 
 //------------------------------------------------------------------------------
 
-void TreeWriter::ProcessElectrons(ExRootTreeBranch *branch, const std::vector<Candidate> &array)
+void TreeWriter::ProcessElectrons(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   Double_t pt, signPz, cosTheta, eta;
   const Double_t c_light = 2.99792458E8;
@@ -709,7 +709,7 @@ void TreeWriter::ProcessElectrons(ExRootTreeBranch *branch, const std::vector<Ca
 
 //------------------------------------------------------------------------------
 
-void TreeWriter::ProcessMuons(ExRootTreeBranch *branch, const std::vector<Candidate> &array)
+void TreeWriter::ProcessMuons(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   Double_t pt, signPz, cosTheta, eta;
 
@@ -762,7 +762,7 @@ void TreeWriter::ProcessMuons(ExRootTreeBranch *branch, const std::vector<Candid
 
 //------------------------------------------------------------------------------
 
-void TreeWriter::ProcessJets(ExRootTreeBranch *branch, const std::vector<Candidate> &array)
+void TreeWriter::ProcessJets(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   Double_t pt, signPz, cosTheta, eta;
   Double_t ecalEnergy, hcalEnergy;
@@ -872,7 +872,7 @@ void TreeWriter::ProcessJets(ExRootTreeBranch *branch, const std::vector<Candida
 
 //------------------------------------------------------------------------------
 
-void TreeWriter::ProcessMissingET(ExRootTreeBranch *branch, const std::vector<Candidate> &array)
+void TreeWriter::ProcessMissingET(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   // get the first entry
   if(!array.empty())
@@ -887,7 +887,7 @@ void TreeWriter::ProcessMissingET(ExRootTreeBranch *branch, const std::vector<Ca
 }
 //------------------------------------------------------------------------------
 
-void TreeWriter::ProcessCscCluster(ExRootTreeBranch *branch, const std::vector<Candidate> &array)
+void TreeWriter::ProcessCscCluster(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   Double_t signPz, cosTheta, eta;
 
@@ -935,7 +935,7 @@ void TreeWriter::ProcessCscCluster(ExRootTreeBranch *branch, const std::vector<C
 
 //------------------------------------------------------------------------------
 
-void TreeWriter::ProcessScalarHT(ExRootTreeBranch *branch, const std::vector<Candidate> &array)
+void TreeWriter::ProcessScalarHT(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   // get the first entry
   if(!array.empty())
@@ -948,7 +948,7 @@ void TreeWriter::ProcessScalarHT(ExRootTreeBranch *branch, const std::vector<Can
 
 //------------------------------------------------------------------------------
 
-void TreeWriter::ProcessRho(ExRootTreeBranch *branch, const std::vector<Candidate> &array)
+void TreeWriter::ProcessRho(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   // loop over all rho
   for(const auto &candidate : array)
@@ -964,7 +964,7 @@ void TreeWriter::ProcessRho(ExRootTreeBranch *branch, const std::vector<Candidat
 
 //------------------------------------------------------------------------------
 
-void TreeWriter::ProcessWeight(ExRootTreeBranch *branch, const std::vector<Candidate> &array)
+void TreeWriter::ProcessWeight(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   // get the first entry
   if(!array.empty())
@@ -977,7 +977,7 @@ void TreeWriter::ProcessWeight(ExRootTreeBranch *branch, const std::vector<Candi
 
 //------------------------------------------------------------------------------
 
-void TreeWriter::ProcessHectorHit(ExRootTreeBranch *branch, const std::vector<Candidate> &array)
+void TreeWriter::ProcessHectorHit(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   // loop over all roman pot hits
   for(const auto &candidate : array)

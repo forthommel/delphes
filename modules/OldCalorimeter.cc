@@ -444,7 +444,7 @@ void OldCalorimeter::FinalizeTower()
   }
   else if(fTowerTrackAllHits > 0 && fTowerECalHits + fTowerHCalHits == fTowerAllHits)
   {
-    std::vector<Candidate> *towerTrackArray = nullptr;
+    CandidatesCollection *towerTrackArray = nullptr;
     if(fTowerECalHits == fTowerECalTrackHits && fTowerHCalHits == fTowerHCalTrackHits)
     {
       towerTrackArray = &fTowerTrackArray;

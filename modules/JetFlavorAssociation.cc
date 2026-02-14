@@ -171,7 +171,7 @@ void JetFlavorAssociation::Finish()
 
 void JetFlavorAssociation::Process()
 {
-  std::vector<Candidate> partonLHEFArray;
+  CandidatesCollection partonLHEFArray;
 
   // select quark and gluons
   fPartonFilter->Reset();
@@ -196,7 +196,7 @@ void JetFlavorAssociation::Process()
 // Standard definition of jet flavor in
 // https://cmssdt.cern.ch/SDT/lxr/source/PhysicsTools/JetMCAlgos/plugins/JetPartonMatcher.cc?v=CMSSW_7_3_0_pre1
 
-void JetFlavorAssociation::GetAlgoFlavor(Candidate &jet, const std::vector<Candidate> &partonArray, const std::vector<Candidate> &partonLHEFArray)
+void JetFlavorAssociation::GetAlgoFlavor(Candidate &jet, const CandidatesCollection &partonArray, const CandidatesCollection &partonLHEFArray)
 {
   float maxPt = 0;
   int daughterCounter = 0;
@@ -260,7 +260,7 @@ void JetFlavorAssociation::GetAlgoFlavor(Candidate &jet, const std::vector<Candi
 
 //------------------------------------------------------------------------------
 
-void JetFlavorAssociation::GetPhysicsFlavor(Candidate &jet, const std::vector<Candidate> &partonArray, const std::vector<Candidate> &partonLHEFArray)
+void JetFlavorAssociation::GetPhysicsFlavor(Candidate &jet, const CandidatesCollection &partonArray, const CandidatesCollection &partonLHEFArray)
 {
   int partonCounter = 0;
   float biggerConeSize = 0.7;
