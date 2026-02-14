@@ -261,8 +261,7 @@ Candidate::Candidate() :
   ExclYmerge45(0),
   ExclYmerge56(0),
   ParticleDensity(0),
-  fFactory(0),
-  fArray(0)
+  fFactory(0)
 {
   int i;
   Edges[0] = 0.0;
@@ -294,17 +293,22 @@ Candidate::Candidate() :
 
 //------------------------------------------------------------------------------
 
-void Candidate::AddCandidate(Candidate *object)
+void Candidate::ClearCandidates()
 {
-  if(!fArray) fArray = fFactory->NewArray();
-  fArray->Add(object);
+  fArray.clear();
 }
 
 //------------------------------------------------------------------------------
 
-TObjArray *Candidate::GetCandidates()
+void Candidate::AddCandidate(const Candidate *object)
 {
-  if(!fArray) fArray = fFactory->NewArray();
+  fArray.emplace_back(const_cast<Candidate *>(object));
+}
+
+//------------------------------------------------------------------------------
+
+const std::vector<Candidate *> &Candidate::GetCandidates() const
+{
   return fArray;
 }
 
@@ -312,26 +316,16 @@ TObjArray *Candidate::GetCandidates()
 
 Bool_t Candidate::Overlaps(const Candidate *object) const
 {
-  const Candidate *candidate;
-
   if(object->GetUniqueID() == GetUniqueID()) return kTRUE;
 
-  if(fArray)
+  for(const auto &candidate : fArray)
   {
-    TIter it(fArray);
-    while((candidate = static_cast<Candidate *>(it.Next())))
-    {
-      if(candidate->Overlaps(object)) return kTRUE;
-    }
+    if(candidate->Overlaps(object)) return kTRUE;
   }
 
-  if(object->fArray)
+  for(const auto &candidate : object->fArray)
   {
-    TIter it(object->fArray);
-    while((candidate = static_cast<Candidate *>(it.Next())))
-    {
-      if(candidate->Overlaps(this)) return kTRUE;
-    }
+    if(candidate->Overlaps(this)) return kTRUE;
   }
 
   return kFALSE;
@@ -351,7 +345,6 @@ TObject *Candidate::Clone(const char * /*newname*/) const
 void Candidate::Copy(TObject &obj) const
 {
   Candidate &object = static_cast<Candidate &>(obj);
-  Candidate *candidate;
 
   object.PID = PID;
   object.Status = Status;
@@ -482,20 +475,13 @@ void Candidate::Copy(TObject &obj) const
   object.SoftDroppedSubJet2 = SoftDroppedSubJet2;
   object.TrackCovariance = TrackCovariance;
   object.fFactory = fFactory;
-  object.fArray = 0;
 
   // copy cluster timing info
   copy(ECalEnergyTimePairs.begin(), ECalEnergyTimePairs.end(), back_inserter(object.ECalEnergyTimePairs));
 
-  if(fArray && fArray->GetEntriesFast() > 0)
-  {
-    TIter itArray(fArray);
-    TObjArray *array = object.GetCandidates();
-    while((candidate = static_cast<Candidate *>(itArray.Next())))
-    {
-      array->Add(candidate);
-    }
-  }
+  object.ClearCandidates();
+  for(const auto &candidate : fArray)
+    object.AddCandidate(candidate);
 }
 
 //------------------------------------------------------------------------------
@@ -624,6 +610,5 @@ void Candidate::Clear(Option_t * /*option*/)
   NSubJetsTrimmed = 0;
   NSubJetsPruned = 0;
   NSubJetsSoftDropped = 0;
-
-  fArray = 0;
+  fArray.clear();
 }

@@ -119,9 +119,8 @@ void TrackCovariance::Process()
 
   for(const auto &candidate : *fInputArray) //TODO: ensure const-qualification of consumers
   {
-
     // converting to meters
-    auto *particle = static_cast<Candidate *>(const_cast<Candidate &>(candidate).GetCandidates()->At(0));
+    const auto *particle = candidate.GetCandidates().at(0);
 
     // converting to meters
     const TLorentzVector &candidatePosition = particle->Position * 1e-03;

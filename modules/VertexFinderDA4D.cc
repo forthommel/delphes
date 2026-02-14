@@ -143,8 +143,7 @@ void VertexFinderDA4D::Finish()
 
 void VertexFinderDA4D::Process()
 {
-  Candidate *track;
-  CandidatesCollection ClusterArray;
+  std::vector<Candidate> ClusterArray;
   Int_t ivtx = 0;
 
   //fInputArray->Sort();
@@ -191,15 +190,11 @@ void VertexFinderDA4D::Process()
 
     int itr = 0;
 
-    if(fVerbose) cout << "this vertex has: " << candidate.GetCandidates()->GetEntriesFast() << " tracks" << endl;
+    if(fVerbose) cout << "this vertex has: " << candidate.GetCandidates().size() << " tracks" << endl;
 
     // loop over tracks belonging to this vertex
-    TIter it1(candidate.GetCandidates());
-    it1.Reset();
-
-    while((track = static_cast<Candidate *>(it1.Next())))
+    for(const auto &track : candidate.GetCandidates())
     {
-
       itr++;
       // TBC: the time is in ns for now TBC
       double t = track->InitialPosition.T() / c_light;
@@ -325,7 +320,7 @@ void VertexFinderDA4D::clusterize(const CandidatesCollection &tracks, Candidates
       clusters.emplace_back(*aCluster);
       //aCluster.clear();
     }
-    //for(unsigned int i=0; i<k->GetCandidates().GetEntriesFast(); i++){
+    //for(unsigned int i=0; i<k->GetCandidates().size(); i++){
     aCluster = *k;
     //}
   }

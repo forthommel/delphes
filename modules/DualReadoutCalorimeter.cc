@@ -443,8 +443,6 @@ void DualReadoutCalorimeter::Process()
 
 void DualReadoutCalorimeter::FinalizeTower()
 {
-
-  Candidate *candidate;
   Double_t energy, pt, eta, phi, r, time;
   Double_t neutralEnergy;
 
@@ -463,10 +461,8 @@ void DualReadoutCalorimeter::FinalizeTower()
   if(debug) cout << "-----------------------------------------------------------------------" << endl;
   if(debug) cout << "New Tower: " << fECalTowerEnergy << "," << fHCalTowerEnergy << "," << fHCalTowerEnergy << "," << fTowerEta << endl;
 
-  if(debug) cout << "   gen particles in tower :" << fTower->GetCandidates()->GetEntriesFast() << endl;
-  TIter it1(fTower->GetCandidates());
-  it1.Reset();
-  while((candidate = static_cast<Candidate *>(it1.Next())))
+  if(debug) cout << "   gen particles in tower :" << fTower->GetCandidates().size() << endl;
+  for(const auto &candidate : fTower->GetCandidates())
   {
     //cout<<": " << <<endl;
     TLorentzVector mom = candidate->Momentum;

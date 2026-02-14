@@ -75,7 +75,6 @@ void TimeOfFlight::Finish()
 
 void TimeOfFlight::Process()
 {
-  Candidate *constituent;
   Double_t ti, t_truth, tf;
   Double_t l, tof, beta;
 
@@ -86,8 +85,7 @@ void TimeOfFlight::Process()
 
   for(const auto &candidate : *fInputArray) //TODO: ensure const-qualification of consumers
   {
-
-    auto *particle = static_cast<Candidate *>(const_cast<Candidate &>(candidate).GetCandidates()->At(0));
+    auto *particle = static_cast<Candidate *>(candidate.GetCandidates().at(0));
 
     const TLorentzVector &candidateInitialPosition = particle->Position;
     const TLorentzVector &candidateInitialPositionSmeared = candidate.InitialPosition;
@@ -118,10 +116,7 @@ void TimeOfFlight::Process()
       beta = 1.;
       for(auto &vertex : *fVertexInputArray) //TODO: ensure const-qualification of consumers
       {
-        TIter itGenParts(vertex.GetCandidates());
-        itGenParts.Reset();
-
-        while((constituent = static_cast<Candidate *>(itGenParts.Next())))
+        for(const auto &constituent : vertex.GetCandidates())
         {
           if(particle == constituent)
           {
@@ -166,19 +161,14 @@ void TimeOfFlight::Process()
 
 void TimeOfFlight::ComputeVertexMomenta()
 {
-  Candidate *constituent;
-
   for(auto &vertex : *fVertexInputArray)
   {
-    TIter itGenParts(vertex.GetCandidates());
-    itGenParts.Reset();
-
-    while((constituent = static_cast<Candidate *>(itGenParts.Next())))
+    for(const auto &constituent : vertex.GetCandidates())
     {
       for(auto &track : *fInputArray)
       {
         // get gen part that generated track
-        auto *particle = static_cast<Candidate *>(track.GetCandidates()->At(0));
+        auto *particle = static_cast<Candidate *>(track.GetCandidates().at(0));
         if(particle == constituent)
           vertex.Momentum += track.Momentum;
       } // end track loop

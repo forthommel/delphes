@@ -68,14 +68,11 @@ void PileUpJetID::Finish()
 
 void PileUpJetID::Process()
 {
-  Candidate *constituent;
-  TLorentzVector momentum, area;
-
   // loop over all input candidates
   for(auto &candidate : *fJetInputArray)
   {
-    momentum = candidate.Momentum;
-    area = candidate.Area;
+    const auto &momentum = candidate.Momentum;
+    const auto &area = candidate.Area;
 
     candidate.NTimeHits = 0;
 
@@ -96,8 +93,7 @@ void PileUpJetID::Process()
 
     if(fUseConstituents)
     {
-      TIter itConstituents(candidate.GetCandidates());
-      while((constituent = static_cast<Candidate *>(itConstituents.Next())))
+      for(const auto &constituent : candidate.GetCandidates())
       {
         float pt = constituent->Momentum.Pt();
         float dr = candidate.Momentum.DeltaR(constituent->Momentum);
@@ -272,8 +268,7 @@ void PileUpJetID::Process()
     {
       if(fUseConstituents)
       {
-        TIter itConstituents(candidate.GetCandidates());
-        while((constituent = static_cast<Candidate *>(itConstituents.Next())))
+        for(const auto &constituent : candidate.GetCandidates())
         {
           if(constituent->Charge == 0 && constituent->Momentum.Pt() > fNeutralPTMin)
           {
