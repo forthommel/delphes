@@ -27,7 +27,6 @@
 #include "modules/FastJetGridMedianEstimator.h"
 
 #include "classes/DelphesClasses.h"
-#include "classes/DelphesFactory.h"
 #include "classes/DelphesFormula.h"
 
 #include "ExRootAnalysis/ExRootClassifier.h"
@@ -38,7 +37,6 @@
 #include "TFormula.h"
 #include "TLorentzVector.h"
 #include "TMath.h"
-#include "TObjArray.h"
 #include "TRandom3.h"
 #include "TString.h"
 
@@ -98,7 +96,7 @@ void FastJetGridMedianEstimator::Init()
   // import input array
   GetFactory()->EventModel()->Attach(GetString("InputArray", "Calorimeter/towers"), fInputArray);
   // create output array
-  GetFactory()->EventModel()->Book(fRhoOutputArray, GetString("RhoOutputArray", "rho"));
+  ExportArray(fRhoOutputArray, GetString("RhoOutputArray", "rho"));
 }
 
 //------------------------------------------------------------------------------

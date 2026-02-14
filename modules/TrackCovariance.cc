@@ -38,12 +38,10 @@
 #include "TrackCovariance/ObsTrk.h"
 #include "TrackCovariance/SolGeom.h"
 #include "TrackCovariance/SolGridCov.h"
-#include "classes/DelphesFactory.h"
 #include "classes/DelphesFormula.h"
 
 #include "TLorentzVector.h"
 #include "TMath.h"
-#include "TObjArray.h"
 
 #include <iostream>
 #include <sstream>
@@ -97,7 +95,7 @@ void TrackCovariance::Init()
   // import input array
   GetFactory()->EventModel()->Attach(GetString("InputArray", "TrackMerger/tracks"), fInputArray);
   // create output arrays
-  GetFactory()->EventModel()->Book(fOutputArray, GetString("OutputArray", "tracks"));
+  ExportArray(fOutputArray, GetString("OutputArray", "tracks"));
 }
 
 //------------------------------------------------------------------------------
@@ -119,11 +117,11 @@ void TrackCovariance::Process()
   Double_t ZinPos = fGeometry->GetZminPos();
   Double_t ZinNeg = fGeometry->GetZminNeg();
 
-  for(auto &candidate : *fInputArray) //TODO: ensure const-qualification of consumers
+  for(const auto &candidate : *fInputArray) //TODO: ensure const-qualification of consumers
   {
 
     // converting to meters
-    auto *particle = static_cast<Candidate *>(candidate.GetCandidates()->At(0));
+    auto *particle = static_cast<Candidate *>(const_cast<Candidate &>(candidate).GetCandidates()->At(0));
 
     // converting to meters
     const TLorentzVector &candidatePosition = particle->Position * 1e-03;
@@ -146,53 +144,55 @@ void TrackCovariance::Process()
     // Try Kalman without any grid
     ObsTrk track(candidatePosition.Vect(), candidateMomentum.Vect(), candidate.Charge, mass, fGeometry);
 
+    auto &non_const_candidate = const_cast<Candidate &>(candidate); //TODO: ensure const-qualification for the formula evaluator
+
     // apply rescaling factors to resolution
     if(TMath::Abs(candidate.PID) == 11)
     {
-      track.SetScale(fElectronScaleFactor->Eval(candidateMomentum.Pt(), candidateMomentum.Eta(), candidateMomentum.Phi(), candidateMomentum.E(), &candidate));
+      track.SetScale(fElectronScaleFactor->Eval(candidateMomentum.Pt(), candidateMomentum.Eta(), candidateMomentum.Phi(), candidateMomentum.E(), &non_const_candidate));
     }
     else if(TMath::Abs(candidate.PID) == 13)
     {
-      track.SetScale(fMuonScaleFactor->Eval(candidateMomentum.Pt(), candidateMomentum.Eta(), candidateMomentum.Phi(), candidateMomentum.E(), &candidate));
+      track.SetScale(fMuonScaleFactor->Eval(candidateMomentum.Pt(), candidateMomentum.Eta(), candidateMomentum.Phi(), candidateMomentum.E(), &non_const_candidate));
     }
     else
     {
-      track.SetScale(fChargedHadronScaleFactor->Eval(candidateMomentum.Pt(), candidateMomentum.Eta(), candidateMomentum.Phi(), candidateMomentum.E(), &candidate));
+      track.SetScale(fChargedHadronScaleFactor->Eval(candidateMomentum.Pt(), candidateMomentum.Eta(), candidateMomentum.Phi(), candidateMomentum.E(), &non_const_candidate));
     }
 
-    auto *new_candidate = static_cast<Candidate *>(candidate.Clone());
+    auto new_candidate = candidate;
 
-    new_candidate->Momentum.SetVectM(track.GetObsP(), mass);
+    new_candidate.Momentum.SetVectM(track.GetObsP(), mass);
 
     // converting back to mm
-    new_candidate->InitialPosition.SetXYZT(track.GetObsX().X() * 1e03, track.GetObsX().Y() * 1e03, track.GetObsX().Z() * 1e03, candidatePosition.T() * 1e03);
+    new_candidate.InitialPosition.SetXYZT(track.GetObsX().X() * 1e03, track.GetObsX().Y() * 1e03, track.GetObsX().Z() * 1e03, candidatePosition.T() * 1e03);
 
     // save full covariance 5x5 matrix internally (D0, phi, Curvature, dz, ctg(theta))
-    new_candidate->TrackCovariance = track.GetCov();
+    new_candidate.TrackCovariance = track.GetCov();
 
-    pt = new_candidate->Momentum.Pt();
-    p = new_candidate->Momentum.P();
+    pt = new_candidate.Momentum.Pt();
+    p = new_candidate.Momentum.P();
     q = track.GetObsQ();
     ct = track.GetObsPar()[4];
 
-    new_candidate->Xd = track.GetObsX().X() * 1e03;
-    new_candidate->Yd = track.GetObsX().Y() * 1e03;
-    new_candidate->Zd = track.GetObsX().Z() * 1e03;
+    new_candidate.Xd = track.GetObsX().X() * 1e03;
+    new_candidate.Yd = track.GetObsX().Y() * 1e03;
+    new_candidate.Zd = track.GetObsX().Z() * 1e03;
 
-    new_candidate->XFirstHit = track.GetFirstHit().X() * 1e03;
-    new_candidate->YFirstHit = track.GetFirstHit().Y() * 1e03;
-    new_candidate->ZFirstHit = track.GetFirstHit().Z() * 1e03;
+    new_candidate.XFirstHit = track.GetFirstHit().X() * 1e03;
+    new_candidate.YFirstHit = track.GetFirstHit().Y() * 1e03;
+    new_candidate.ZFirstHit = track.GetFirstHit().Z() * 1e03;
 
-    new_candidate->D0 = track.GetObsPar()[0] * 1e03;
-    new_candidate->Phi = track.GetObsPar()[1];
+    new_candidate.D0 = track.GetObsPar()[0] * 1e03;
+    new_candidate.Phi = track.GetObsPar()[1];
 
     // inverse of curvature
-    new_candidate->C = track.GetObsPar()[2] * 1e-03;
-    new_candidate->DZ = track.GetObsPar()[3] * 1e03;
-    new_candidate->CtgTheta = track.GetObsPar()[4];
-    new_candidate->P = track.GetObsP().Mag();
-    new_candidate->PT = pt;
-    new_candidate->Charge = q;
+    new_candidate.C = track.GetObsPar()[2] * 1e-03;
+    new_candidate.DZ = track.GetObsPar()[3] * 1e03;
+    new_candidate.CtgTheta = track.GetObsPar()[4];
+    new_candidate.P = track.GetObsP().Mag();
+    new_candidate.PT = pt;
+    new_candidate.Charge = q;
 
     dd0 = TMath::Sqrt(track.GetCov()(0, 0)) * 1e03;
     ddz = TMath::Sqrt(track.GetCov()(3, 3)) * 1e03;
@@ -202,19 +202,19 @@ void TrackCovariance::Process()
     dp = TMath::Sqrt((1. + ct * ct) * dpt * dpt + 4 * pt * pt * ct * ct * dct * dct / (1. + ct * ct) / (1. + ct * ct));
     dC = TMath::Sqrt(track.GetCov()(2, 2)) * 1e-03;
 
-    new_candidate->ErrorD0 = dd0;
-    new_candidate->ErrorDZ = ddz;
-    new_candidate->ErrorP = dp;
-    new_candidate->ErrorC = dC;
-    new_candidate->ErrorCtgTheta = dct;
-    new_candidate->ErrorPhi = dphi;
-    new_candidate->ErrorPT = dpt;
+    new_candidate.ErrorD0 = dd0;
+    new_candidate.ErrorDZ = ddz;
+    new_candidate.ErrorP = dp;
+    new_candidate.ErrorC = dC;
+    new_candidate.ErrorCtgTheta = dct;
+    new_candidate.ErrorPhi = dphi;
+    new_candidate.ErrorPT = dpt;
     //new_candidate->TrackResolution = dpt / pt;
-    new_candidate->TrackResolution = dp / p;
+    new_candidate.TrackResolution = dp / p;
 
-    new_candidate->AddCandidate(&candidate); // mother particle
+    new_candidate.AddCandidate(&non_const_candidate); // mother particle
 
-    fOutputArray->emplace_back(*new_candidate);
+    fOutputArray->emplace_back(new_candidate);
   }
 }
 

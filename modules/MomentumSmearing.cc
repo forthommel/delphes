@@ -27,7 +27,6 @@
 #include "modules/MomentumSmearing.h"
 
 #include "classes/DelphesClasses.h"
-#include "classes/DelphesFactory.h"
 #include "classes/DelphesFormula.h"
 
 #include "ExRootAnalysis/ExRootClassifier.h"
@@ -38,7 +37,6 @@
 #include "TFormula.h"
 #include "TLorentzVector.h"
 #include "TMath.h"
-#include "TObjArray.h"
 #include "TRandom3.h"
 #include "TString.h"
 
@@ -79,7 +77,7 @@ void MomentumSmearing::Init()
   fUseMomentumVector = GetBool("UseMomentumVector", false);
 
   // create output array
-  GetFactory()->EventModel()->Book(fOutputArray, GetString("OutputArray", "stableParticles"));
+  ExportArray(fOutputArray, GetString("OutputArray", "stableParticles"));
 }
 
 //------------------------------------------------------------------------------
@@ -121,15 +119,15 @@ void MomentumSmearing::Process()
 
     //if(pt <= 0.0) continue;
 
-    auto *new_candidate = static_cast<Candidate *>(candidate.Clone());
+    auto new_candidate = candidate;
     eta = candidateMomentum.Eta();
     phi = candidateMomentum.Phi();
-    new_candidate->Momentum.SetPtEtaPhiM(pt, eta, phi, m);
+    new_candidate.Momentum.SetPtEtaPhiM(pt, eta, phi, m);
     //new_candidate->TrackResolution = fFormula->Eval(pt, eta, phi, e);
-    new_candidate->TrackResolution = res;
-    new_candidate->AddCandidate(const_cast<Candidate *>(&candidate)); // ensure parentage
+    new_candidate.TrackResolution = res;
+    new_candidate.AddCandidate(const_cast<Candidate *>(&candidate)); // ensure parentage
 
-    fOutputArray->emplace_back(*new_candidate);
+    fOutputArray->emplace_back(new_candidate);
   }
 }
 //----------------------------------------------------------------

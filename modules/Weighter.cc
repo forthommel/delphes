@@ -27,7 +27,6 @@
 #include "modules/Weighter.h"
 
 #include "classes/DelphesClasses.h"
-#include "classes/DelphesFactory.h"
 #include "classes/DelphesFormula.h"
 
 #include "ExRootAnalysis/ExRootClassifier.h"
@@ -38,7 +37,6 @@
 #include "TFormula.h"
 #include "TLorentzVector.h"
 #include "TMath.h"
-#include "TObjArray.h"
 #include "TRandom3.h"
 #include "TString.h"
 
@@ -111,7 +109,7 @@ void Weighter::Init()
   // import input array(s)
   GetFactory()->EventModel()->Attach(GetString("InputArray", "Delphes/allParticles"), fInputArray);
   // create output arrays
-  GetFactory()->EventModel()->Book(fOutputArray, GetString("OutputArray", "weight"));
+  ExportArray(fOutputArray, GetString("OutputArray", "weight"));
 }
 
 //------------------------------------------------------------------------------

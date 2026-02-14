@@ -30,7 +30,6 @@
 #include "modules/Isolation.h"
 
 #include "classes/DelphesClasses.h"
-#include "classes/DelphesFactory.h"
 #include "classes/DelphesFormula.h"
 
 #include "ExRootAnalysis/ExRootClassifier.h"
@@ -41,7 +40,6 @@
 #include "TFormula.h"
 #include "TLorentzVector.h"
 #include "TMath.h"
-#include "TObjArray.h"
 #include "TRandom3.h"
 #include "TString.h"
 
@@ -118,7 +116,7 @@ void Isolation::Init()
   fFilter = new ExRootSTLVectorFilter(*fIsolationInputArray);
 
   // create output array
-  GetFactory()->EventModel()->Book(fOutputArray, GetString("OutputArray", "electrons"));
+  ExportArray(fOutputArray, GetString("OutputArray", "electrons"));
 }
 
 //------------------------------------------------------------------------------

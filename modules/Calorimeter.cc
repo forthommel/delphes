@@ -28,7 +28,6 @@
 #include "modules/Calorimeter.h"
 
 #include "classes/DelphesClasses.h"
-#include "classes/DelphesFactory.h"
 #include "classes/DelphesFormula.h"
 
 #include "ExRootAnalysis/ExRootClassifier.h"
@@ -39,7 +38,6 @@
 #include "TFormula.h"
 #include "TLorentzVector.h"
 #include "TMath.h"
-#include "TObjArray.h"
 #include "TRandom3.h"
 #include "TString.h"
 
@@ -55,7 +53,6 @@ using namespace std;
 Calorimeter::Calorimeter() :
   fECalResolutionFormula(0), fHCalResolutionFormula(0)
 {
-
   fECalResolutionFormula = new DelphesFormula;
   fHCalResolutionFormula = new DelphesFormula;
 }
@@ -159,12 +156,12 @@ void Calorimeter::Init()
   GetFactory()->EventModel()->Attach(GetString("TrackInputArray", "ParticlePropagator/tracks"), fTrackInputArray);
 
   // create output arrays
-  GetFactory()->EventModel()->Book(fTowerOutputArray, GetString("TowerOutputArray", "towers"));
-  GetFactory()->EventModel()->Book(fPhotonOutputArray, GetString("PhotonOutputArray", "photons"));
+  ExportArray(fTowerOutputArray, GetString("TowerOutputArray", "towers"));
+  ExportArray(fPhotonOutputArray, GetString("PhotonOutputArray", "photons"));
 
-  GetFactory()->EventModel()->Book(fEFlowTrackOutputArray, GetString("EFlowTrackOutputArray", "eflowTracks"));
-  GetFactory()->EventModel()->Book(fEFlowPhotonOutputArray, GetString("EFlowPhotonOutputArray", "eflowPhotons"));
-  GetFactory()->EventModel()->Book(fEFlowNeutralHadronOutputArray, GetString("EFlowNeutralHadronOutputArray", "eflowNeutralHadrons"));
+  ExportArray(fEFlowTrackOutputArray, GetString("EFlowTrackOutputArray", "eflowTracks"));
+  ExportArray(fEFlowPhotonOutputArray, GetString("EFlowPhotonOutputArray", "eflowPhotons"));
+  ExportArray(fEFlowNeutralHadronOutputArray, GetString("EFlowNeutralHadronOutputArray", "eflowNeutralHadrons"));
 }
 
 //------------------------------------------------------------------------------
@@ -562,9 +559,9 @@ void Calorimeter::FinalizeTower()
     //clone tracks
     for(const auto &track : fECalTowerTrackArray)
     {
-      auto *new_track = static_cast<Candidate *>(track.Clone());
-      new_track->AddCandidate(const_cast<Candidate *>(&track)); // keep parentage
-      fEFlowTrackOutputArray->emplace_back(*new_track);
+      auto new_track = track;
+      new_track.AddCandidate(const_cast<Candidate *>(&track)); // keep parentage
+      fEFlowTrackOutputArray->emplace_back(new_track);
     }
   }
 
@@ -580,10 +577,10 @@ void Calorimeter::FinalizeTower()
     //rescale tracks
     for(const auto &track : fECalTowerTrackArray)
     {
-      auto *new_track = static_cast<Candidate *>(track.Clone());
-      new_track->AddCandidate(const_cast<Candidate *>(&track)); // keep parentage
-      new_track->Momentum *= rescaleFactor;
-      fEFlowTrackOutputArray->emplace_back(*new_track);
+      auto new_track = track;
+      new_track.AddCandidate(const_cast<Candidate *>(&track)); // keep parentage
+      new_track.Momentum *= rescaleFactor;
+      fEFlowTrackOutputArray->emplace_back(new_track);
     }
   }
 
@@ -603,9 +600,9 @@ void Calorimeter::FinalizeTower()
     //clone tracks
     for(const auto &track : fHCalTowerTrackArray)
     {
-      auto *new_track = static_cast<Candidate *>(track.Clone());
-      new_track->AddCandidate(const_cast<Candidate *>(&track)); // keep parentage
-      fEFlowTrackOutputArray->emplace_back(*new_track);
+      auto new_track = track;
+      new_track.AddCandidate(const_cast<Candidate *>(&track)); // keep parentage
+      fEFlowTrackOutputArray->emplace_back(new_track);
     }
   }
 
@@ -621,12 +618,13 @@ void Calorimeter::FinalizeTower()
     //rescale tracks
     for(const auto &track : fHCalTowerTrackArray)
     {
-      auto *new_track = static_cast<Candidate *>(track.Clone());
-      new_track->AddCandidate(const_cast<Candidate *>(&track)); // keep parentage
-      new_track->Momentum *= rescaleFactor;
-      new_track->Momentum.SetPtEtaPhiM(track.Momentum.Pt() * rescaleFactor, track.Momentum.Eta(), track.Momentum.Phi(), track.Momentum.M());
+      auto new_track = track;
+      new_track.AddCandidate(const_cast<Candidate *>(&track)); // keep parentage
+      new_track.Momentum *= rescaleFactor;
+      new_track.Momentum.SetPtEtaPhiM(track.Momentum.Pt() * rescaleFactor, track.Momentum.Eta(), track.Momentum.Phi(), track.Momentum.M());
+      //TODO: one can be dropped...
 
-      fEFlowTrackOutputArray->emplace_back(*new_track);
+      fEFlowTrackOutputArray->emplace_back(new_track);
     }
   }
 }

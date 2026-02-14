@@ -29,7 +29,6 @@
 
 #include "classes/DelphesClasses.h"
 #include "classes/DelphesCscClusterFormula.h"
-#include "classes/DelphesFactory.h"
 
 #include "ExRootAnalysis/ExRootClassifier.h"
 #include "ExRootAnalysis/ExRootFilter.h"
@@ -39,7 +38,6 @@
 #include "TFormula.h"
 #include "TLorentzVector.h"
 #include "TMath.h"
-#include "TObjArray.h"
 #include "TRandom3.h"
 #include "TString.h"
 
@@ -75,7 +73,7 @@ void CscClusterEfficiency::Init()
   // import input array(s)
   GetFactory()->EventModel()->Attach(GetString("InputArray", "ParticlePropagator/stableParticles"), fInputArray);
   // create output arrays
-  GetFactory()->EventModel()->Book(fOutputArray, GetString("OutputArray", "stableParticles"));
+  ExportArray(fOutputArray, GetString("OutputArray", "stableParticles"));
 }
 
 //------------------------------------------------------------------------------

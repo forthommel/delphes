@@ -27,7 +27,6 @@
 #include "modules/TimeOfFlight.h"
 
 #include "classes/DelphesClasses.h"
-#include "classes/DelphesFactory.h"
 #include "classes/DelphesFormula.h"
 
 #include "ExRootAnalysis/ExRootClassifier.h"
@@ -38,7 +37,6 @@
 #include "TFormula.h"
 #include "TLorentzVector.h"
 #include "TMath.h"
-#include "TObjArray.h"
 #include "TRandom3.h"
 #include "TString.h"
 
@@ -64,7 +62,7 @@ void TimeOfFlight::Init()
   GetFactory()->EventModel()->Attach(GetString("VertexInputArray", "TruthVertexFinder/vertices"), fVertexInputArray);
 
   // create output array
-  GetFactory()->EventModel()->Book(fOutputArray, GetString("OutputArray", "tracks"));
+  ExportArray(fOutputArray, GetString("OutputArray", "tracks"));
 }
 
 //------------------------------------------------------------------------------
@@ -86,10 +84,10 @@ void TimeOfFlight::Process()
   // first compute momenta of vertices based on reconstructed tracks
   ComputeVertexMomenta();
 
-  for(auto &candidate : *fInputArray) //TODO: ensure const-qualification of consumers
+  for(const auto &candidate : *fInputArray) //TODO: ensure const-qualification of consumers
   {
 
-    auto *particle = static_cast<Candidate *>(candidate.GetCandidates()->At(0));
+    auto *particle = static_cast<Candidate *>(const_cast<Candidate &>(candidate).GetCandidates()->At(0));
 
     const TLorentzVector &candidateInitialPosition = particle->Position;
     const TLorentzVector &candidateInitialPositionSmeared = candidate.InitialPosition;
@@ -151,16 +149,16 @@ void TimeOfFlight::Process()
     beta = l / (c_light * tof);
 
     // calculate particle mass (i.e particle ID)
-    auto *new_candidate = static_cast<Candidate *>(candidate.Clone());
+    auto new_candidate = candidate;
 
     // update time at vertex based on option
-    new_candidate->InitialPosition.SetT(ti * 1.0E3 * c_light);
+    new_candidate.InitialPosition.SetT(ti * 1.0E3 * c_light);
 
     // update particle mass based on TOF-based PID (commented for now, assume this calculation is done offline)
-    //new_candidate->Momentum.SetVectM(candidateMomentum.Vect(), mass);
+    //new_candidate.Momentum.SetVectM(candidateMomentum.Vect(), mass);
 
-    new_candidate->AddCandidate(&candidate); // keep parentage
-    fOutputArray->emplace_back(*new_candidate);
+    new_candidate.AddCandidate(const_cast<Candidate *>(&candidate)); // keep parentage
+    fOutputArray->emplace_back(new_candidate);
   }
 }
 

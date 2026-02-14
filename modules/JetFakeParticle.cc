@@ -28,7 +28,6 @@
 #include "modules/JetFakeParticle.h"
 
 #include "classes/DelphesClasses.h"
-#include "classes/DelphesFactory.h"
 #include "classes/DelphesFormula.h"
 
 #include "ExRootAnalysis/ExRootClassifier.h"
@@ -39,7 +38,6 @@
 #include "TFormula.h"
 #include "TLorentzVector.h"
 #include "TMath.h"
-#include "TObjArray.h"
 #include "TRandom3.h"
 #include "TString.h"
 
@@ -93,10 +91,10 @@ void JetFakeParticle::Init()
   GetFactory()->EventModel()->Attach(GetString("InputArray", "FastJetFinder/jets"), fInputArray);
 
   // create output arrays
-  GetFactory()->EventModel()->Book(fElectronOutputArray, GetString("ElectronOutputArray", "fakeElectrons"));
-  GetFactory()->EventModel()->Book(fMuonOutputArray, GetString("MuonOutputArray", "fakeMuons"));
-  GetFactory()->EventModel()->Book(fPhotonOutputArray, GetString("PhotonOutputArray", "fakePhotons"));
-  GetFactory()->EventModel()->Book(fJetOutputArray, GetString("JetOutputArray", "jets"));
+  ExportArray(fElectronOutputArray, GetString("ElectronOutputArray", "fakeElectrons"));
+  ExportArray(fMuonOutputArray, GetString("MuonOutputArray", "fakeMuons"));
+  ExportArray(fPhotonOutputArray, GetString("PhotonOutputArray", "fakePhotons"));
+  ExportArray(fJetOutputArray, GetString("JetOutputArray", "jets"));
 }
 
 //------------------------------------------------------------------------------

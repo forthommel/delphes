@@ -34,7 +34,6 @@
 #include "modules/DecayFilter.h"
 
 #include "classes/DelphesClasses.h"
-#include "classes/DelphesFactory.h"
 #include "classes/DelphesFormula.h"
 
 #include "ExRootAnalysis/ExRootClassifier.h"
@@ -45,7 +44,6 @@
 #include "TFormula.h"
 #include "TLorentzVector.h"
 #include "TMath.h"
-#include "TObjArray.h"
 #include "TParticlePDG.h"
 #include "TRandom3.h"
 #include "TString.h"
@@ -64,7 +62,7 @@ void DecayFilter::Init()
   // import input array(s)
   GetFactory()->EventModel()->Attach(GetString("InputArray", "FastJetFinder/jets"), fInputArray);
   // create output arrays
-  GetFactory()->EventModel()->Book(fOutputArray, GetString("OutputArray", "tracks"));
+  ExportArray(fOutputArray, GetString("OutputArray", "tracks"));
 }
 
 //------------------------------------------------------------------------------

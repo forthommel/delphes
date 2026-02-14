@@ -27,7 +27,6 @@
 #include "modules/DenseTrackFilter.h"
 
 #include "classes/DelphesClasses.h"
-#include "classes/DelphesFactory.h"
 #include "classes/DelphesFormula.h"
 
 #include "ExRootAnalysis/ExRootClassifier.h"
@@ -38,7 +37,6 @@
 #include "TFormula.h"
 #include "TLorentzVector.h"
 #include "TMath.h"
-#include "TObjArray.h"
 #include "TRandom3.h"
 #include "TString.h"
 
@@ -101,10 +99,10 @@ void DenseTrackFilter::Init()
   // import input arrays
   GetFactory()->EventModel()->Attach(GetString("TrackInputArray", "TrackMergerProp/tracks"), fTrackInputArray);
   // create output arrays
-  GetFactory()->EventModel()->Book(fTrackOutputArray, GetString("TrackOutputArray", "tracks"));
-  GetFactory()->EventModel()->Book(fChargedHadronOutputArray, GetString("ChargedHadronOutputArray", "chargedHadrons"));
-  GetFactory()->EventModel()->Book(fElectronOutputArray, GetString("ElectronOutputArray", "electrons"));
-  GetFactory()->EventModel()->Book(fMuonOutputArray, GetString("MuonOutputArray", "muons"));
+  ExportArray(fTrackOutputArray, GetString("TrackOutputArray", "tracks"));
+  ExportArray(fChargedHadronOutputArray, GetString("ChargedHadronOutputArray", "chargedHadrons"));
+  ExportArray(fElectronOutputArray, GetString("ElectronOutputArray", "electrons"));
+  ExportArray(fMuonOutputArray, GetString("MuonOutputArray", "muons"));
 }
 
 //------------------------------------------------------------------------------

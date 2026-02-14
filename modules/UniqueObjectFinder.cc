@@ -27,7 +27,6 @@
 #include "modules/UniqueObjectFinder.h"
 
 #include "classes/DelphesClasses.h"
-#include "classes/DelphesFactory.h"
 #include "classes/DelphesFormula.h"
 
 #include "ExRootAnalysis/ExRootClassifier.h"
@@ -38,7 +37,6 @@
 #include "TFormula.h"
 #include "TLorentzVector.h"
 #include "TMath.h"
-#include "TObjArray.h"
 #include "TRandom3.h"
 #include "TString.h"
 
@@ -70,7 +68,7 @@ void UniqueObjectFinder::Init()
   {
     auto &[input_collection, output_collection] = fInputMap.emplace_back();
     GetFactory()->EventModel()->Attach(param[i * 2].GetString(), input_collection);
-    GetFactory()->EventModel()->Book(output_collection, param[i * 2 + 1].GetString());
+    ExportArray(output_collection, param[i * 2 + 1].GetString());
   }
 }
 

@@ -28,7 +28,6 @@
 #include "modules/ParticleDensity.h"
 
 #include "classes/DelphesClasses.h"
-#include "classes/DelphesFactory.h"
 #include "classes/DelphesFormula.h"
 
 #include "ExRootAnalysis/ExRootClassifier.h"
@@ -39,7 +38,6 @@
 #include "TH2F.h"
 #include "TLorentzVector.h"
 #include "TMath.h"
-#include "TObjArray.h"
 #include "TRandom3.h"
 #include "TString.h"
 
@@ -57,7 +55,7 @@ void ParticleDensity::Init()
   // import input array
   GetFactory()->EventModel()->Attach(GetString("InputArray", "FastJetFinder/jets"), fInputArray); // I/O
   // create output array
-  GetFactory()->EventModel()->Book(fOutputArray, GetString("OutputArray", "tracks"));
+  ExportArray(fOutputArray, GetString("OutputArray", "tracks"));
 
   // create multiplicity histogram
 

@@ -27,7 +27,6 @@
 #include "modules/Hector.h"
 
 #include "classes/DelphesClasses.h"
-#include "classes/DelphesFactory.h"
 #include "classes/DelphesFormula.h"
 
 #include "ExRootAnalysis/ExRootClassifier.h"
@@ -38,7 +37,6 @@
 #include "TFormula.h"
 #include "TLorentzVector.h"
 #include "TMath.h"
-#include "TObjArray.h"
 #include "TRandom3.h"
 #include "TString.h"
 
@@ -92,7 +90,7 @@ void Hector::Init()
   GetFactory()->EventModel()->Attach(GetString("InputArray", "ParticlePropagator/stableParticles"), fInputArray);
 
   // create output array
-  GetFactory()->EventModel()->Book(fOutputArray, GetString("OutputArray", "hits"));
+  ExportArray(fOutputArray, GetString("OutputArray", "hits"));
 }
 
 //------------------------------------------------------------------------------
@@ -149,11 +147,11 @@ void Hector::Process()
 
     particle.propagate(fDistance);
 
-    auto *new_candidate = static_cast<Candidate *>(candidate.Clone());
-    new_candidate->Position.SetXYZT(particle.getX(), particle.getY(), particle.getS(), time);
-    new_candidate->Momentum.SetPxPyPzE(particle.getTX(), particle.getTY(), 0.0, particle.getE());
-    new_candidate->AddCandidate(const_cast<Candidate *>(&candidate)); // preserve parentage
-    fOutputArray->emplace_back(*new_candidate);
+    auto new_candidate = candidate;
+    new_candidate.Position.SetXYZT(particle.getX(), particle.getY(), particle.getS(), time);
+    new_candidate.Momentum.SetPxPyPzE(particle.getTX(), particle.getTY(), 0.0, particle.getE());
+    new_candidate.AddCandidate(const_cast<Candidate *>(&candidate)); // preserve parentage
+    fOutputArray->emplace_back(new_candidate);
   }
 }
 
