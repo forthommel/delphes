@@ -91,7 +91,7 @@ void AngularSmearing::Finish()
 void AngularSmearing::Process()
 {
   Double_t pt, eta, phi, e, m;
-
+  fOutputArray->clear();
   for(const auto &candidate : *fInputArray)
   {
     const TLorentzVector &candidateMomentum = candidate.Momentum;

@@ -94,6 +94,7 @@ void ParticleDensity::Finish()
 void ParticleDensity::Process()
 {
   fHisto->Reset();
+  fOutputArray->clear();
 
   // loop over all input candidates to fill histogram
   for(const auto &candidate : *fInputArray)

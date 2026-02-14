@@ -88,6 +88,7 @@ void EnergySmearing::Process()
 {
   Double_t pt, energy, eta, phi, m;
 
+  fOutputArray->clear();
   for(const auto &candidate : *fInputArray)
   {
     const TLorentzVector &candidatePosition = candidate.Position;

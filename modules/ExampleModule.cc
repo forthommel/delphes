@@ -100,13 +100,12 @@ void ExampleModule::Finish()
 
 void ExampleModule::Process()
 {
-  TLorentzVector candidatePosition, candidateMomentum;
-
+  fOutputArray->clear(); // clear the output collection for each event
   // loop over all input candidates
   for(const auto &candidate : *fInputArray)
   {
-    candidatePosition = candidate.Position;
-    candidateMomentum = candidate.Momentum;
+    const auto &candidatePosition = candidate.Position;
+    const auto &candidateMomentum = candidate.Momentum;
 
     // apply an efficency formula
     if(gRandom->Uniform() <= fFormula->Eval(candidateMomentum.Pt(), candidatePosition.Eta()))

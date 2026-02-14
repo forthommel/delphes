@@ -68,12 +68,12 @@ void PileUpJetID::Finish()
 
 void PileUpJetID::Process()
 {
+  fOutputArray->clear();
+  fNeutralsInPassingJets->clear();
+
   // loop over all input candidates
   for(auto &candidate : *fJetInputArray)
   {
-    const auto &momentum = candidate.Momentum;
-    const auto &area = candidate.Area;
-
     candidate.NTimeHits = 0;
 
     float sumpt = 0.;

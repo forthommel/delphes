@@ -132,6 +132,10 @@ void DenseTrackFilter::Process()
 
   vector<Long64_t>::iterator itTowerHits;
 
+  fTrackOutputArray->clear();
+  fChargedHadronOutputArray->clear();
+  fElectronOutputArray->clear();
+  fMuonOutputArray->clear();
   fTowerHits.clear();
 
   // loop over all tracks

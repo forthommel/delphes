@@ -227,6 +227,10 @@ void SimpleCalorimeter::Process()
   number = -1;
   fTowerRmax = 0.;
 
+  fTowerOutputArray->clear();
+  fEFlowTrackOutputArray->clear();
+  fEFlowTowerOutputArray->clear();
+
   for(const auto &particle : *fParticleInputArray)
   {
     const TLorentzVector &particlePosition = particle.Position;

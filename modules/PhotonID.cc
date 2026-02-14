@@ -110,6 +110,7 @@ void PhotonID::Process()
 
   //cout<< "----  new event ---------"<<endl;
 
+  fOutputArray->clear();
   for(const auto &candidate : *fInputPhotonArray)
   {
     auto new_candidate = candidate;

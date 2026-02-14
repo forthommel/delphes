@@ -100,8 +100,6 @@ void ParticlePropagator::Finish()
 
 void ParticlePropagator::Process()
 {
-  Candidate *particle;
-  TLorentzVector particlePosition, particleMomentum, beamSpotPosition;
   Double_t px, py, pz, pt, pt2, e, q;
   Double_t x, y, z, t, r;
   Double_t x_c, y_c, r_c, phi_0;
@@ -116,11 +114,14 @@ void ParticlePropagator::Process()
 
   const Double_t c_light = 2.99792458E8;
 
-  if(!fBeamSpotInputArray || fBeamSpotInputArray->empty())
-  {
-    beamSpotPosition.SetXYZT(0.0, 0.0, 0.0, 0.0);
-  }
-  else
+  fOutputArray->clear();
+  fNeutralOutputArray->clear();
+  fChargedHadronOutputArray->clear();
+  fElectronOutputArray->clear();
+  fMuonOutputArray->clear();
+
+  TLorentzVector beamSpotPosition;
+  if(fBeamSpotInputArray && !fBeamSpotInputArray->empty())
   {
     const auto &beamSpotCandidate = fBeamSpotInputArray->at(0);
     beamSpotPosition = beamSpotCandidate.Position;
@@ -128,6 +129,7 @@ void ParticlePropagator::Process()
 
   for(auto &candidate : *fInputArray) //TODO: ensure a const-qualified version cannot be used
   {
+    Candidate *particle = nullptr;
     if(candidate.GetCandidates().empty())
     {
       particle = &candidate;
@@ -137,8 +139,8 @@ void ParticlePropagator::Process()
       particle = static_cast<Candidate *>(candidate.GetCandidates().at(0));
     }
 
-    particlePosition = particle->Position;
-    particleMomentum = particle->Momentum;
+    const auto &particlePosition = particle->Position;
+    const auto &particleMomentum = particle->Momentum;
 
     x = particlePosition.X() * 1.0E-3;
     y = particlePosition.Y() * 1.0E-3;
@@ -269,6 +271,7 @@ void ParticlePropagator::Process()
       px = pt * TMath::Cos(phid);
       py = pt * TMath::Sin(phid);
 
+      TLorentzVector particleMomentum;
       particleMomentum.SetPtEtaPhiE(pt, particleMomentum.Eta(), phid, particleMomentum.E());
 
       // calculate additional track parameters (correct for beamspot position)

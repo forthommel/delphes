@@ -70,7 +70,7 @@ void LeptonDressing::Finish()
 
 void LeptonDressing::Process()
 {
-  TLorentzVector momentum;
+  fOutputArray->clear();
 
   // loop over all input candidate
   for(const auto &candidate : *fCandidateInputArray)
@@ -78,7 +78,7 @@ void LeptonDressing::Process()
     const TLorentzVector &candidateMomentum = candidate.Momentum;
 
     // loop over all input tracks
-    momentum.SetPxPyPzE(0.0, 0.0, 0.0, 0.0);
+    TLorentzVector momentum;
     for(const auto &dressing : *fDressingInputArray)
     {
       const TLorentzVector &dressingMomentum = dressing.Momentum;

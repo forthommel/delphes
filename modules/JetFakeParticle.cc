@@ -121,6 +121,11 @@ void JetFakeParticle::Process()
 
   Double_t p, r, rs, total;
 
+  fElectronOutputArray->clear();
+  fMuonOutputArray->clear();
+  fPhotonOutputArray->clear();
+  fJetOutputArray->clear();
+
   for(const auto &candidate : *fInputArray)
   {
     const TLorentzVector &candidateMomentum = candidate.Momentum;

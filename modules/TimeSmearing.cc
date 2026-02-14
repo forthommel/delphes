@@ -93,6 +93,8 @@ void TimeSmearing::Process()
 
   const Double_t c_light = 2.99792458E8;
 
+  fOutputArray->clear();
+
   for(const auto &candidate : *fInputArray)
   {
 

@@ -92,6 +92,7 @@ void MomentumSmearing::Process()
 {
   Double_t pt, eta, phi, e, m, res;
 
+  fOutputArray->clear();
   for(const auto &candidate : *fInputArray)
   {
     const TLorentzVector &candidatePosition = candidate.Position;

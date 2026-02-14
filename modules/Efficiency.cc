@@ -92,6 +92,7 @@ void Efficiency::Process()
 {
   Double_t pt, eta, phi, e;
 
+  fOutputArray->clear();
   for(const auto &candidate : *fInputArray)
   {
     const TLorentzVector &candidatePosition = candidate.Position;

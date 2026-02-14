@@ -89,6 +89,7 @@ void EnergyScale::Process()
   TLorentzVector momentum;
   Double_t scale;
 
+  fOutputArray->clear();
   for(const auto &candidate : *fInputArray)
   {
     momentum = candidate.Momentum;
