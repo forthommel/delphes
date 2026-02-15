@@ -567,7 +567,7 @@ void Calorimeter::FinalizeTower()
     for(const auto &track : fECalTowerTrackArray)
     {
       auto new_track = track;
-      new_track.AddCandidate(const_cast<Candidate *>(&track)); // keep parentage
+      new_track.AddCandidate(&track); // keep parentage
       fEFlowTrackOutputArray->emplace_back(new_track);
     }
   }
@@ -585,7 +585,7 @@ void Calorimeter::FinalizeTower()
     for(const auto &track : fECalTowerTrackArray)
     {
       auto new_track = track;
-      new_track.AddCandidate(const_cast<Candidate *>(&track)); // keep parentage
+      new_track.AddCandidate(&track); // keep parentage
       new_track.Momentum *= rescaleFactor;
       fEFlowTrackOutputArray->emplace_back(new_track);
     }
@@ -608,7 +608,7 @@ void Calorimeter::FinalizeTower()
     for(const auto &track : fHCalTowerTrackArray)
     {
       auto new_track = track;
-      new_track.AddCandidate(const_cast<Candidate *>(&track)); // keep parentage
+      new_track.AddCandidate(&track); // keep parentage
       fEFlowTrackOutputArray->emplace_back(new_track);
     }
   }
@@ -626,7 +626,7 @@ void Calorimeter::FinalizeTower()
     for(const auto &track : fHCalTowerTrackArray)
     {
       auto new_track = track;
-      new_track.AddCandidate(const_cast<Candidate *>(&track)); // keep parentage
+      new_track.AddCandidate(&track); // keep parentage
       new_track.Momentum *= rescaleFactor;
       new_track.Momentum.SetPtEtaPhiM(track.Momentum.Pt() * rescaleFactor, track.Momentum.Eta(), track.Momentum.Phi(), track.Momentum.M());
       //TODO: one can be dropped...

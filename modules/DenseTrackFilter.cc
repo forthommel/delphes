@@ -206,7 +206,7 @@ void DenseTrackFilter::Process()
       if(momentum.Pt() > ptmax)
       {
         ptmax = momentum.Pt();
-        fBestTrack = const_cast<Candidate *>(&track);
+        fBestTrack = &track;
       }
       continue;
     }

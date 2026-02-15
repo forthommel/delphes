@@ -114,7 +114,7 @@ void PhotonID::Process()
   for(const auto &candidate : *fInputPhotonArray)
   {
     auto new_candidate = candidate;
-    new_candidate.AddCandidate(const_cast<Candidate *>(&candidate));
+    new_candidate.AddCandidate(&candidate);
 
     const TLorentzVector &candidatePosition = candidate.Position;
     const TLorentzVector &candidateMomentum = candidate.Momentum;
