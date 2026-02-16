@@ -65,9 +65,9 @@ public:
     std::string fFieldLabel;
   };
 
-  /// Book a memory segment, and attach it to a given field identified by a field name and a description
+  /// Book a memory segment, and return it as a given field identified by a field name and a description
   template <typename T>
-  void Book(OutputHandle<T> &handle, std::string_view field_name, std::string_view description = "")
+  OutputHandle<T> Book(std::string_view field_name, std::string_view description = "")
   {
     const auto field_name_str = std::string{field_name};
     if(!fFields.insert(field_name_str).second)
@@ -75,8 +75,25 @@ public:
     const auto field_label = FieldName(field_name).FieldLabel();
     if(fFieldTypes.count(field_label) == 0)
       fFieldTypes[field_label] = RField<T>::TypeName();
-    handle = std::make_shared<T>();
+    auto handle = std::make_shared<T>();
     fMemorySegments[field_label] = reinterpret_cast<void *>(handle.get());
+    return handle;
+  }
+
+  /// Book a memory segment, and attach it to a given field identified by a field name and a description
+  template <typename T>
+  void Book(OutputHandle<T> &handle, std::string_view field_name, std::string_view description = "")
+  {
+    handle = Book<T>(field_name, description);
+  }
+
+  /// Attach a memory segment and return it as a given field identified by a field name
+  template <typename T>
+  InputHandle<T> Attach(std::string_view field_name) const
+  {
+    InputHandle<T> handle;
+    Attach<T>(field_name, handle);
+    return handle;
   }
 
   /// Attach a memory segment to a given field identified by a field name
