@@ -107,9 +107,9 @@ void Weighter::Init()
   }
 
   // import input array(s)
-  ImportArray(GetString("InputArray", "Delphes/allParticles"), fInputArray);
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "Delphes/allParticles"));
   // create output arrays
-  ExportArray(fOutputArray, GetString("OutputArray", "weight"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "weight"));
 }
 
 //------------------------------------------------------------------------------

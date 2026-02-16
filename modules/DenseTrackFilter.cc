@@ -97,12 +97,12 @@ void DenseTrackFilter::Init()
   fEtaPhiRes = GetDouble("EtaPhiRes", 0.003);
 
   // import input arrays
-  ImportArray(GetString("TrackInputArray", "TrackMergerProp/tracks"), fTrackInputArray);
+  fTrackInputArray = ImportArray<CandidatesCollection>(GetString("TrackInputArray", "TrackMergerProp/tracks"));
   // create output arrays
-  ExportArray(fTrackOutputArray, GetString("TrackOutputArray", "tracks"));
-  ExportArray(fChargedHadronOutputArray, GetString("ChargedHadronOutputArray", "chargedHadrons"));
-  ExportArray(fElectronOutputArray, GetString("ElectronOutputArray", "electrons"));
-  ExportArray(fMuonOutputArray, GetString("MuonOutputArray", "muons"));
+  fTrackOutputArray = ExportArray<CandidatesCollection>(GetString("TrackOutputArray", "tracks"));
+  fChargedHadronOutputArray = ExportArray<CandidatesCollection>(GetString("ChargedHadronOutputArray", "chargedHadrons"));
+  fElectronOutputArray = ExportArray<CandidatesCollection>(GetString("ElectronOutputArray", "electrons"));
+  fMuonOutputArray = ExportArray<CandidatesCollection>(GetString("MuonOutputArray", "muons"));
 }
 
 //------------------------------------------------------------------------------

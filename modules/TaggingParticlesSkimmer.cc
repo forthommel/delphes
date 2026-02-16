@@ -73,11 +73,11 @@ void TaggingParticlesSkimmer::Init()
   fEtaMax = GetDouble("EtaMax", 2.5);
 
   // import input arrays
-  ImportArray(GetString("InputArray", "Delphes/partons"), fPartonInputArray);
-  ImportArray(GetString("InputArray", "Delphes/allParticles"), fParticleInputArray);
+  fPartonInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "Delphes/partons"));
+  fParticleInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "Delphes/allParticles"));
 
   // create output array
-  ExportArray(fOutputArray, GetString("OutputArray", "taggingParticles"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "taggingParticles"));
 
   fClassifier = new TauTaggingPartonClassifier(*fParticleInputArray);
   fClassifier->fPTMin = GetDouble("PTMin", 15.0);

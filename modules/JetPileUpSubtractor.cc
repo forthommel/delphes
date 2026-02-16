@@ -54,11 +54,11 @@ void JetPileUpSubtractor::Init()
   fJetPTMin = GetDouble("JetPTMin", 20.0);
 
   // import input arrays
-  ImportArray(GetString("JetInputArray", "FastJetFinder/jets"), fJetInputArray);
-  ImportArray(GetString("RhoInputArray", "Rho/rho"), fRhoInputArray);
+  fJetInputArray = ImportArray<CandidatesCollection>(GetString("JetInputArray", "FastJetFinder/jets"));
+  fRhoInputArray = ImportArray<CandidatesCollection>(GetString("RhoInputArray", "Rho/rho"));
 
   // create output arrays
-  ExportArray(fOutputArray, GetString("OutputArray", "jets"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "jets"));
 }
 
 //------------------------------------------------------------------------------

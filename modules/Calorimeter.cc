@@ -152,16 +152,16 @@ void Calorimeter::Init()
   fHCalResolutionFormula->Compile(GetString("HCalResolutionFormula", "0"));
 
   // import array with output from other modules
-  ImportArray(GetString("ParticleInputArray", "ParticlePropagator/particles"), fParticleInputArray);
-  ImportArray(GetString("TrackInputArray", "ParticlePropagator/tracks"), fTrackInputArray);
+  fParticleInputArray = ImportArray<CandidatesCollection>(GetString("ParticleInputArray", "ParticlePropagator/particles"));
+  fTrackInputArray = ImportArray<CandidatesCollection>(GetString("TrackInputArray", "ParticlePropagator/tracks"));
 
   // create output arrays
-  ExportArray(fTowerOutputArray, GetString("TowerOutputArray", "towers"));
-  ExportArray(fPhotonOutputArray, GetString("PhotonOutputArray", "photons"));
+  fTowerOutputArray = ExportArray<CandidatesCollection>(GetString("TowerOutputArray", "towers"));
+  fPhotonOutputArray = ExportArray<CandidatesCollection>(GetString("PhotonOutputArray", "photons"));
 
-  ExportArray(fEFlowTrackOutputArray, GetString("EFlowTrackOutputArray", "eflowTracks"));
-  ExportArray(fEFlowPhotonOutputArray, GetString("EFlowPhotonOutputArray", "eflowPhotons"));
-  ExportArray(fEFlowNeutralHadronOutputArray, GetString("EFlowNeutralHadronOutputArray", "eflowNeutralHadrons"));
+  fEFlowTrackOutputArray = ExportArray<CandidatesCollection>(GetString("EFlowTrackOutputArray", "eflowTracks"));
+  fEFlowPhotonOutputArray = ExportArray<CandidatesCollection>(GetString("EFlowPhotonOutputArray", "eflowPhotons"));
+  fEFlowNeutralHadronOutputArray = ExportArray<CandidatesCollection>(GetString("EFlowNeutralHadronOutputArray", "eflowNeutralHadrons"));
 }
 
 //------------------------------------------------------------------------------

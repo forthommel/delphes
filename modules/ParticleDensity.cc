@@ -53,9 +53,9 @@ using namespace std;
 void ParticleDensity::Init()
 {
   // import input array
-  ImportArray(GetString("InputArray", "FastJetFinder/jets"), fInputArray); // I/O
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "FastJetFinder/jets")); // I/O
   // create output array
-  ExportArray(fOutputArray, GetString("OutputArray", "tracks"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "tracks"));
 
   // create multiplicity histogram
 

@@ -71,9 +71,9 @@ void ImpactParameterSmearing::Init()
   fFormula->Compile(GetString("ResolutionFormula", "0.0"));
 
   // import input array
-  ImportArray(GetString("InputArray", "TrackMerger/tracks"), fInputArray);
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "TrackMerger/tracks"));
   // create output array
-  ExportArray(fOutputArray, GetString("OutputArray", "tracks"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "tracks"));
 }
 
 //------------------------------------------------------------------------------

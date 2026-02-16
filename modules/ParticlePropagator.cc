@@ -73,21 +73,21 @@ void ParticlePropagator::Init()
   fHalfLengthMax = GetDouble("HalfLengthMax", fHalfLength);
 
   // import array with output from filter/classifier module
-  ImportArray(GetString("InputArray", "Delphes/stableParticles"), fInputArray);
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "Delphes/stableParticles"));
   try
   { // import beamspot
-    ImportArray(GetString("BeamSpotInputArray", "BeamSpotFilter/beamSpotParticle"), fBeamSpotInputArray);
+    fBeamSpotInputArray = ImportArray<CandidatesCollection>(GetString("BeamSpotInputArray", "BeamSpotFilter/beamSpotParticle"));
   }
   catch(runtime_error &e)
   {
   }
 
   // create output arrays
-  ExportArray(fOutputArray, GetString("OutputArray", "stableParticles"));
-  ExportArray(fNeutralOutputArray, GetString("NeutralOutputArray", "neutralParticles"));
-  ExportArray(fChargedHadronOutputArray, GetString("ChargedHadronOutputArray", "chargedHadrons"));
-  ExportArray(fElectronOutputArray, GetString("ElectronOutputArray", "electrons"));
-  ExportArray(fMuonOutputArray, GetString("MuonOutputArray", "muons"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "stableParticles"));
+  fNeutralOutputArray = ExportArray<CandidatesCollection>(GetString("NeutralOutputArray", "neutralParticles"));
+  fChargedHadronOutputArray = ExportArray<CandidatesCollection>(GetString("ChargedHadronOutputArray", "chargedHadrons"));
+  fElectronOutputArray = ExportArray<CandidatesCollection>(GetString("ElectronOutputArray", "electrons"));
+  fMuonOutputArray = ExportArray<CandidatesCollection>(GetString("MuonOutputArray", "muons"));
 }
 
 //------------------------------------------------------------------------------

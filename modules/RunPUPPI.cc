@@ -23,9 +23,9 @@ using namespace fastjet;
 void RunPUPPI::Init()
 {
   // input collection
-  ImportArray(GetString("TrackInputArray", "Calorimeter/towers"), fTrackInputArray);
-  ImportArray(GetString("NeutralInputArray", "Calorimeter/towers"), fNeutralInputArray);
-  ImportArray(GetString("PVInputArray", "PV"), fPVInputArray);
+  fTrackInputArray = ImportArray<CandidatesCollection>(GetString("TrackInputArray", "Calorimeter/towers"));
+  fNeutralInputArray = ImportArray<CandidatesCollection>(GetString("NeutralInputArray", "Calorimeter/towers"));
+  fPVInputArray = ImportArray<CandidatesCollection>(GetString("PVInputArray", "PV"));
   // puppi parameters
   fApplyNoLep = GetBool("UseNoLep", true);
   fMinPuppiWeight = GetDouble("MinPuppiWeight", 0.01);
@@ -83,9 +83,9 @@ void RunPUPPI::Init()
   fCombId.clear();
   for(int iMap = 0; iMap < param.GetSize(); ++iMap) fCombId.push_back(param[iMap].GetInt());
   // create output array
-  ExportArray(fOutputArray, GetString("OutputArray", "puppiParticles"));
-  ExportArray(fOutputTrackArray, GetString("OutputArrayTracks", "puppiTracks"));
-  ExportArray(fOutputNeutralArray, GetString("OutputArrayNeutrals", "puppiNeutrals"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "puppiParticles"));
+  fOutputTrackArray = ExportArray<CandidatesCollection>(GetString("OutputArrayTracks", "puppiTracks"));
+  fOutputNeutralArray = ExportArray<CandidatesCollection>(GetString("OutputArrayNeutrals", "puppiNeutrals"));
   // Create algorithm list for puppi
   std::vector<AlgoObj> puppiAlgo;
   if(puppiAlgo.empty())

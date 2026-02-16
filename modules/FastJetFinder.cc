@@ -283,12 +283,12 @@ void FastJetFinder::Init()
   }
 
   // import input array
-  ImportArray(GetString("InputArray", "Calorimeter/towers"), fInputArray);
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "Calorimeter/towers"));
 
   // create output arrays
-  ExportArray(fOutputArray, GetString("OutputArray", "jets"));
-  ExportArray(fRhoOutputArray, GetString("RhoOutputArray", "rho"));
-  ExportArray(fConstituentsOutputArray, GetString("ConstituentsOutputArray", "constituents"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "jets"));
+  fRhoOutputArray = ExportArray<CandidatesCollection>(GetString("RhoOutputArray", "rho"));
+  fConstituentsOutputArray = ExportArray<CandidatesCollection>(GetString("ConstituentsOutputArray", "constituents"));
 }
 
 //------------------------------------------------------------------------------

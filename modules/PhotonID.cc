@@ -79,10 +79,10 @@ void PhotonID::Init()
   fFakeFormula->Compile(GetString("FakeFormula", "1.0"));
 
   // import input arrays
-  ImportArray(GetString("InputPhotonArray", "PhotonIsolation/photons"), fInputPhotonArray);
+  fInputPhotonArray = ImportArray<CandidatesCollection>(GetString("InputPhotonArray", "PhotonIsolation/photons"));
 
   // use filtered collection for speed
-  ImportArray(GetString("InputGenArray", "GenParticleFilter/filteredParticles"), fInputGenArray);
+  fInputGenArray = ImportArray<CandidatesCollection>(GetString("InputGenArray", "GenParticleFilter/filteredParticles"));
 
   // min pt to be considered, make sure this threshold is higher than threshold in particle filter
   fPTMin = GetDouble("PTMin", 10.0);
@@ -91,7 +91,7 @@ void PhotonID::Init()
   fRelIsoMax = GetDouble("fRelIsoMax", 0.3);
 
   // create output array
-  ExportArray(fOutputArray, GetString("OutputArray", "photons"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "photons"));
 }
 
 //------------------------------------------------------------------------------

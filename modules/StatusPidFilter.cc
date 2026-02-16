@@ -150,10 +150,10 @@ void StatusPidFilter::Init()
   fRequireNotPileup = GetBool("RequireNotPileup", false);
 
   // import input array
-  ImportArray(GetString("InputArray", "Delphes/allParticles"), fInputArray);
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "Delphes/allParticles"));
 
   // create output array
-  ExportArray(fOutputArray, GetString("OutputArray", "filteredParticles"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "filteredParticles"));
 }
 
 //------------------------------------------------------------------------------

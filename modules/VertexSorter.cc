@@ -44,22 +44,22 @@ void VertexSorter::Init()
   fMethod = GetString("Method", "BTV");
 
   // import input arrays
-  ImportArray(GetString("InputArray", "VertexFinder/vertices"), fInputArray);
-  ImportArray(GetString("TrackInputArray", "VertexFinder/tracks"), fTrackInputArray);
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "VertexFinder/vertices"));
+  fTrackInputArray = ImportArray<CandidatesCollection>(GetString("TrackInputArray", "VertexFinder/tracks"));
 
   if(const auto jet_input_array_label = string(GetString("JetInputArray", "")); !jet_input_array_label.empty())
-    ImportArray(jet_input_array_label, fJetInputArray);
+    fJetInputArray = ImportArray<CandidatesCollection>(jet_input_array_label);
 
   try
   { // import beamspot
-    ImportArray(GetString("BeamSpotInputArray", "BeamSpotFilter/beamSpotParticle"), fBeamSpotInputArray);
+    fBeamSpotInputArray = ImportArray<CandidatesCollection>(GetString("BeamSpotInputArray", "BeamSpotFilter/beamSpotParticle"));
   }
   catch(runtime_error &e)
   {
   }
 
   // create output array
-  ExportArray(fOutputArray, GetString("OutputArray", "clusters"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "clusters"));
 }
 
 //------------------------------------------------------------------------------

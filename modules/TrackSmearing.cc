@@ -122,18 +122,18 @@ void TrackSmearing::Init()
   fApplyToPileUp = GetBool("ApplyToPileUp", true);
 
   // import input arrays
-  ImportArray(GetString("InputArray", "ParticlePropagator/stableParticles"), fInputArray);
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "ParticlePropagator/stableParticles"));
   // import beamspot
   try
   {
-    ImportArray(GetString("BeamSpotInputArray", "BeamSpotFilter/beamSpotParticle"), fBeamSpotInputArray);
+    fBeamSpotInputArray = ImportArray<CandidatesCollection>(GetString("BeamSpotInputArray", "BeamSpotFilter/beamSpotParticle"));
   }
   catch(runtime_error &e)
   {
   }
 
   // create output array
-  ExportArray(fOutputArray, GetString("OutputArray", "stableParticles"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "stableParticles"));
 }
 
 //------------------------------------------------------------------------------

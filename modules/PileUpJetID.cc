@@ -49,12 +49,12 @@ void PileUpJetID::Init()
   fAverageEachTower = false; // for timing
 
   // import input arrays
-  ImportArray(GetString("JetInputArray", "FastJetFinder/jets"), fJetInputArray); // I/O
-  ImportArray(GetString("TrackInputArray", "ParticlePropagator/tracks"), fTrackInputArray);
-  ImportArray(GetString("NeutralInputArray", "ParticlePropagator/tracks"), fNeutralInputArray);
+  fJetInputArray = ImportArray<CandidatesCollection>(GetString("JetInputArray", "FastJetFinder/jets")); // I/O
+  fTrackInputArray = ImportArray<CandidatesCollection>(GetString("TrackInputArray", "ParticlePropagator/tracks"));
+  fNeutralInputArray = ImportArray<CandidatesCollection>(GetString("NeutralInputArray", "ParticlePropagator/tracks"));
   // create output arrays
-  ExportArray(fOutputArray, GetString("OutputArray", "jets"));
-  ExportArray(fNeutralsInPassingJets, GetString("NeutralsInPassingJets", "eflowtowers"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "jets"));
+  fNeutralsInPassingJets = ExportArray<CandidatesCollection>(GetString("NeutralsInPassingJets", "eflowtowers"));
 }
 
 //------------------------------------------------------------------------------

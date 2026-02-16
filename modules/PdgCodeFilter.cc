@@ -70,7 +70,7 @@ void PdgCodeFilter::Init()
   fCharge = GetInt("Charge", 1);
 
   // import input array
-  ImportArray(GetString("InputArray", "Delphes/allParticles"), fInputArray);
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "Delphes/allParticles"));
 
   param = GetParam("PdgCode");
   size = param.GetSize();
@@ -79,12 +79,10 @@ void PdgCodeFilter::Init()
 
   fPdgCodes.clear();
   for(i = 0; i < size; ++i)
-  {
     fPdgCodes.push_back(param[i].GetInt());
-  }
 
   // create output array
-  ExportArray(fOutputArray, GetString("OutputArray", "filteredParticles"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "filteredParticles"));
 }
 
 //------------------------------------------------------------------------------

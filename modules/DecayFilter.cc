@@ -60,9 +60,9 @@ using namespace std;
 void DecayFilter::Init()
 {
   // import input array(s)
-  ImportArray(GetString("InputArray", "FastJetFinder/jets"), fInputArray);
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "FastJetFinder/jets"));
   // create output arrays
-  ExportArray(fOutputArray, GetString("OutputArray", "tracks"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "tracks"));
 }
 
 //------------------------------------------------------------------------------

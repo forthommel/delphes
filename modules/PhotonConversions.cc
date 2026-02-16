@@ -82,10 +82,10 @@ void PhotonConversions::Init()
   fConversionMap->Compile(GetString("ConversionMap", "0.0"));
 
   // import array with output from filter/classifier module
-  ImportArray(GetString("InputArray", "Delphes/stableParticles"), fInputArray);
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "Delphes/stableParticles"));
 
   // create output arrays
-  ExportArray(fOutputArray, GetString("OutputArray", "stableParticles"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "stableParticles"));
 }
 
 //------------------------------------------------------------------------------

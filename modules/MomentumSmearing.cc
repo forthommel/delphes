@@ -71,13 +71,13 @@ void MomentumSmearing::Init()
   fFormula->Compile(GetString("ResolutionFormula", "0.0"));
 
   // import input array
-  ImportArray(GetString("InputArray", "ParticlePropagator/stableParticles"), fInputArray);
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "ParticlePropagator/stableParticles"));
 
   // switch to compute momentum smearing based on momentum vector eta, phi
   fUseMomentumVector = GetBool("UseMomentumVector", false);
 
   // create output array
-  ExportArray(fOutputArray, GetString("OutputArray", "stableParticles"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "stableParticles"));
 }
 
 //------------------------------------------------------------------------------

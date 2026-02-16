@@ -71,9 +71,9 @@ void EnergySmearing::Init()
   fFormula->Compile(GetString("ResolutionFormula", "0.0"));
 
   // import input array(s)
-  ImportArray(GetString("InputArray", "ParticlePropagator/stableParticles"), fInputArray);
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "ParticlePropagator/stableParticles"));
   // create output arrays
-  ExportArray(fOutputArray, GetString("OutputArray", "stableParticles"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "stableParticles"));
 }
 
 //------------------------------------------------------------------------------

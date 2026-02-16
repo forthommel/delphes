@@ -85,9 +85,9 @@ void ExampleModule::Init()
   }
 
   // import input array(s)
-  ImportArray(GetString("InputArray", "FastJetFinder/jets"), fInputArray);
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "FastJetFinder/jets"));
   // create output arrays
-  ExportArray(fOutputArray, GetString("OutputArray", "jets"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "jets"));
 }
 
 //------------------------------------------------------------------------------

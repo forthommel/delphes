@@ -54,10 +54,10 @@ void LeptonDressing::Init()
   fDeltaR = GetDouble("DeltaRMax", 0.4);
 
   // import input arrays
-  ImportArray(GetString("DressingInputArray", "Calorimeter/photons"), fDressingInputArray);
-  ImportArray(GetString("CandidateInputArray", "UniqueObjectFinder/electrons"), fCandidateInputArray);
+  fDressingInputArray = ImportArray<CandidatesCollection>(GetString("DressingInputArray", "Calorimeter/photons"));
+  fCandidateInputArray = ImportArray<CandidatesCollection>(GetString("CandidateInputArray", "UniqueObjectFinder/electrons"));
   // create output arrays
-  ExportArray(fOutputArray, GetString("OutputArray", "electrons"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "electrons"));
 }
 
 //------------------------------------------------------------------------------

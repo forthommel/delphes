@@ -87,10 +87,10 @@ void Hector::Init()
   fBeamLine->calcMatrix();
 
   // import input array
-  ImportArray(GetString("InputArray", "ParticlePropagator/stableParticles"), fInputArray);
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "ParticlePropagator/stableParticles"));
 
   // create output array
-  ExportArray(fOutputArray, GetString("OutputArray", "hits"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "hits"));
 }
 
 //------------------------------------------------------------------------------

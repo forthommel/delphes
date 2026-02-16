@@ -127,10 +127,10 @@ void VertexFinderDA4D::Init()
   fD0CutOff /= 10.0;
 
   // import input array
-  ImportArray(GetString("InputArray", "TrackSmearing/tracks"), fInputArray);
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "TrackSmearing/tracks"));
   // create output arrays
-  ExportArray(fOutputArray, GetString("OutputArray", "tracks"));
-  ExportArray(fVertexOutputArray, GetString("VertexOutputArray", "vertices"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "tracks"));
+  fVertexOutputArray = ExportArray<CandidatesCollection>(GetString("VertexOutputArray", "vertices"));
 }
 
 //------------------------------------------------------------------------------

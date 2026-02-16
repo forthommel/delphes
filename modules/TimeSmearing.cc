@@ -71,10 +71,10 @@ void TimeSmearing::Init()
   fResolutionFormula->Compile(GetString("TimeResolution", "30e-12"));
 
   // import track input array
-  ImportArray(GetString("InputArray", "MuonMomentumSmearing/muons"), fInputArray);
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "MuonMomentumSmearing/muons"));
 
   // create output array
-  ExportArray(fOutputArray, GetString("OutputArray", "tracks"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "tracks"));
 }
 
 //------------------------------------------------------------------------------

@@ -56,13 +56,13 @@ void TimeOfFlight::Init()
   fVertexTimeMode = GetInt("VertexTimeMode", 0);
 
   // import track input array
-  ImportArray(GetString("InputArray", "MuonMomentumSmearing/muons"), fInputArray);
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "MuonMomentumSmearing/muons"));
 
   // import vertex input array
-  ImportArray(GetString("VertexInputArray", "TruthVertexFinder/vertices"), fVertexInputArray);
+  fVertexInputArray = ImportArray<CandidatesCollection>(GetString("VertexInputArray", "TruthVertexFinder/vertices"));
 
   // create output array
-  ExportArray(fOutputArray, GetString("OutputArray", "tracks"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "tracks"));
 }
 
 //------------------------------------------------------------------------------

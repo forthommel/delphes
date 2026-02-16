@@ -79,11 +79,10 @@ void TrackPileUpSubtractor::Init()
   ExRootConfParam param = GetParam("InputArray");
 
   for(Long_t i = 0; i < param.GetSize() / 2; ++i)
-  {
-    auto &[input_collection, output_collection] = fInputMap.emplace_back();
-    ImportArray(param[i * 2].GetString(), input_collection);
-    ExportArray(output_collection, param[i * 2 + 1].GetString());
-  }
+    fInputMap.emplace_back(std::make_pair(
+      ImportArray<CandidatesCollection>(param[i * 2].GetString()), // input
+      ExportArray<CandidatesCollection>(param[i * 2 + 1].GetString()) // output
+      ));
 }
 
 //------------------------------------------------------------------------------

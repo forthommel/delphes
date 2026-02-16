@@ -57,12 +57,12 @@ void Merger::Init()
   ExRootConfParam param = GetParam("InputArray");
 
   for(Long_t i = 0; i < param.GetSize(); ++i)
-    ImportArray(param[i].GetString(), fInputList.emplace_back());
+    fInputList.emplace_back(ImportArray<CandidatesCollection>(param[i].GetString()));
 
   // create output arrays
-  ExportArray(fOutputArray, GetString("OutputArray", "candidates"));
-  ExportArray(fMomentumOutputArray, GetString("MomentumOutputArray", "momentum"));
-  ExportArray(fEnergyOutputArray, GetString("EnergyOutputArray", "energy"));
+  fOutputArray = ExportArray<CandidatesCollection>(GetString("OutputArray", "candidates"));
+  fMomentumOutputArray = ExportArray<CandidatesCollection>(GetString("MomentumOutputArray", "momentum"));
+  fEnergyOutputArray = ExportArray<CandidatesCollection>(GetString("EnergyOutputArray", "energy"));
 }
 
 //------------------------------------------------------------------------------

@@ -88,13 +88,13 @@ void JetFakeParticle::Init()
   }
 
   // import input array
-  ImportArray(GetString("InputArray", "FastJetFinder/jets"), fInputArray);
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "FastJetFinder/jets"));
 
   // create output arrays
-  ExportArray(fElectronOutputArray, GetString("ElectronOutputArray", "fakeElectrons"));
-  ExportArray(fMuonOutputArray, GetString("MuonOutputArray", "fakeMuons"));
-  ExportArray(fPhotonOutputArray, GetString("PhotonOutputArray", "fakePhotons"));
-  ExportArray(fJetOutputArray, GetString("JetOutputArray", "jets"));
+  fElectronOutputArray = ExportArray<CandidatesCollection>(GetString("ElectronOutputArray", "fakeElectrons"));
+  fMuonOutputArray = ExportArray<CandidatesCollection>(GetString("MuonOutputArray", "fakeMuons"));
+  fPhotonOutputArray = ExportArray<CandidatesCollection>(GetString("PhotonOutputArray", "fakePhotons"));
+  fJetOutputArray = ExportArray<CandidatesCollection>(GetString("JetOutputArray", "jets"));
 }
 
 //------------------------------------------------------------------------------

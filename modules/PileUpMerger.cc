@@ -90,11 +90,11 @@ void PileUpMerger::Init()
   fReader = new DelphesPileUpReader(fileName);
 
   // import input array
-  ImportArray(GetString("InputArray", "Delphes/stableParticles"), fInputArray); // I/O
+  fInputArray = ImportArray<CandidatesCollection>(GetString("InputArray", "Delphes/stableParticles")); // I/O
 
   // create output arrays
-  ExportArray(fParticleOutputArray, GetString("ParticleOutputArray", "stableParticles"));
-  ExportArray(fVertexOutputArray, GetString("VertexOutputArray", "vertices"));
+  fParticleOutputArray = ExportArray<CandidatesCollection>(GetString("ParticleOutputArray", "stableParticles"));
+  fVertexOutputArray = ExportArray<CandidatesCollection>(GetString("VertexOutputArray", "vertices"));
 }
 
 //------------------------------------------------------------------------------
