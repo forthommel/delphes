@@ -49,8 +49,6 @@ public:
 
   DelphesModel *EventModel() { return &fEventModel; }
 
-  TObjArray *NewPermanentArray();
-
   TObjArray *NewArray() { return New<TObjArray>(); }
 
   Candidate *NewCandidate();

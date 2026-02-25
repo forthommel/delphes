@@ -37,7 +37,6 @@
 
 #include "TDatabasePDG.h"
 #include "TLorentzVector.h"
-#include "TObjArray.h"
 #include "TParticlePDG.h"
 #include "TStopwatch.h"
 

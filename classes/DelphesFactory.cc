@@ -77,15 +77,6 @@ void DelphesFactory::Clear(Option_t * /*option*/)
 
 //------------------------------------------------------------------------------
 
-TObjArray *DelphesFactory::NewPermanentArray()
-{
-  TObjArray *array = static_cast<TObjArray *>(fObjArrays->NewEntry());
-  fPool.insert(array);
-  return array;
-}
-
-//------------------------------------------------------------------------------
-
 Candidate *DelphesFactory::NewCandidate()
 {
   Candidate *object = New<Candidate>();

@@ -35,7 +35,6 @@
 
 #include "TClass.h"
 #include "TFolder.h"
-#include "TObjArray.h"
 #include "TROOT.h"
 
 #include <iostream>
