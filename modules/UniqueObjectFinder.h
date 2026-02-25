@@ -27,12 +27,11 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 #include <utility>
 #include <vector>
-
-class Candidate;
 
 class UniqueObjectFinder : public DelphesModule
 {
@@ -46,7 +45,7 @@ public:
 private:
   Bool_t fUseUniqueID;
 
-  using InputMap = std::vector<std::pair<InputHandle<std::vector<Candidate> >, OutputHandle<std::vector<Candidate> > > >;
+  using InputMap = std::vector<std::pair<InputHandle<CandidatesCollection>, OutputHandle<CandidatesCollection> > >;
 
   Bool_t Unique(const Candidate *candidate, InputMap::const_iterator itInputMap);
 

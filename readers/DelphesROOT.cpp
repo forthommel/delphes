@@ -217,17 +217,17 @@ int main(int argc, char *argv[])
           candidate->Charge = gen->Charge;
           candidate->Mass = gen->Mass;
 
-          allParticleOutputArray->emplace_back(*candidate);
+          allParticleOutputArray->emplace_back(candidate);
 
           pdgCode = TMath::Abs(gen->PID);
 
           if(gen->Status == 1)
           {
-            stableParticleOutputArray->emplace_back(*candidate);
+            stableParticleOutputArray->emplace_back(candidate);
           }
           else if(pdgCode <= 5 || pdgCode == 21 || pdgCode == 15)
           {
-            partonOutputArray->emplace_back(*candidate);
+            partonOutputArray->emplace_back(candidate);
           }
         }
 

@@ -9,13 +9,12 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 #include <map>
 #include <string>
 #include <vector>
-
-class Candidate;
 
 class VertexFinder : public DelphesModule
 {
@@ -41,9 +40,9 @@ private:
   Int_t fMinNDF;
   Int_t fGrowSeeds;
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fVertexOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
+  OutputHandle<CandidatesCollection> fVertexOutputArray; //!
 
   std::map<UInt_t, std::map<std::string, Double_t> > trackIDToDouble;
   std::map<UInt_t, std::map<std::string, Int_t> > trackIDToInt;

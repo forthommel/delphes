@@ -30,9 +30,8 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
-
-class Candidate;
 
 class StatusPidFilter : public DelphesModule
 {
@@ -48,8 +47,8 @@ private:
 
   Bool_t fRequireNotPileup; //!
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(StatusPidFilter, 1)
 };

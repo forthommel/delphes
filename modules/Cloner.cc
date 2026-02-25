@@ -26,7 +26,6 @@
 
 #include "modules/Cloner.h"
 
-#include "classes/DelphesClasses.h"
 #include "classes/DelphesFormula.h"
 
 #include "ExRootAnalysis/ExRootClassifier.h"

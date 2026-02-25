@@ -88,10 +88,10 @@ void ConstituentFilter::Process()
     // loop over all jets
     for(auto &jet : *input_collection) //TODO: ensure cons-qualification
     {
-      if(jet.Momentum.Pt() <= fJetPTMin) continue;
+      if(jet->Momentum.Pt() <= fJetPTMin) continue;
 
       // loop over all constituents
-      for(const auto &constituent : jet.GetCandidates())
+      for(const auto &constituent : jet->GetCandidates())
       {
         // set the IsConstituent flag
         constituent->IsConstituent = 1;
@@ -104,7 +104,7 @@ void ConstituentFilter::Process()
   {
     // loop over all constituents
     for(const auto &constituent : *input_collection)
-      if(constituent.IsConstituent) // check the IsConstituent flag
+      if(constituent->IsConstituent) // check the IsConstituent flag
         output_collection->emplace_back(constituent);
   }
 }

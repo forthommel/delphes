@@ -328,7 +328,9 @@ void DelphesSTDHEPReader::ReadSTDCM1()
   // skip 5*4 + 2*8 = 36 bytes
   SkipBytes(36);
 
-  if((strncmp((char *)fBuffer, "1.", 2) == 0) || (strncmp((char *)fBuffer, "2.", 2) == 0) || (strncmp((char *)fBuffer, "3.", 2) == 0) || (strncmp((char *)fBuffer, "4.", 2) == 0) || (strncmp((char *)fBuffer, "5.00", 4) == 0))
+  if((strncmp((char *)fBuffer, "1.", 2) == 0) || (strncmp((char *)fBuffer, "2.", 2) == 0) ||
+     (strncmp((char *)fBuffer, "3.", 2) == 0) || (strncmp((char *)fBuffer, "4.", 2) == 0) ||
+     (strncmp((char *)fBuffer, "5.00", 4) == 0))
   {
     return;
   }
@@ -383,7 +385,10 @@ void DelphesSTDHEPReader::ReadSTDHEP()
   fReader[5].ReadValue(&phepSize, 4);
   fReader[6].ReadValue(&vhepSize, 4);
 
-  if(fEventSize < 0 || fEventSize != (int)idhepSize || fEventSize != (int)isthepSize || (2 * fEventSize) != (int)jmohepSize || (2 * fEventSize) != (int)jdahepSize || (5 * fEventSize) != (int)phepSize || (4 * fEventSize) != (int)vhepSize)
+  if(fEventSize < 0 ||
+     fEventSize != (int)idhepSize      || fEventSize != (int)isthepSize     ||
+     (2*fEventSize) != (int)jmohepSize || (2*fEventSize) != (int)jdahepSize ||
+     (5*fEventSize) != (int)phepSize   || (4*fEventSize) != (int)vhepSize)
   {
     throw runtime_error("Inconsistent size of arrays. File is probably corrupted.");
   }
@@ -502,17 +507,17 @@ void DelphesSTDHEPReader::AnalyzeParticles(DelphesFactory *factory,
 
     candidate->Position.SetXYZT(x, y, z, t);
 
-    allParticleOutputArray.emplace_back(*candidate);
+    allParticleOutputArray.emplace_back(candidate);
 
     if(!pdgParticle) continue;
 
     if(status == 1)
     {
-      stableParticleOutputArray.emplace_back(*candidate);
+      stableParticleOutputArray.emplace_back(candidate);
     }
     else if(pdgCode <= 5 || pdgCode == 21 || pdgCode == 15)
     {
-      partonOutputArray.emplace_back(*candidate);
+      partonOutputArray.emplace_back(candidate);
     }
   }
 }

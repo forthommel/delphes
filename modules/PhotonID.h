@@ -29,10 +29,10 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 class DelphesFormula;
-class Candidate;
 
 class PhotonID : public DelphesModule
 {
@@ -50,15 +50,15 @@ private:
   DelphesFormula *fFakeFormula;
 
   // import input arrays
-  InputHandle<std::vector<Candidate> > fInputPhotonArray; //!
+  InputHandle<CandidatesCollection> fInputPhotonArray; //!
 
   // use filtered collection for speed
-  InputHandle<std::vector<Candidate> > fInputGenArray; //!
+  InputHandle<CandidatesCollection> fInputGenArray; //!
 
   Double_t fPTMin;
   Double_t fRelIsoMax;
 
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   Bool_t isFake(const Candidate *obj);
 

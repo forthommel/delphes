@@ -27,12 +27,11 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 #include <map>
 #include <vector>
-
-class Candidate;
 
 class ConstituentFilter : public DelphesModule
 {
@@ -46,10 +45,10 @@ public:
 private:
   Double_t fJetPTMin;
 
-  std::vector<InputHandle<std::vector<Candidate> > > fInputList; //!
-  std::vector<std::pair<InputHandle<std::vector<Candidate> >, OutputHandle<std::vector<Candidate> > > > fInputMap; //!
+  std::vector<InputHandle<CandidatesCollection> > fInputList; //!
+  std::vector<std::pair<InputHandle<CandidatesCollection>, OutputHandle<CandidatesCollection> > > fInputMap; //!
 
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(ConstituentFilter, 1)
 };

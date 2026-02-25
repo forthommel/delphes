@@ -520,7 +520,7 @@ void DelphesHepMC3Reader::FinalizeParticles(CandidatesCollection &allParticleOut
         }
       }
 
-      allParticleOutputArray.emplace_back(*candidate);
+      allParticleOutputArray.emplace_back(candidate);
 
       ++counter;
 
@@ -534,51 +534,51 @@ void DelphesHepMC3Reader::FinalizeParticles(CandidatesCollection &allParticleOut
 
       if(candidate->Status == 1)
       {
-        stableParticleOutputArray.emplace_back(*candidate);
+        stableParticleOutputArray.emplace_back(candidate);
       }
       else if(pdgCode <= 5 || pdgCode == 21 || pdgCode == 15)
       {
-        partonOutputArray.emplace_back(*candidate);
+        partonOutputArray.emplace_back(candidate);
       }
     }
   }
 
   for(auto &candidate : allParticleOutputArray)
   {
-    itMotherMap = fMotherMap.find(candidate.M1);
+    itMotherMap = fMotherMap.find(candidate->M1);
     if(itMotherMap == fMotherMap.end())
     {
-      candidate.M1 = -1;
-      candidate.M2 = -1;
+      candidate->M1 = -1;
+      candidate->M2 = -1;
     }
     else
     {
-      candidate.M1 = itMotherMap->second.first;
-      candidate.M2 = itMotherMap->second.second;
+      candidate->M1 = itMotherMap->second.first;
+      candidate->M2 = itMotherMap->second.second;
     }
 
-    if(candidate.D1 < 0)
+    if(candidate->D1 < 0)
     {
-      candidate.D1 = -1;
-      candidate.D2 = -1;
+      candidate->D1 = -1;
+      candidate->D2 = -1;
     }
     else
     {
-      itDaughterMap = fDaughterMap.find(candidate.D1);
+      itDaughterMap = fDaughterMap.find(candidate->D1);
       if(itDaughterMap == fDaughterMap.end())
       {
-        candidate.D1 = -1;
-        candidate.D2 = -1;
-        const TLorentzVector &decayPosition = candidate.Position;
-        candidate.DecayPosition.SetXYZT(decayPosition.X(), decayPosition.Y(), decayPosition.Z(), decayPosition.T()); // decay position
+        candidate->D1 = -1;
+        candidate->D2 = -1;
+        const TLorentzVector &decayPosition = candidate->Position;
+        candidate->DecayPosition.SetXYZT(decayPosition.X(), decayPosition.Y(), decayPosition.Z(), decayPosition.T()); // decay position
       }
       else
       {
-        candidate.D1 = itDaughterMap->second.first;
-        candidate.D2 = itDaughterMap->second.second;
-        const auto &candidateDaughter = allParticleOutputArray.at(candidate.D1);
-        const TLorentzVector &decayPosition = candidateDaughter.Position;
-        candidate.DecayPosition.SetXYZT(decayPosition.X(), decayPosition.Y(), decayPosition.Z(), decayPosition.T()); // decay position
+        candidate->D1 = itDaughterMap->second.first;
+        candidate->D2 = itDaughterMap->second.second;
+        const auto &candidateDaughter = allParticleOutputArray.at(candidate->D1);
+        const TLorentzVector &decayPosition = candidateDaughter->Position;
+        candidate->DecayPosition.SetXYZT(decayPosition.X(), decayPosition.Y(), decayPosition.Z(), decayPosition.T()); // decay position
       }
     }
   }

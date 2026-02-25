@@ -184,10 +184,10 @@ void OldCalorimeter::Process()
   number = -1;
   for(const auto &particle : *fParticleInputArray)
   {
-    const TLorentzVector &particlePosition = particle.Position;
+    const TLorentzVector &particlePosition = particle->Position;
     ++number;
 
-    pdgCode = TMath::Abs(particle.PID);
+    pdgCode = TMath::Abs(particle->PID);
 
     itFractionMap = fFractionMap.find(pdgCode);
     if(itFractionMap == fFractionMap.end())
@@ -231,10 +231,10 @@ void OldCalorimeter::Process()
   number = -1;
   for(const auto &track : *fTrackInputArray)
   {
-    const TLorentzVector &trackPosition = track.Position;
+    const TLorentzVector &trackPosition = track->Position;
     ++number;
 
-    pdgCode = TMath::Abs(track.PID);
+    pdgCode = TMath::Abs(track->PID);
 
     itFractionMap = fFractionMap.find(pdgCode);
     if(itFractionMap == fFractionMap.end())
@@ -357,7 +357,7 @@ void OldCalorimeter::Process()
 
     //FIXME: potential bug of non-scoped particle pointer spotted: check whether this changes anything
     auto &particle = fParticleInputArray->at(number);
-    momentum = particle.Momentum;
+    momentum = particle->Momentum;
 
     // check for ECAL hits
     if(flags & 2)
@@ -383,7 +383,7 @@ void OldCalorimeter::Process()
     fTowerECalEnergy += ecalEnergy;
     fTowerHCalEnergy += hcalEnergy;
 
-    fTower->AddCandidate(&particle);
+    fTower->AddCandidate(particle);
   }
 
   // finalize last tower
@@ -434,10 +434,10 @@ void OldCalorimeter::FinalizeTower()
   {
     if(fTowerPhotonHits > 0 && fTowerTrackAllHits == 0)
     {
-      fPhotonOutputArray->emplace_back(*fTower);
+      fPhotonOutputArray->emplace_back(fTower);
     }
 
-    fTowerOutputArray->emplace_back(*fTower);
+    fTowerOutputArray->emplace_back(fTower);
   }
 
   // fill energy flow candidates
@@ -465,7 +465,7 @@ void OldCalorimeter::FinalizeTower()
         auto *tower = factory->NewCandidate();
 
         for(const auto &particle : fTowerHCalArray)
-          tower->AddCandidate(&particle); // keep parentage
+          tower->AddCandidate(particle); // keep parentage
 
         pt = hcalEnergy / TMath::CosH(eta);
 
@@ -479,7 +479,7 @@ void OldCalorimeter::FinalizeTower()
         tower->Edges[2] = fTowerEdges[2];
         tower->Edges[3] = fTowerEdges[3];
 
-        fEFlowTowerOutputArray->emplace_back(*tower);
+        fEFlowTowerOutputArray->emplace_back(tower);
       }
     }
     else if(fTowerHCalHits == fTowerHCalTrackHits)
@@ -494,7 +494,7 @@ void OldCalorimeter::FinalizeTower()
         auto *tower = factory->NewCandidate();
 
         for(const auto &particle : fTowerECalArray)
-          tower->AddCandidate(&particle); // keep parentage
+          tower->AddCandidate(particle); // keep parentage
 
         pt = ecalEnergy / TMath::CosH(eta);
 
@@ -508,11 +508,11 @@ void OldCalorimeter::FinalizeTower()
         tower->Edges[2] = fTowerEdges[2];
         tower->Edges[3] = fTowerEdges[3];
 
-        fEFlowTowerOutputArray->emplace_back(*tower);
+        fEFlowTowerOutputArray->emplace_back(tower);
       }
     }
     else
-      fEFlowTowerOutputArray->emplace_back(*fTower);
+      fEFlowTowerOutputArray->emplace_back(fTower);
 
     if(towerTrackArray)
       for(const auto &track : *towerTrackArray)
@@ -520,7 +520,7 @@ void OldCalorimeter::FinalizeTower()
   }
   else if(energy > 0.0)
   {
-    fEFlowTowerOutputArray->emplace_back(*fTower);
+    fEFlowTowerOutputArray->emplace_back(fTower);
   }
 }
 

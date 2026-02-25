@@ -27,11 +27,11 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 #include <map>
 
-class Candidate;
 class DelphesFormula;
 
 class TrackPileUpSubtractor : public DelphesModule
@@ -49,8 +49,8 @@ private:
 
   Double_t fPTMin;
 
-  InputHandle<std::vector<Candidate> > fVertexInputArray; //!
-  std::vector<std::pair<InputHandle<std::vector<Candidate> >, OutputHandle<std::vector<Candidate> > > > fInputMap; //!
+  InputHandle<CandidatesCollection> fVertexInputArray; //!
+  std::vector<std::pair<InputHandle<CandidatesCollection>, OutputHandle<CandidatesCollection> > > fInputMap; //!
 
   ClassDef(TrackPileUpSubtractor, 1)
 };

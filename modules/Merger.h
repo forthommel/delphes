@@ -28,11 +28,10 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 #include <vector>
-
-class Candidate;
 
 class Merger : public DelphesModule
 {
@@ -44,11 +43,11 @@ public:
   void Finish();
 
 private:
-  std::vector<InputHandle<std::vector<Candidate> > > fInputList; //!
+  std::vector<InputHandle<CandidatesCollection> > fInputList; //!
 
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fMomentumOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fEnergyOutputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
+  OutputHandle<CandidatesCollection> fMomentumOutputArray; //!
+  OutputHandle<CandidatesCollection> fEnergyOutputArray; //!
 
   ClassDef(Merger, 1)
 };

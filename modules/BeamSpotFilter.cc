@@ -39,6 +39,6 @@ void BeamSpotFilter::Process()
   for(const auto &candidate : *fInputArray)
   {
     fOutputArray->emplace_back(candidate);
-    if(candidate.IsPU == 0) break;
+    if(candidate->IsPU == 0) break;
   }
 }

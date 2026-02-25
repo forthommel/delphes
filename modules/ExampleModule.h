@@ -27,11 +27,11 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 #include <deque>
 
-class Candidate;
 class DelphesFormula;
 
 class ExampleModule : public DelphesModule
@@ -52,8 +52,8 @@ private:
 
   DelphesFormula *fFormula; //!
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(ExampleModule, 1)
 };

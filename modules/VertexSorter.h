@@ -11,11 +11,10 @@
  *
 */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 #include <string>
-
-class Candidate;
 
 class VertexSorter : public DelphesModule
 {
@@ -27,11 +26,11 @@ public:
   void Finish();
 
 private:
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  InputHandle<std::vector<Candidate> > fTrackInputArray; //!
-  InputHandle<std::vector<Candidate> > fJetInputArray; //!
-  InputHandle<std::vector<Candidate> > fBeamSpotInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  InputHandle<CandidatesCollection> fTrackInputArray; //!
+  InputHandle<CandidatesCollection> fJetInputArray; //!
+  InputHandle<CandidatesCollection> fBeamSpotInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   std::string fMethod;
 

@@ -28,9 +28,9 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
-class Candidate;
 class DelphesFormula;
 
 class JetFakeParticle : public DelphesModule
@@ -48,11 +48,11 @@ private:
   TFakeMap fEfficiencyMap;
 #endif
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fElectronOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fMuonOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fPhotonOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fJetOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fElectronOutputArray; //!
+  OutputHandle<CandidatesCollection> fMuonOutputArray; //!
+  OutputHandle<CandidatesCollection> fPhotonOutputArray; //!
+  OutputHandle<CandidatesCollection> fJetOutputArray; //!
 
   ClassDef(JetFakeParticle, 1)
 };

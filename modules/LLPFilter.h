@@ -31,10 +31,10 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
-#include <vector>
 
-class Candidate;
+#include <vector>
 
 class LLPFilter : public DelphesModule
 {
@@ -64,9 +64,9 @@ private:
 
   std::vector<Int_t> fPdgCodes;
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  InputHandle<std::vector<Candidate> > fParticleInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  InputHandle<CandidatesCollection> fParticleInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(LLPFilter, 1)
 };

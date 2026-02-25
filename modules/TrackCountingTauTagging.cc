@@ -77,16 +77,16 @@ Int_t TrackCountingTauTaggingPartonClassifier::GetCategory(TObject *object)
   for(i = tau->D1; i <= tau->D2; ++i)
   {
     const auto &daughter1 = fParticleInputArray.at(i);
-    pdgCode = TMath::Abs(daughter1.PID);
+    pdgCode = TMath::Abs(daughter1->PID);
     if(pdgCode == 11 || pdgCode == 13 || pdgCode == 15)
       return -1;
     else if(pdgCode == 24)
     {
-      if(daughter1.D1 < 0) return -1;
-      for(j = daughter1.D1; j <= daughter1.D2; ++j)
+      if(daughter1->D1 < 0) return -1;
+      for(j = daughter1->D1; j <= daughter1->D2; ++j)
       {
         const auto &daughter2 = fParticleInputArray.at(j);
-        pdgCode = TMath::Abs(daughter2.PID);
+        pdgCode = TMath::Abs(daughter2->PID);
         if(pdgCode == 11 || pdgCode == 13) return -1;
       }
     }
@@ -196,7 +196,7 @@ void TrackCountingTauTagging::Process()
   for(auto &jet : *fJetInputArray)
   {
     identifier = 0;
-    const TLorentzVector &jetMomentum = jet.Momentum;
+    const TLorentzVector &jetMomentum = jet->Momentum;
     charge = 0;
     eta = jetMomentum.Eta();
     phi = jetMomentum.Phi();
@@ -206,11 +206,11 @@ void TrackCountingTauTagging::Process()
     // loop over all input tracks
     for(const auto &track : *fTrackInputArray)
     {
-      if((track.Momentum).Pt() < fTrackPTMin) continue;
-      if(jetMomentum.DeltaR(track.Momentum) <= fDeltaRTrack)
+      if((track->Momentum).Pt() < fTrackPTMin) continue;
+      if(jetMomentum.DeltaR(track->Momentum) <= fDeltaRTrack)
       {
         identifier -= 1;
-        charge += track.Charge;
+        charge += track->Charge;
       }
     }
 
@@ -218,20 +218,20 @@ void TrackCountingTauTagging::Process()
     bool matchedTau = false;
     for(const auto &tau : tauArray)
     {
-      if(tau.D1 < 0) continue;
+      if(tau->D1 < 0) continue;
 
-      if(tau.D1 >= static_cast<int>(fParticleInputArray->size()) || tau.D2 >= static_cast<int>(fParticleInputArray->size()))
+      if(tau->D1 >= static_cast<int>(fParticleInputArray->size()) || tau->D2 >= static_cast<int>(fParticleInputArray->size()))
       {
         throw runtime_error("tau's daughter index is greater than the ParticleInputArray size");
       }
 
       tauMomentum.SetPxPyPzE(0.0, 0.0, 0.0, 0.0);
 
-      for(int i = tau.D1; i <= tau.D2; ++i)
+      for(int i = tau->D1; i <= tau->D2; ++i)
       {
         const auto &daughter = fParticleInputArray->at(i);
-        if(TMath::Abs(daughter.PID) == 16) continue;
-        tauMomentum += daughter.Momentum;
+        if(TMath::Abs(daughter->PID) == 16) continue;
+        tauMomentum += daughter->Momentum;
       }
 
       if(jetMomentum.DeltaR(tauMomentum) <= fDeltaR)
@@ -258,10 +258,10 @@ void TrackCountingTauTagging::Process()
     // apply an efficency formula
 
     // apply an efficency formula
-    jet.TauTag |= (gRandom->Uniform() <= formula->Eval(pt, eta, phi, e)) << fBitNumber;
+    jet->TauTag |= (gRandom->Uniform() <= formula->Eval(pt, eta, phi, e)) << fBitNumber;
 
     // set tau charge
-    jet.Charge = charge;
+    jet->Charge = charge;
   }
 }
 

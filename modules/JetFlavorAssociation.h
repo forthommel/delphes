@@ -27,9 +27,9 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
-class Candidate;
 class DelphesFormula;
 
 class ExRootSTLVectorFilter;
@@ -46,8 +46,8 @@ public:
   void Process();
   void Finish();
 
-  void GetAlgoFlavor(Candidate &jet, const std::vector<Candidate> &partonArray, const std::vector<Candidate> &partonLHEFArray);
-  void GetPhysicsFlavor(Candidate &jet, const std::vector<Candidate> &partonArray, const std::vector<Candidate> &partonLHEFArray);
+  void GetAlgoFlavor(Candidate *jet, const CandidatesCollection &partonArray, const CandidatesCollection &partonLHEFArray);
+  void GetPhysicsFlavor(Candidate *jet, const CandidatesCollection &partonArray, const CandidatesCollection &partonLHEFArray);
 
 private:
   Double_t fDeltaR;
@@ -58,10 +58,10 @@ private:
   ExRootSTLVectorFilter *fPartonFilter;
   ExRootSTLVectorFilter *fParticleLHEFFilter;
 
-  InputHandle<std::vector<Candidate> > fPartonInputArray; //!
-  InputHandle<std::vector<Candidate> > fParticleInputArray; //!
-  InputHandle<std::vector<Candidate> > fParticleLHEFInputArray; //!
-  InputHandle<std::vector<Candidate> > fJetInputArray; //!
+  InputHandle<CandidatesCollection> fPartonInputArray; //!
+  InputHandle<CandidatesCollection> fParticleInputArray; //!
+  InputHandle<CandidatesCollection> fParticleLHEFInputArray; //!
+  InputHandle<CandidatesCollection> fJetInputArray; //!
 
   ClassDef(JetFlavorAssociation, 1)
 };

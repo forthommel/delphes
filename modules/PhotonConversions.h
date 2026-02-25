@@ -27,9 +27,9 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
-class Candidate;
 class DelphesCylindricalFormula;
 class TF1;
 
@@ -47,8 +47,8 @@ private:
   Double_t fRadius, fRadius2, fHalfLength;
   Double_t fEtaMin, fEtaMax;
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   DelphesCylindricalFormula *fConversionMap; //!
 

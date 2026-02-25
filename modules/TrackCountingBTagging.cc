@@ -83,7 +83,7 @@ void TrackCountingBTagging::Process()
   // loop over all input jets
   for(auto &jet : *fJetInputArray)
   {
-    const TLorentzVector &jetMomentum = jet.Momentum;
+    const TLorentzVector &jetMomentum = jet->Momentum;
     jpx = jetMomentum.Px();
     jpy = jetMomentum.Py();
     jpz = jetMomentum.Pz();
@@ -94,22 +94,22 @@ void TrackCountingBTagging::Process()
     for(const auto &track : *fTrackInputArray)
     {
       if(count >= fNtracks) break;
-      const TLorentzVector &trkMomentum = track.Momentum;
+      const TLorentzVector &trkMomentum = track->Momentum;
       tpt = trkMomentum.Pt();
       if(tpt < fPtMin) continue;
 
-      d0 = TMath::Abs(track.D0);
+      d0 = TMath::Abs(track->D0);
       if(d0 > fIPmax) continue;
 
       dr = jetMomentum.DeltaR(trkMomentum);
       if(dr > fDeltaR) continue;
 
-      xd = track.Xd;
-      yd = track.Yd;
-      zd = track.Zd;
-      dd0 = TMath::Abs(track.ErrorD0);
-      dz = TMath::Abs(track.DZ);
-      ddz = TMath::Abs(track.ErrorDZ);
+      xd = track->Xd;
+      yd = track->Yd;
+      zd = track->Zd;
+      dd0 = TMath::Abs(track->ErrorD0);
+      dz = TMath::Abs(track->DZ);
+      ddz = TMath::Abs(track->ErrorDZ);
 
       if(fUse3D)
       {
@@ -127,7 +127,7 @@ void TrackCountingBTagging::Process()
     }
 
     // set BTag flag to true if count >= Ntracks
-    jet.BTag |= (count >= fNtracks) << fBitNumber;
+    jet->BTag |= (count >= fNtracks) << fBitNumber;
   }
 }
 

@@ -91,8 +91,8 @@ void EnergySmearing::Process()
   fOutputArray->clear();
   for(const auto &candidate : *fInputArray)
   {
-    const TLorentzVector &candidatePosition = candidate.Position;
-    const TLorentzVector &candidateMomentum = candidate.Momentum;
+    const TLorentzVector &candidatePosition = candidate->Position;
+    const TLorentzVector &candidateMomentum = candidate->Momentum;
 
     pt = candidatePosition.Pt();
     eta = candidatePosition.Eta();
@@ -105,13 +105,13 @@ void EnergySmearing::Process()
 
     if(energy <= 0.0) continue;
 
-    auto new_candidate = candidate;
+    auto *new_candidate = static_cast<Candidate *>(candidate->Clone());
     eta = candidateMomentum.Eta();
     phi = candidateMomentum.Phi();
     pt = (energy > m) ? TMath::Sqrt(energy * energy - m * m) / TMath::CosH(eta) : 0;
-    new_candidate.Momentum.SetPtEtaPhiE(pt, eta, phi, energy);
-    new_candidate.TrackResolution = fFormula->Eval(pt, eta, phi, energy) / candidateMomentum.E();
-    new_candidate.AddCandidate(const_cast<Candidate *>(&candidate)); //TODO: ensure const-qualification
+    new_candidate->Momentum.SetPtEtaPhiE(pt, eta, phi, energy);
+    new_candidate->TrackResolution = fFormula->Eval(pt, eta, phi, energy) / candidateMomentum.E();
+    new_candidate->AddCandidate(candidate); // keep parentage
     fOutputArray->emplace_back(new_candidate);
   }
 }

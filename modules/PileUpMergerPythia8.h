@@ -27,9 +27,9 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
-class Candidate;
 class DelphesTF2;
 
 namespace Pythia8
@@ -65,9 +65,9 @@ private:
 
   Pythia8::Pythia *fPythia; //!
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fParticleOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fVertexOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fParticleOutputArray; //!
+  OutputHandle<CandidatesCollection> fVertexOutputArray; //!
 
   ClassDef(PileUpMergerPythia8, 1)
 };

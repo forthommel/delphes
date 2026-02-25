@@ -27,12 +27,11 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 #include <map>
 #include <set>
-
-class Candidate;
 
 class Weighter : public DelphesModule
 {
@@ -55,8 +54,8 @@ private:
   std::map<TIndexStruct, Double_t> fWeightMap;
 #endif
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(Weighter, 1)
 };

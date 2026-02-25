@@ -27,6 +27,7 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 #include <map>
@@ -34,7 +35,6 @@
 class TClass;
 class TRefArray;
 
-class Candidate;
 class ExRootTreeBranch;
 
 class TreeWriter : public DelphesModule
@@ -47,36 +47,36 @@ public:
   void Finish();
 
 private:
-  void FillParticles(const Candidate &candidate, TRefArray *array);
+  void FillParticles(const Candidate *candidate, TRefArray *array);
 
-  void ProcessParticles(ExRootTreeBranch *branch, const std::vector<Candidate> *array);
-  void ProcessVertices(ExRootTreeBranch *branch, const std::vector<Candidate> *array);
-  void ProcessTracks(ExRootTreeBranch *branch, const std::vector<Candidate> *array);
-  void ProcessTowers(ExRootTreeBranch *branch, const std::vector<Candidate> *array);
-  void ProcessParticleFlowCandidates(ExRootTreeBranch *branch, const std::vector<Candidate> *array);
-  void ProcessPhotons(ExRootTreeBranch *branch, const std::vector<Candidate> *array);
-  void ProcessElectrons(ExRootTreeBranch *branch, const std::vector<Candidate> *array);
-  void ProcessMuons(ExRootTreeBranch *branch, const std::vector<Candidate> *array);
-  void ProcessCscCluster(ExRootTreeBranch *branch, const std::vector<Candidate> *array);
-  void ProcessTauJets(ExRootTreeBranch *branch, const std::vector<Candidate> *array);
-  void ProcessJets(ExRootTreeBranch *branch, const std::vector<Candidate> *array);
-  void ProcessMissingET(ExRootTreeBranch *branch, const std::vector<Candidate> *array);
-  void ProcessScalarHT(ExRootTreeBranch *branch, const std::vector<Candidate> *array);
-  void ProcessRho(ExRootTreeBranch *branch, const std::vector<Candidate> *array);
-  void ProcessWeight(ExRootTreeBranch *branch, const std::vector<Candidate> *array);
-  void ProcessHectorHit(ExRootTreeBranch *branch, const std::vector<Candidate> *array);
+  void ProcessParticles(ExRootTreeBranch *branch, const CandidatesCollection *array);
+  void ProcessVertices(ExRootTreeBranch *branch, const CandidatesCollection *array);
+  void ProcessTracks(ExRootTreeBranch *branch, const CandidatesCollection *array);
+  void ProcessTowers(ExRootTreeBranch *branch, const CandidatesCollection *array);
+  void ProcessParticleFlowCandidates(ExRootTreeBranch *branch, const CandidatesCollection *array);
+  void ProcessPhotons(ExRootTreeBranch *branch, const CandidatesCollection *array);
+  void ProcessElectrons(ExRootTreeBranch *branch, const CandidatesCollection *array);
+  void ProcessMuons(ExRootTreeBranch *branch, const CandidatesCollection *array);
+  void ProcessCscCluster(ExRootTreeBranch *branch, const CandidatesCollection *array);
+  void ProcessTauJets(ExRootTreeBranch *branch, const CandidatesCollection *array);
+  void ProcessJets(ExRootTreeBranch *branch, const CandidatesCollection *array);
+  void ProcessMissingET(ExRootTreeBranch *branch, const CandidatesCollection *array);
+  void ProcessScalarHT(ExRootTreeBranch *branch, const CandidatesCollection *array);
+  void ProcessRho(ExRootTreeBranch *branch, const CandidatesCollection *array);
+  void ProcessWeight(ExRootTreeBranch *branch, const CandidatesCollection *array);
+  void ProcessHectorHit(ExRootTreeBranch *branch, const CandidatesCollection *array);
 
 #if !defined(__CINT__) && !defined(__CLING__)
-  typedef void (TreeWriter::*TProcessMethod)(ExRootTreeBranch *, const std::vector<Candidate> *); //!
+  typedef void (TreeWriter::*TProcessMethod)(ExRootTreeBranch *, const CandidatesCollection *); //!
 
-  typedef std::map<ExRootTreeBranch *, std::pair<TProcessMethod, const std::vector<Candidate> *> > TBranchMap; //!
+  typedef std::map<ExRootTreeBranch *, std::pair<TProcessMethod, const CandidatesCollection *> > TBranchMap; //!
 
   TBranchMap fBranchMap; //!
 
   std::map<TClass *, TProcessMethod> fClassMap; //!
 #endif
 
-  std::vector<InputHandle<std::vector<Candidate> > > fInputCollections;
+  std::vector<InputHandle<CandidatesCollection> > fInputCollections;
 
   ClassDef(TreeWriter, 2)
 };

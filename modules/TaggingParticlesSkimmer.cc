@@ -113,37 +113,37 @@ void TaggingParticlesSkimmer::Process()
   // loop over all input taus
   for(const auto &tau : tauArray)
   {
-    if(tau.D1 < 0) continue;
+    if(tau->D1 < 0) continue;
 
-    if(tau.D1 >= static_cast<int>(fParticleInputArray->size()) || tau.D2 >= static_cast<int>(fParticleInputArray->size()))
+    if(tau->D1 >= static_cast<int>(fParticleInputArray->size()) || tau->D2 >= static_cast<int>(fParticleInputArray->size()))
     {
       throw runtime_error("tau's daughter index is greater than the ParticleInputArray size");
     }
 
     tauMomentum.SetPxPyPzE(0.0, 0.0, 0.0, 0.0);
 
-    for(int i = tau.D1; i <= tau.D2; ++i)
+    for(int i = tau->D1; i <= tau->D2; ++i)
     {
       const auto &daughter = fParticleInputArray->at(i);
-      if(TMath::Abs(daughter.PID) == 16) continue;
-      tauMomentum += daughter.Momentum;
+      if(TMath::Abs(daughter->PID) == 16) continue;
+      tauMomentum += daughter->Momentum;
     }
 
-    auto new_candidate = tau;
-    new_candidate.Momentum = tauMomentum;
+    auto *new_candidate = static_cast<Candidate *>(tau->Clone());
+    new_candidate->Momentum = tauMomentum;
     fOutputArray->emplace_back(new_candidate);
   }
 
   // then add all other partons (except tau's to avoid double counting)
   for(const auto &candidate : *fPartonInputArray)
   {
-    pdgCode = TMath::Abs(candidate.PID);
+    pdgCode = TMath::Abs(candidate->PID);
     if(pdgCode == 15) continue;
 
-    pt = candidate.Momentum.Pt();
+    pt = candidate->Momentum.Pt();
     if(pt < fPTMin) continue;
 
-    eta = TMath::Abs(candidate.Momentum.Eta());
+    eta = TMath::Abs(candidate->Momentum.Eta());
     if(eta > fEtaMax) continue;
 
     fOutputArray->emplace_back(candidate);

@@ -30,11 +30,11 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 class ExRootSTLVectorFilter;
 
-class Candidate;
 class IsolationClassifier;
 
 class Isolation : public DelphesModule
@@ -66,10 +66,10 @@ private:
 
   ExRootSTLVectorFilter *fFilter;
 
-  InputHandle<std::vector<Candidate> > fIsolationInputArray; //!
-  InputHandle<std::vector<Candidate> > fCandidateInputArray; //!
-  InputHandle<std::vector<Candidate> > fRhoInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fIsolationInputArray; //!
+  InputHandle<CandidatesCollection> fCandidateInputArray; //!
+  InputHandle<CandidatesCollection> fRhoInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(Isolation, 1)
 };

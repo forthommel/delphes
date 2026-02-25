@@ -28,9 +28,9 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
-class Candidate;
 class DelphesFormula;
 
 class IdentificationMap : public DelphesModule
@@ -47,8 +47,8 @@ private:
 
   TMisIDMap fEfficiencyMap; //!
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(IdentificationMap, 1)
 };

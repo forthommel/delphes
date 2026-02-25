@@ -27,9 +27,9 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
-class Candidate;
 class DelphesFormula;
 
 class Efficiency : public DelphesModule
@@ -45,8 +45,8 @@ public:
 private:
   DelphesFormula *fFormula; //!
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   Double_t fUseMomentumVector; //!
 

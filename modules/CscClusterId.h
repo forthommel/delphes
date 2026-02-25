@@ -27,9 +27,9 @@
  *  \author Christina Wang
  *
  */
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
-class Candidate;
 class DelphesCscClusterFormula;
 
 class CscClusterId : public DelphesModule
@@ -47,8 +47,8 @@ private:
   DelphesCscClusterFormula *fEtaFormula; //!
   Double_t fEtaCutMax;
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(CscClusterId, 1)
 };

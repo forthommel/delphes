@@ -233,14 +233,14 @@ void SimpleCalorimeter::Process()
 
   for(const auto &particle : *fParticleInputArray)
   {
-    const TLorentzVector &particlePosition = particle.Position;
+    const TLorentzVector &particlePosition = particle->Position;
     ++number;
 
     // compute maximum radius (needed in FinalizeTower to assess whether barrel or endcap tower)
     if(particlePosition.Perp() > fTowerRmax)
       fTowerRmax = particlePosition.Perp();
 
-    pdgCode = TMath::Abs(particle.PID);
+    pdgCode = TMath::Abs(particle->PID);
 
     itFractionMap = fFractionMap.find(pdgCode);
     if(itFractionMap == fFractionMap.end())
@@ -285,10 +285,10 @@ void SimpleCalorimeter::Process()
   number = -1;
   for(const auto &track : *fTrackInputArray)
   {
-    const TLorentzVector &trackPosition = track.Position;
+    const TLorentzVector &trackPosition = track->Position;
     ++number;
 
-    pdgCode = TMath::Abs(track.PID);
+    pdgCode = TMath::Abs(track->PID);
 
     itFractionMap = fFractionMap.find(pdgCode);
     if(itFractionMap == fFractionMap.end())
@@ -400,8 +400,8 @@ void SimpleCalorimeter::Process()
     {
       ++fTowerTrackHits;
       const auto &track = fTrackInputArray->at(number);
-      momentum = track.Momentum;
-      position = track.Position;
+      momentum = track->Momentum;
+      position = track->Position;
 
       energy = momentum.E() * fTrackFractions[number];
 
@@ -415,15 +415,15 @@ void SimpleCalorimeter::Process()
         fTrackEnergy += energy;
 
         // compute energy contribution from PU tracks
-        if(track.IsPU) fTrackEnergyFromPU += energy;
+        if(track->IsPU) fTrackEnergyFromPU += energy;
 
         sigma = fResolutionFormula->Eval(0.0, fTowerEta, 0.0, momentum.E());
-        if(sigma / momentum.E() < track.TrackResolution)
+        if(sigma / momentum.E() < track->TrackResolution)
           energyGuess = energy;
         else
           energyGuess = momentum.E();
 
-        fTrackSigma += ((track.TrackResolution) * energyGuess) * ((track.TrackResolution) * energyGuess);
+        fTrackSigma += ((track->TrackResolution) * energyGuess) * ((track->TrackResolution) * energyGuess);
         if(fTower) fTowerTrackArray.emplace_back(track); // add only if tower exists
       }
       else
@@ -435,7 +435,7 @@ void SimpleCalorimeter::Process()
     else
     {
       const auto &particle = fParticleInputArray->at(number);
-      momentum = particle.Momentum;
+      momentum = particle->Momentum;
 
       energy = momentum.E() * fTrackFractions[number];
 
@@ -443,7 +443,7 @@ void SimpleCalorimeter::Process()
       {
         // compute total neutral energy
         fNeutralEnergy += energy;
-        if(particle.IsPU) fNeutralEnergyFromPU += energy;
+        if(particle->IsPU) fNeutralEnergyFromPU += energy;
       }
     }
 
@@ -454,8 +454,8 @@ void SimpleCalorimeter::Process()
     if(flags & 2) ++fTowerPhotonHits;
 
     const auto &particle = fParticleInputArray->at(number);
-    momentum = particle.Momentum;
-    position = particle.Position;
+    momentum = particle->Momentum;
+    position = particle->Position;
 
     // fill current tower
     energy = momentum.E() * fTowerFractions[number];
@@ -464,9 +464,9 @@ void SimpleCalorimeter::Process()
       fTowerEnergy += energy;
       fTowerTime += energy * energy * position.T(); //sigma_t ~ 1/E
       fTowerTimeWeight += energy * energy;
-      fTower->AddCandidate(&particle); // preserve parentage
+      fTower->AddCandidate(particle); // preserve parentage
       fTower->Position = position;
-      if(particle.IsPU) fTowerEnergyFromPU += energy;
+      if(particle->IsPU) fTowerEnergyFromPU += energy;
     }
   }
 
@@ -543,7 +543,7 @@ void SimpleCalorimeter::FinalizeTower()
   fTower->BetaStar = hardEnergyFraction;
 
   // fill  SimpleCalorimeter towers
-  if(energy > 0.0) fTowerOutputArray->emplace_back(*fTower);
+  if(energy > 0.0) fTowerOutputArray->emplace_back(fTower);
 
   // e-flow candidates
 
@@ -578,12 +578,12 @@ void SimpleCalorimeter::FinalizeTower()
 
     tower->BetaStar = hardEnergyFraction;
 
-    fEFlowTowerOutputArray->emplace_back(*tower);
+    fEFlowTowerOutputArray->emplace_back(tower);
 
     for(const auto &track : fTowerTrackArray)
     {
-      auto new_track = track;
-      new_track.AddCandidate(&track); // preserve parentage
+      auto *new_track = static_cast<Candidate *>(track->Clone());
+      new_track->AddCandidate(track); // preserve parentage
       fEFlowTrackOutputArray->emplace_back(new_track);
     }
   }
@@ -600,9 +600,9 @@ void SimpleCalorimeter::FinalizeTower()
 
     for(const auto &track : fTowerTrackArray)
     {
-      auto new_track = track;
-      new_track.AddCandidate(&track); // preserve parentage
-      new_track.Momentum.SetPtEtaPhiM(track.Momentum.Pt() * rescaleFactor, track.Momentum.Eta(), track.Momentum.Phi(), track.Momentum.M());
+      auto *new_track = static_cast<Candidate *>(track->Clone());
+      new_track->AddCandidate(track); // preserve parentage
+      new_track->Momentum.SetPtEtaPhiM(track->Momentum.Pt() * rescaleFactor, track->Momentum.Eta(), track->Momentum.Phi(), track->Momentum.M());
       fEFlowTrackOutputArray->emplace_back(new_track);
     }
   }

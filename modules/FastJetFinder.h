@@ -27,11 +27,10 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 #include <vector>
-
-class Candidate;
 
 namespace fastjet
 {
@@ -146,10 +145,10 @@ private:
   std::vector<TEstimatorStruct> fEstimators; //!
 #endif
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fRhoOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fConstituentsOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
+  OutputHandle<CandidatesCollection> fRhoOutputArray; //!
+  OutputHandle<CandidatesCollection> fConstituentsOutputArray; //!
 
   ClassDef(FastJetFinder, 1)
 };

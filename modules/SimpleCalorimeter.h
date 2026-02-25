@@ -30,13 +30,13 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 #include <map>
 #include <set>
 #include <vector>
 
-class Candidate;
 class DelphesFormula;
 
 class SimpleCalorimeter : public DelphesModule
@@ -107,13 +107,13 @@ private:
 
   DelphesFormula *fResolutionFormula; //!
 
-  InputHandle<std::vector<Candidate> > fParticleInputArray; //!
-  InputHandle<std::vector<Candidate> > fTrackInputArray; //!
-  OutputHandle<std::vector<Candidate> > fTowerOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fEFlowTrackOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fEFlowTowerOutputArray; //!
+  InputHandle<CandidatesCollection> fParticleInputArray; //!
+  InputHandle<CandidatesCollection> fTrackInputArray; //!
+  OutputHandle<CandidatesCollection> fTowerOutputArray; //!
+  OutputHandle<CandidatesCollection> fEFlowTrackOutputArray; //!
+  OutputHandle<CandidatesCollection> fEFlowTowerOutputArray; //!
 
-  std::vector<Candidate> fTowerTrackArray; //!
+  CandidatesCollection fTowerTrackArray; //!
 
   void FinalizeTower();
   Double_t LogNormal(Double_t mean, Double_t sigma);

@@ -37,7 +37,6 @@
 #include "TParticlePDG.h"
 #include "TStopwatch.h"
 
-#include "classes/DelphesClasses.h"
 #include "classes/DelphesFactory.h"
 #include "classes/DelphesStream.h"
 
@@ -296,17 +295,17 @@ void DelphesLHEFReader::AnalyzeParticle(DelphesFactory *factory,
   candidate->D1 = -1;
   candidate->D2 = -1;
 
-  allParticleOutputArray.emplace_back(*candidate);
+  allParticleOutputArray.emplace_back(candidate);
 
   if(!pdgParticle) return;
 
   if(fStatus == 1)
   {
-    stableParticleOutputArray.emplace_back(*candidate);
+    stableParticleOutputArray.emplace_back(candidate);
   }
   else if(pdgCode <= 5 || pdgCode == 21 || pdgCode == 15)
   {
-    partonOutputArray.emplace_back(*candidate);
+    partonOutputArray.emplace_back(candidate);
   }
 }
 

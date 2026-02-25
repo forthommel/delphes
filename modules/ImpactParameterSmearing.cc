@@ -94,7 +94,7 @@ void ImpactParameterSmearing::Process()
   {
 
     // take momentum before smearing (otherwise apply double smearing on d0)
-    auto *particle = static_cast<Candidate *>(candidate.GetCandidates().at(0));
+    auto *particle = static_cast<Candidate *>(candidate->GetCandidates().at(0));
 
     const TLorentzVector &candidateMomentum = particle->Momentum;
 
@@ -107,9 +107,9 @@ void ImpactParameterSmearing::Process()
     py = candidateMomentum.Py();
 
     // calculate coordinates of closest approach to track circle in transverse plane xd, yd, zd
-    xd = candidate.Xd;
-    yd = candidate.Yd;
-    zd = candidate.Zd;
+    xd = candidate->Xd;
+    yd = candidate->Yd;
+    zd = candidate->Zd;
 
     // calculate smeared values
     sx = gRandom->Gaus(0.0, fFormula->Eval(pt, eta, phi, e));
@@ -126,15 +126,15 @@ void ImpactParameterSmearing::Process()
     dd0 = gRandom->Gaus(0.0, fFormula->Eval(pt, eta, phi, e));
 
     // fill smeared values in candidate
-    auto new_candidate = candidate;
-    new_candidate.Xd = xd;
-    new_candidate.Yd = yd;
-    new_candidate.Zd = zd;
+    auto *new_candidate = static_cast<Candidate *>(candidate->Clone());
+    new_candidate->Xd = xd;
+    new_candidate->Yd = yd;
+    new_candidate->Zd = zd;
 
-    new_candidate.D0 = d0;
-    new_candidate.ErrorD0 = dd0;
+    new_candidate->D0 = d0;
+    new_candidate->ErrorD0 = dd0;
 
-    new_candidate.AddCandidate(&candidate); // ensure parentage
+    new_candidate->AddCandidate(candidate); // ensure parentage
     fOutputArray->emplace_back(new_candidate);
   }
 }

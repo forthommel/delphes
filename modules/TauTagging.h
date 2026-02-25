@@ -32,11 +32,11 @@
 #include "ExRootAnalysis/ExRootClassifier.h"
 #include "ExRootAnalysis/ExRootResult.h"
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 #include <map>
 
-class Candidate;
 class DelphesFormula;
 
 class ExRootSTLVectorFilter;
@@ -65,9 +65,9 @@ private:
 
   ExRootSTLVectorFilter *fFilter;
 
-  InputHandle<std::vector<Candidate> > fParticleInputArray; //!
-  InputHandle<std::vector<Candidate> > fPartonInputArray; //!
-  InputHandle<std::vector<Candidate> > fJetInputArray; //!
+  InputHandle<CandidatesCollection> fParticleInputArray; //!
+  InputHandle<CandidatesCollection> fPartonInputArray; //!
+  InputHandle<CandidatesCollection> fJetInputArray; //!
 
   ClassDef(TauTagging, 1)
 };
@@ -77,14 +77,14 @@ private:
 class TauTaggingPartonClassifier : public ExRootClassifier
 {
 public:
-  explicit TauTaggingPartonClassifier(const std::vector<Candidate> &array) :
+  explicit TauTaggingPartonClassifier(const CandidatesCollection &array) :
     fParticleInputArray(array) {}
 
   Int_t GetCategory(TObject *object);
 
   Double_t fEtaMax, fPTMin;
 
-  const std::vector<Candidate> &fParticleInputArray;
+  const CandidatesCollection &fParticleInputArray;
 };
 
 #endif

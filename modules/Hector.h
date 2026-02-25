@@ -27,9 +27,9 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
-class Candidate;
 class H_BeamLine;
 
 class Hector : public DelphesModule
@@ -52,8 +52,8 @@ private:
 
   H_BeamLine *fBeamLine;
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(Hector, 1)
 };

@@ -28,10 +28,10 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 class TLorentzVector;
-class Candidate;
 
 class UnstablePropagator : public DelphesModule
 {
@@ -48,7 +48,7 @@ private:
   Double_t fLmin; // minimum
 
   Bool_t fDebug;
-  InputHandle<std::vector<Candidate> > fInputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
 
   std::vector<Int_t> DaughterIndices(Candidate *candidate);
   void PrintPart(TString prefix, Candidate *candidate);

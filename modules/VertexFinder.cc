@@ -131,9 +131,9 @@ void VertexFinder::Process()
   // Add tracks to the output array after updating their ClusterIndex.
   for(auto &candidate : *fInputArray)
   {
-    if(candidate.Momentum.Pt() < fMinPT || fabs(candidate.Momentum.Eta()) > fMaxEta)
+    if(candidate->Momentum.Pt() < fMinPT || fabs(candidate->Momentum.Eta()) > fMaxEta)
       continue;
-    candidate.ClusterIndex = trackIDToInt.at(candidate.GetUniqueID()).at("clusterIndex");
+    candidate->ClusterIndex = trackIDToInt.at(candidate->GetUniqueID()).at("clusterIndex");
     fOutputArray->emplace_back(candidate);
   }
 
@@ -151,13 +151,14 @@ void VertexFinder::Process()
 
   for(vector<pair<UInt_t, Double_t> >::const_iterator cluster = clusterSumPT2.begin(); cluster != clusterSumPT2.end(); cluster++)
   {
-    auto &new_candidate = fVertexOutputArray->emplace_back();
-    new_candidate.ClusterIndex = cluster->first;
-    new_candidate.ClusterNDF = clusterIDToInt.at(cluster->first).at("ndf");
-    new_candidate.ClusterSigma = fSigma;
-    new_candidate.SumPT2 = cluster->second;
-    new_candidate.Position.SetXYZT(0.0, 0.0, clusterIDToDouble.at(cluster->first).at("z"), 0.0);
-    new_candidate.PositionError.SetXYZT(0.0, 0.0, clusterIDToDouble.at(cluster->first).at("ez"), 0.0);
+    auto *new_candidate = GetFactory()->NewCandidate();
+    new_candidate->ClusterIndex = cluster->first;
+    new_candidate->ClusterNDF = clusterIDToInt.at(cluster->first).at("ndf");
+    new_candidate->ClusterSigma = fSigma;
+    new_candidate->SumPT2 = cluster->second;
+    new_candidate->Position.SetXYZT(0.0, 0.0, clusterIDToDouble.at(cluster->first).at("z"), 0.0);
+    new_candidate->PositionError.SetXYZT(0.0, 0.0, clusterIDToDouble.at(cluster->first).at("ez"), 0.0);
+    fVertexOutputArray->emplace_back(new_candidate);
   }
 }
 
@@ -170,23 +171,23 @@ void VertexFinder::createSeeds()
   // Loop over all tracks, initializing some variables.
   for(const auto &candidate : *fInputArray)
   {
-    if(candidate.Momentum.Pt() < fMinPT || fabs(candidate.Momentum.Eta()) > fMaxEta)
+    if(candidate->Momentum.Pt() < fMinPT || fabs(candidate->Momentum.Eta()) > fMaxEta)
       continue;
 
-    trackIDToDouble[candidate.GetUniqueID()]["pt"] = candidate.Momentum.Pt();
-    trackIDToDouble[candidate.GetUniqueID()]["ept"] = candidate.ErrorPT ? candidate.ErrorPT : 1.0e-15;
+    trackIDToDouble[candidate->GetUniqueID()]["pt"] = candidate->Momentum.Pt();
+    trackIDToDouble[candidate->GetUniqueID()]["ept"] = candidate->ErrorPT ? candidate->ErrorPT : 1.0e-15;
     ;
-    trackIDToDouble[candidate.GetUniqueID()]["eta"] = candidate.Momentum.Eta();
+    trackIDToDouble[candidate->GetUniqueID()]["eta"] = candidate->Momentum.Eta();
 
-    trackIDToDouble[candidate.GetUniqueID()]["z"] = candidate.DZ;
-    trackIDToDouble[candidate.GetUniqueID()]["ez"] = candidate.ErrorDZ ? candidate.ErrorDZ : 1.0e-15;
+    trackIDToDouble[candidate->GetUniqueID()]["z"] = candidate->DZ;
+    trackIDToDouble[candidate->GetUniqueID()]["ez"] = candidate->ErrorDZ ? candidate->ErrorDZ : 1.0e-15;
 
-    trackIDToInt[candidate.GetUniqueID()]["clusterIndex"] = -1;
-    trackIDToInt[candidate.GetUniqueID()]["interactionIndex"] = candidate.IsPU;
+    trackIDToInt[candidate->GetUniqueID()]["clusterIndex"] = -1;
+    trackIDToInt[candidate->GetUniqueID()]["interactionIndex"] = candidate->IsPU;
 
-    trackIDToBool[candidate.GetUniqueID()]["claimed"] = false;
+    trackIDToBool[candidate->GetUniqueID()]["claimed"] = false;
 
-    trackPT.push_back(make_pair(candidate.GetUniqueID(), candidate.Momentum.Pt()));
+    trackPT.push_back(make_pair(candidate->GetUniqueID(), candidate->Momentum.Pt()));
   }
 
   // Sort tracks by pt and leave only the SeedMinPT highest pt ones in the

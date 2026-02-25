@@ -144,15 +144,15 @@ void Isolation::Process()
   // loop over all input jets
   for(auto &candidate : *fCandidateInputArray)
   {
-    const TLorentzVector &candidateMomentum = candidate.Momentum;
+    const TLorentzVector &candidateMomentum = candidate->Momentum;
     eta = TMath::Abs(candidateMomentum.Eta());
 
     // find rho
     rho = 0.0;
     if(fRhoInputArray)
       for(const auto &object : *fRhoInputArray)
-        if(eta >= object.Edges[0] && eta < object.Edges[1])
-          rho = object.Momentum.Pt();
+        if(eta >= object->Edges[0] && eta < object->Edges[1])
+          rho = object->Momentum.Pt();
 
     // loop over all input tracks
 
@@ -163,7 +163,7 @@ void Isolation::Process()
 
     for(const auto &isolation : isolationArray)
     {
-      const TLorentzVector &isolationMomentum = isolation.Momentum;
+      const TLorentzVector isolationMomentum = isolation->Momentum;
 
       if(fUseMiniCone)
       {
@@ -171,16 +171,16 @@ void Isolation::Process()
       }
       else
       {
-        pass = candidateMomentum.DeltaR(isolationMomentum) <= fDeltaRMax && candidate.GetUniqueID() != isolation.GetUniqueID();
+        pass = candidateMomentum.DeltaR(isolationMomentum) <= fDeltaRMax && candidate->GetUniqueID() != isolation->GetUniqueID();
       }
 
       if(pass)
       {
 
         sumAllParticles += isolationMomentum.Pt();
-        if(isolation.Charge != 0)
+        if(isolation->Charge != 0)
         {
-          if(isolation.IsRecoPU)
+          if(isolation->IsRecoPU)
           {
             sumChargedPU += isolationMomentum.Pt();
           }
@@ -200,8 +200,8 @@ void Isolation::Process()
     rho = 0.0;
     if(fRhoInputArray)
       for(const auto &object : *fRhoInputArray)
-        if(eta >= object.Edges[0] && eta < object.Edges[1])
-          rho = object.Momentum.Pt();
+        if(eta >= object->Edges[0] && eta < object->Edges[1])
+          rho = object->Momentum.Pt();
 
     // correct sum for pile-up contamination
     sumDBeta = sumChargedNoPU + TMath::Max(sumNeutral - 0.5 * sumChargedPU, 0.0);
@@ -209,12 +209,12 @@ void Isolation::Process()
     ratioDBeta = sumDBeta / candidateMomentum.Pt();
     ratioRhoCorr = sumRhoCorr / candidateMomentum.Pt();
 
-    candidate.IsolationVar = ratioDBeta;
-    candidate.IsolationVarRhoCorr = ratioRhoCorr;
-    candidate.SumPtCharged = sumChargedNoPU;
-    candidate.SumPtNeutral = sumNeutral;
-    candidate.SumPtChargedPU = sumChargedPU;
-    candidate.SumPt = sumAllParticles;
+    candidate->IsolationVar = ratioDBeta;
+    candidate->IsolationVarRhoCorr = ratioRhoCorr;
+    candidate->SumPtCharged = sumChargedNoPU;
+    candidate->SumPtNeutral = sumNeutral;
+    candidate->SumPtChargedPU = sumChargedPU;
+    candidate->SumPt = sumAllParticles;
 
     sum = fUseRhoCorrection ? sumRhoCorr : sumDBeta;
     if(fUsePTSum && sum > fPTSumMax) continue;

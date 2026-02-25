@@ -27,9 +27,8 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
-
-class Candidate;
 
 class JetPileUpSubtractor : public DelphesModule
 {
@@ -43,9 +42,9 @@ public:
 private:
   Double_t fJetPTMin;
 
-  InputHandle<std::vector<Candidate> > fJetInputArray; //!
-  InputHandle<std::vector<Candidate> > fRhoInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fJetInputArray; //!
+  InputHandle<CandidatesCollection> fRhoInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(JetPileUpSubtractor, 1)
 };

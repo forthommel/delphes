@@ -27,9 +27,9 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
-class Candidate;
 class DelphesFormula;
 
 class AngularSmearing : public DelphesModule
@@ -46,8 +46,8 @@ private:
   DelphesFormula *fFormulaEta; //!
   DelphesFormula *fFormulaPhi; //!
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(AngularSmearing, 1)
 };

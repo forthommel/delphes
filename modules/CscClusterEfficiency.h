@@ -19,8 +19,6 @@
 #ifndef CscClusterEfficiency_h
 #define CscClusterEfficiency_h
 
-#include "classes/DelphesModule.h"
-
 /** \class CscClusterEfficiency
  *
  *  This module is specific to the CMS paper searching for neutral LLPs in the CMS endcap muon detectors: https://arxiv.org/abs/2107.04838
@@ -30,7 +28,9 @@
  *
  */
 
-class Candidate;
+#include "classes/DelphesClasses.h"
+#include "classes/DelphesModule.h"
+
 class DelphesCscClusterFormula;
 
 class CscClusterEfficiency : public DelphesModule
@@ -46,8 +46,8 @@ public:
 private:
   DelphesCscClusterFormula *fFormula; //!
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(CscClusterEfficiency, 1)
 };

@@ -27,9 +27,8 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
-
-class Candidate;
 
 class TrackCountingBTagging : public DelphesModule
 {
@@ -50,8 +49,8 @@ private:
   Int_t fNtracks;
   Bool_t fUse3D;
 
-  InputHandle<std::vector<Candidate> > fTrackInputArray; //!
-  InputHandle<std::vector<Candidate> > fJetInputArray; //!
+  InputHandle<CandidatesCollection> fTrackInputArray; //!
+  InputHandle<CandidatesCollection> fJetInputArray; //!
 
   ClassDef(TrackCountingBTagging, 1)
 };

@@ -30,9 +30,8 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
-
-class Candidate;
 
 class ParticlePropagator : public DelphesModule
 {
@@ -47,13 +46,13 @@ private:
   Double_t fRadius, fRadius2, fRadiusMax, fHalfLength, fHalfLengthMax;
   Double_t fBz;
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  InputHandle<std::vector<Candidate> > fBeamSpotInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fNeutralOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fChargedHadronOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fElectronOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fMuonOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  InputHandle<CandidatesCollection> fBeamSpotInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
+  OutputHandle<CandidatesCollection> fNeutralOutputArray; //!
+  OutputHandle<CandidatesCollection> fChargedHadronOutputArray; //!
+  OutputHandle<CandidatesCollection> fElectronOutputArray; //!
+  OutputHandle<CandidatesCollection> fMuonOutputArray; //!
 
   ClassDef(ParticlePropagator, 1)
 };

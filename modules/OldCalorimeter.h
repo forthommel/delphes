@@ -14,6 +14,7 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 #include <map>
@@ -21,7 +22,6 @@
 #include <vector>
 
 class DelphesFormula;
-class Candidate;
 
 class OldCalorimeter : public DelphesModule
 {
@@ -58,18 +58,18 @@ private:
   DelphesFormula *fECalResolutionFormula; //!
   DelphesFormula *fHCalResolutionFormula; //!
 
-  InputHandle<std::vector<Candidate> > fParticleInputArray; //!
-  InputHandle<std::vector<Candidate> > fTrackInputArray; //!
-  OutputHandle<std::vector<Candidate> > fTowerOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fPhotonOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fEFlowTrackOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fEFlowTowerOutputArray; //!
+  InputHandle<CandidatesCollection> fParticleInputArray; //!
+  InputHandle<CandidatesCollection> fTrackInputArray; //!
+  OutputHandle<CandidatesCollection> fTowerOutputArray; //!
+  OutputHandle<CandidatesCollection> fPhotonOutputArray; //!
+  OutputHandle<CandidatesCollection> fEFlowTrackOutputArray; //!
+  OutputHandle<CandidatesCollection> fEFlowTowerOutputArray; //!
 
-  std::vector<Candidate> fTowerECalArray; //!
-  std::vector<Candidate> fTowerHCalArray; //!
-  std::vector<Candidate> fTowerTrackArray; //!
-  std::vector<Candidate> fTowerECalTrackArray; //!
-  std::vector<Candidate> fTowerHCalTrackArray; //!
+  CandidatesCollection fTowerECalArray; //!
+  CandidatesCollection fTowerHCalArray; //!
+  CandidatesCollection fTowerTrackArray; //!
+  CandidatesCollection fTowerECalTrackArray; //!
+  CandidatesCollection fTowerHCalTrackArray; //!
 
   void FinalizeTower();
   Double_t LogNormal(Double_t mean, Double_t sigma);

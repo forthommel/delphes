@@ -316,8 +316,6 @@ void FastJetFinder::Finish()
 
 void FastJetFinder::Process()
 {
-  TLorentzVector momentum;
-
   Double_t deta, dphi, detaMax, dphiMax;
   Double_t time, timeWeight;
   Double_t neutralEnergyFraction, chargedEnergyFraction;
@@ -348,7 +346,7 @@ void FastJetFinder::Process()
   number = 0;
   for(const auto &candidate : *fInputArray)
   {
-    momentum = candidate.Momentum;
+    const auto &momentum = candidate->Momentum;
     jet = PseudoJet(momentum.Px(), momentum.Py(), momentum.Pz(), momentum.E());
     jet.set_user_index(number);
     inputList.push_back(jet);
@@ -377,7 +375,7 @@ void FastJetFinder::Process()
       candidate->Momentum.SetPtEtaPhiE(rho, 0.0, 0.0, rho);
       candidate->Edges[0] = itEstimators->etaMin;
       candidate->Edges[1] = itEstimators->etaMax;
-      fRhoOutputArray->emplace_back(*candidate);
+      fRhoOutputArray->emplace_back(candidate);
     }
   }
 
@@ -423,6 +421,7 @@ void FastJetFinder::Process()
     jet = *itOutputList;
     if(fJetAlgorithm == 7) jet = join(jet.constituents());
 
+    TLorentzVector momentum;
     momentum.SetPxPyPzE(jet.px(), jet.py(), jet.pz(), jet.E());
 
     area.reset(0.0, 0.0, 0.0, 0.0);
@@ -449,29 +448,29 @@ void FastJetFinder::Process()
       if(itInputList->user_index() < 0) continue;
       const auto &constituent = fInputArray->at(itInputList->user_index());
 
-      deta = TMath::Abs(momentum.Eta() - constituent.Momentum.Eta());
-      dphi = TMath::Abs(momentum.DeltaPhi(constituent.Momentum));
+      deta = TMath::Abs(momentum.Eta() - constituent->Momentum.Eta());
+      dphi = TMath::Abs(momentum.DeltaPhi(constituent->Momentum));
       if(deta > detaMax) detaMax = deta;
       if(dphi > dphiMax) dphiMax = dphi;
 
-      if(constituent.Charge == 0)
+      if(constituent->Charge == 0)
       {
         nneutrals++;
-        neutralEnergyFraction += constituent.Momentum.E();
+        neutralEnergyFraction += constituent->Momentum.E();
       }
       else
       {
         ncharged++;
-        chargedEnergyFraction += constituent.Momentum.E();
+        chargedEnergyFraction += constituent->Momentum.E();
       }
 
-      time += TMath::Sqrt(constituent.Momentum.E()) * (constituent.Position.T());
-      timeWeight += TMath::Sqrt(constituent.Momentum.E());
+      time += TMath::Sqrt(constituent->Momentum.E()) * (constituent->Position.T());
+      timeWeight += TMath::Sqrt(constituent->Momentum.E());
 
-      charge += constituent.Charge;
+      charge += constituent->Charge;
 
       fConstituentsOutputArray->emplace_back(constituent);
-      candidate->AddCandidate(&constituent);
+      candidate->AddCandidate(constituent);
     }
 
     candidate->Momentum = momentum;
@@ -594,7 +593,7 @@ void FastJetFinder::Process()
       candidate->Tau[4] = nSub5(*itOutputList);
     }
 
-    fOutputArray->emplace_back(*candidate);
+    fOutputArray->emplace_back(candidate);
   }
   delete sequence;
 }

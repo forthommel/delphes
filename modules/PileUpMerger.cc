@@ -147,11 +147,11 @@ void PileUpMerger::Process()
 
   for(auto &candidate : *fInputArray)
   {
-    vx += candidate.Position.X();
-    vy += candidate.Position.Y();
-    z = candidate.Position.Z();
-    t = candidate.Position.T();
-    pt = candidate.Momentum.Pt();
+    vx += candidate->Position.X();
+    vy += candidate->Position.Y();
+    z = candidate->Position.Z();
+    t = candidate->Position.T();
+    pt = candidate->Momentum.Pt();
 
     // take postion and time from first stable particle
     if(dz0 < -999999.0)
@@ -160,18 +160,18 @@ void PileUpMerger::Process()
       dt0 = t;
 
     // cancel any possible offset in position and time the input file
-    candidate.Position.SetZ(z - dz0 + dz);
-    candidate.Position.SetT(t - dt0 + dt);
+    candidate->Position.SetZ(z - dz0 + dz);
+    candidate->Position.SetT(t - dt0 + dt);
 
-    candidate.IsPU = 0;
+    candidate->IsPU = 0;
 
     fParticleOutputArray->emplace_back(candidate);
 
-    if(TMath::Abs(candidate.Charge) > 1.0E-9)
+    if(TMath::Abs(candidate->Charge) > 1.0E-9)
     {
       nch++;
       sumpt2 += pt * pt;
-      vertex->AddCandidate(&candidate);
+      vertex->AddCandidate(candidate);
     }
   }
 
@@ -187,7 +187,7 @@ void PileUpMerger::Process()
   vertex->ClusterNDF = nch;
   vertex->SumPT2 = sumpt2;
   vertex->GenSumPT2 = sumpt2;
-  fVertexOutputArray->emplace_back(*vertex);
+  fVertexOutputArray->emplace_back(vertex);
 
   // --- Then with pile-up vertices  ------
 
@@ -271,7 +271,7 @@ void PileUpMerger::Process()
         vertex->AddCandidate(candidate);
       }
 
-      fParticleOutputArray->emplace_back(*candidate);
+      fParticleOutputArray->emplace_back(candidate);
     }
 
     if(numberOfParticles > 0)
@@ -291,7 +291,7 @@ void PileUpMerger::Process()
 
     vertex->IsPU = 1;
 
-    fVertexOutputArray->emplace_back(*vertex);
+    fVertexOutputArray->emplace_back(vertex);
   }
 }
 

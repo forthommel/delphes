@@ -128,7 +128,7 @@ void JetFakeParticle::Process()
 
   for(const auto &candidate : *fInputArray)
   {
-    const TLorentzVector &candidateMomentum = candidate.Momentum;
+    const TLorentzVector &candidateMomentum = candidate->Momentum;
     eta = candidateMomentum.Eta();
     phi = candidateMomentum.Phi();
     pt = candidateMomentum.Pt();
@@ -148,15 +148,15 @@ void JetFakeParticle::Process()
 
       if(total <= r && r < total + p)
       {
-        fake = static_cast<Candidate *>(candidate.Clone());
+        fake = static_cast<Candidate *>(candidate->Clone());
 
         // convert jet
 
         if(TMath::Abs(pdgCodeOut) == 11 || TMath::Abs(pdgCodeOut) == 13)
         {
-          if(candidate.Charge != 0)
+          if(candidate->Charge != 0)
           {
-            fake->Charge = candidate.Charge / TMath::Abs(candidate.Charge);
+            fake->Charge = candidate->Charge / TMath::Abs(candidate->Charge);
           }
           else
           {
@@ -167,9 +167,9 @@ void JetFakeParticle::Process()
 
         if(TMath::Abs(pdgCodeOut) == 22) fake->PID = 22;
 
-        if(TMath::Abs(pdgCodeOut) == 11) fElectronOutputArray->emplace_back(*fake);
-        if(TMath::Abs(pdgCodeOut) == 13) fMuonOutputArray->emplace_back(*fake);
-        if(TMath::Abs(pdgCodeOut) == 22) fPhotonOutputArray->emplace_back(*fake);
+        if(TMath::Abs(pdgCodeOut) == 11) fElectronOutputArray->emplace_back(fake);
+        if(TMath::Abs(pdgCodeOut) == 13) fMuonOutputArray->emplace_back(fake);
+        if(TMath::Abs(pdgCodeOut) == 22) fPhotonOutputArray->emplace_back(fake);
 
         break;
       }

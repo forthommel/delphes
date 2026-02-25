@@ -28,9 +28,9 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
-class Candidate;
 class TrkUtil;
 
 class ClusterCounting : public DelphesModule
@@ -54,8 +54,8 @@ private:
 
   TrkUtil *fTrackUtil;
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(ClusterCounting, 1)
 };

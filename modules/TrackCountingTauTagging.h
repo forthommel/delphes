@@ -15,11 +15,11 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 #include <map>
 
-class Candidate;
 class DelphesFormula;
 
 class ExRootSTLVectorFilter;
@@ -48,10 +48,10 @@ private:
 
   ExRootSTLVectorFilter *fFilter;
 
-  InputHandle<std::vector<Candidate> > fParticleInputArray; //!
-  InputHandle<std::vector<Candidate> > fTrackInputArray; //!
-  InputHandle<std::vector<Candidate> > fPartonInputArray; //!
-  InputHandle<std::vector<Candidate> > fJetInputArray; //!
+  InputHandle<CandidatesCollection> fParticleInputArray; //!
+  InputHandle<CandidatesCollection> fTrackInputArray; //!
+  InputHandle<CandidatesCollection> fPartonInputArray; //!
+  InputHandle<CandidatesCollection> fJetInputArray; //!
 
   ClassDef(TrackCountingTauTagging, 1)
 };

@@ -102,14 +102,14 @@ void PdgCodeFilter::Process()
   fOutputArray->clear();
   for(const auto &candidate : *fInputArray)
   {
-    pdgCode = candidate.PID;
-    const TLorentzVector &candidateMomentum = candidate.Momentum;
+    pdgCode = candidate->PID;
+    const TLorentzVector &candidateMomentum = candidate->Momentum;
     pt = candidateMomentum.Pt();
 
     if(pt < fPTMin) continue;
-    if(fRequireStatus && (candidate.Status != fStatus)) continue;
-    if(fRequireCharge && (candidate.Charge != fCharge)) continue;
-    if(fRequireNotPileup && (candidate.IsPU > 0)) continue;
+    if(fRequireStatus && (candidate->Status != fStatus)) continue;
+    if(fRequireCharge && (candidate->Charge != fCharge)) continue;
+    if(fRequireNotPileup && (candidate->IsPU > 0)) continue;
 
     pass = kTRUE;
     if(find(fPdgCodes.begin(), fPdgCodes.end(), pdgCode) != fPdgCodes.end()) pass = kFALSE;

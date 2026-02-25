@@ -29,10 +29,10 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
-#include <vector>
 
-class Candidate;
+#include <vector>
 
 class PdgCodeFilter : public DelphesModule
 {
@@ -54,8 +54,8 @@ private:
 
   std::vector<Int_t> fPdgCodes;
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(PdgCodeFilter, 1)
 };

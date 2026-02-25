@@ -151,44 +151,44 @@ void RunPUPPI::Process()
   // take the leading vertex
   float PVZ = 0.;
   if(!fPVInputArray->empty())
-    PVZ = fPVInputArray->at(0).Position.Z();
+    PVZ = fPVInputArray->at(0)->Position.Z();
   // Fill input particles for puppi
   std::vector<RecoObj> puppiInputVector;
   puppiInputVector.clear();
   // Loop on charge track candidate
   for(auto &candidate : *fTrackInputArray) //TODO: check if const GetCandidates getter is possible
   {
-    const auto momentum = candidate.Momentum;
+    const auto momentum = candidate->Momentum;
     RecoObj curRecoObj;
     curRecoObj.pt = momentum.Pt();
     curRecoObj.eta = momentum.Eta();
     curRecoObj.phi = momentum.Phi();
     curRecoObj.m = momentum.M();
-    const auto *particle = static_cast<Candidate *>(candidate.GetCandidates().at(0)); //if(fApplyNoLep && TMath::Abs(candidate->PID) == 11) continue; //Dumb cut to minimize the nolepton on electron
+    const auto *particle = static_cast<Candidate *>(candidate->GetCandidates().at(0)); //if(fApplyNoLep && TMath::Abs(candidate->PID) == 11) continue; //Dumb cut to minimize the nolepton on electron
     //if(fApplyNoLep && TMath::Abs(candidate->PID) == 13) continue;
-    if(candidate.IsRecoPU and candidate.Charge != 0)
+    if(candidate->IsRecoPU and candidate->Charge != 0)
     { // if it comes fromPU vertexes after the resolution smearing and the dZ matching within resolution
       curRecoObj.id = 2;
       curRecoObj.vtxId = 0.7 * (fPVInputArray->size()); //Hack apply reco vtx efficiency of 70% for calibration
-      if(TMath::Abs(candidate.PID) == 11)
+      if(TMath::Abs(candidate->PID) == 11)
         curRecoObj.pfType = 2;
-      else if(TMath::Abs(candidate.PID) == 13)
+      else if(TMath::Abs(candidate->PID) == 13)
         curRecoObj.pfType = 3;
-      else if(TMath::Abs(candidate.PID) == 22)
+      else if(TMath::Abs(candidate->PID) == 22)
         curRecoObj.pfType = 4;
       else
         curRecoObj.pfType = 1;
       curRecoObj.dZ = particle->Position.Z() - PVZ;
     }
-    else if(!candidate.IsRecoPU && candidate.Charge != 0)
+    else if(!candidate->IsRecoPU && candidate->Charge != 0)
     {
       curRecoObj.id = 1; // charge from LV
       curRecoObj.vtxId = 1; // from PV
-      if(TMath::Abs(candidate.PID) == 11)
+      if(TMath::Abs(candidate->PID) == 11)
         curRecoObj.pfType = 2;
-      else if(TMath::Abs(candidate.PID) == 13)
+      else if(TMath::Abs(candidate->PID) == 13)
         curRecoObj.pfType = 3;
-      else if(TMath::Abs(candidate.PID) == 22)
+      else if(TMath::Abs(candidate->PID) == 22)
         curRecoObj.pfType = 4;
       else
         curRecoObj.pfType = 1;
@@ -201,29 +201,29 @@ void RunPUPPI::Process()
     }
 
     puppiInputVector.push_back(curRecoObj);
-    InputParticles.push_back(&candidate);
+    InputParticles.push_back(candidate);
   }
 
   // Loop on neutral calo cells
   for(auto &candidate : *fNeutralInputArray) //TODO: check for const-qualified GetCandidates
   {
-    const auto momentum = candidate.Momentum;
+    const auto momentum = candidate->Momentum;
     RecoObj curRecoObj;
     curRecoObj.pt = momentum.Pt();
     curRecoObj.eta = momentum.Eta();
     curRecoObj.phi = momentum.Phi();
     curRecoObj.m = momentum.M();
     curRecoObj.charge = 0;
-    const auto *particle = static_cast<Candidate *>(candidate.GetCandidates().at(0));
-    if(candidate.Charge == 0)
+    const auto *particle = static_cast<Candidate *>(candidate->GetCandidates().at(0));
+    if(candidate->Charge == 0)
     {
       curRecoObj.id = 0; // neutrals have id==0
       curRecoObj.vtxId = 0; // neutrals have vtxId==0
-      if(TMath::Abs(candidate.PID) == 11)
+      if(TMath::Abs(candidate->PID) == 11)
         curRecoObj.pfType = 2;
-      else if(TMath::Abs(candidate.PID) == 13)
+      else if(TMath::Abs(candidate->PID) == 13)
         curRecoObj.pfType = 3;
-      else if(TMath::Abs(candidate.PID) == 22)
+      else if(TMath::Abs(candidate->PID) == 22)
         curRecoObj.pfType = 4;
       else
         curRecoObj.pfType = 5;
@@ -235,7 +235,7 @@ void RunPUPPI::Process()
       continue;
     }
     puppiInputVector.push_back(curRecoObj);
-    InputParticles.push_back(&candidate);
+    InputParticles.push_back(candidate);
   }
   // Create PUPPI container
   fPuppi->initialize(puppiInputVector);
@@ -249,11 +249,11 @@ void RunPUPPI::Process()
     {
       auto *candidate = static_cast<Candidate *>(InputParticles.at(it->user_index())->Clone());
       candidate->Momentum.SetPxPyPzE(it->px(), it->py(), it->pz(), it->e());
-      fOutputArray->emplace_back(*candidate);
+      fOutputArray->emplace_back(candidate);
       if(puppiInputVector.at(it->user_index()).id == 1 or puppiInputVector.at(it->user_index()).id == 2)
-        fOutputTrackArray->emplace_back(*candidate);
+        fOutputTrackArray->emplace_back(candidate);
       else if(puppiInputVector.at(it->user_index()).id == 0)
-        fOutputNeutralArray->emplace_back(*candidate);
+        fOutputNeutralArray->emplace_back(candidate);
     }
     else
     {

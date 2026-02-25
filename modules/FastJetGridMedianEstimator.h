@@ -27,10 +27,10 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
-#include <vector>
 
-class Candidate;
+#include <vector>
 
 namespace fastjet
 {
@@ -49,8 +49,8 @@ public:
 private:
   std::vector<fastjet::GridMedianBackgroundEstimator *> fEstimators; //!
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fRhoOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fRhoOutputArray; //!
 
   ClassDef(FastJetGridMedianEstimator, 1)
 };

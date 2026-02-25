@@ -15,7 +15,7 @@
 
 #include <stdexcept>
 
-ExRootSTLVectorFilter::ExRootSTLVectorFilter(const std::vector<Candidate> &collection) :
+ExRootSTLVectorFilter::ExRootSTLVectorFilter(const std::vector<Candidate *> &collection) :
   fCollection(collection)
 {
 }
@@ -46,7 +46,7 @@ void ExRootSTLVectorFilter::Reset(ExRootClassifier *classifier)
 
 //------------------------------------------------------------------------------
 
-std::vector<Candidate> ExRootSTLVectorFilter::GetSubArray(ExRootClassifier *classifier, Int_t category)
+std::vector<Candidate *> ExRootSTLVectorFilter::GetSubArray(ExRootClassifier *classifier, Int_t category)
 {
   auto itMap = fMap.find(classifier);
   if(itMap == fMap.end()) // classifier was not found
@@ -62,12 +62,12 @@ std::vector<Candidate> ExRootSTLVectorFilter::GetSubArray(ExRootClassifier *clas
     itMap->second.first = false;
     for(const auto &element : fCollection)
     {
-      const auto result = classifier->GetCategory(const_cast<TObject *>(static_cast<const TObject *>(&element)));
+      const auto result = classifier->GetCategory(const_cast<TObject *>(static_cast<const TObject *>(element)));
       if(result < 0) continue;
       auto itSubMap = itMap->second.second.find(result);
       if(itSubMap == itMap->second.second.end())
       {
-        auto pairSubMap = itMap->second.second.insert(std::make_pair(result, std::vector<Candidate>(fCollection.size())));
+        auto pairSubMap = itMap->second.second.insert(std::make_pair(result, std::vector<Candidate *>(fCollection.size())));
         if(!pairSubMap.second)
         {
           throw std::runtime_error("can't insert category");
@@ -80,7 +80,7 @@ std::vector<Candidate> ExRootSTLVectorFilter::GetSubArray(ExRootClassifier *clas
   }
   if(auto itSubMap = itMap->second.second.find(category); itSubMap != itMap->second.second.end())
     return itSubMap->second;
-  return std::vector<Candidate>{};
+  return std::vector<Candidate *>{};
 }
 
 //------------------------------------------------------------------------------

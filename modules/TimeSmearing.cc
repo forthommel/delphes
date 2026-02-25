@@ -98,8 +98,8 @@ void TimeSmearing::Process()
   for(const auto &candidate : *fInputArray)
   {
 
-    const TLorentzVector &candidateFinalPosition = candidate.Position;
-    const TLorentzVector &candidateMomentum = candidate.Momentum;
+    const TLorentzVector &candidateFinalPosition = candidate->Position;
+    const TLorentzVector &candidateMomentum = candidate->Momentum;
 
     tf = candidateFinalPosition.T() * 1.0E-3 / c_light;
 
@@ -110,12 +110,12 @@ void TimeSmearing::Process()
     timeResolution = fResolutionFormula->Eval(0.0, eta, 0.0, energy);
     tf_smeared = gRandom->Gaus(tf, timeResolution);
 
-    auto new_candidate = candidate;
+    auto *new_candidate = static_cast<Candidate *>(candidate->Clone());
 
-    new_candidate.Position.SetE(tf_smeared * 1.0E3 * c_light);
-    new_candidate.ErrorT = timeResolution * 1.0E3 * c_light;
+    new_candidate->Position.SetE(tf_smeared * 1.0E3 * c_light);
+    new_candidate->ErrorT = timeResolution * 1.0E3 * c_light;
 
-    new_candidate.AddCandidate(&candidate); // ensure parentage
+    new_candidate->AddCandidate(candidate); // ensure parentage
     fOutputArray->emplace_back(new_candidate);
   }
 }

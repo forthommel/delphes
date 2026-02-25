@@ -91,11 +91,11 @@ void CscClusterEfficiency::Process()
   fOutputArray->clear();
   for(const auto &candidate : *fInputArray)
   {
-    const TLorentzVector &candidateDecayPosition = candidate.DecayPosition;
+    const TLorentzVector &candidateDecayPosition = candidate->DecayPosition;
     decayZ = abs(candidateDecayPosition.Z());
     decayR = sqrt(pow(candidateDecayPosition.X(), 2) + pow(candidateDecayPosition.Y(), 2));
-    Ehad = candidate.Ehad;
-    Eem = candidate.Eem;
+    Ehad = candidate->Ehad;
+    Eem = candidate->Eem;
     // apply an efficency formula
     if(gRandom->Uniform() > fFormula->Eval(decayR, decayZ, Ehad, Eem)) continue;
 

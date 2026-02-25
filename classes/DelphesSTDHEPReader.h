@@ -27,6 +27,7 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesXDRReader.h"
 
 #include <stdint.h>
@@ -37,7 +38,6 @@ class TStopwatch;
 class TDatabasePDG;
 class ExRootTreeBranch;
 
-class Candidate;
 class DelphesFactory;
 
 class DelphesSTDHEPReader
@@ -64,18 +64,18 @@ public:
   bool EventReady();
 
   bool ReadBlock(DelphesFactory *factory,
-    std::vector<Candidate> &allParticleOutputArray,
-    std::vector<Candidate> &stableParticleOutputArray,
-    std::vector<Candidate> &partonOutputArray);
+    CandidatesCollection &allParticleOutputArray,
+    CandidatesCollection &stableParticleOutputArray,
+    CandidatesCollection &partonOutputArray);
 
   void AnalyzeEvent(ExRootTreeBranch *branch, long long eventNumber,
     TStopwatch *readStopWatch, TStopwatch *procStopWatch);
 
 private:
   void AnalyzeParticles(DelphesFactory *factory,
-    std::vector<Candidate> &allParticleOutputArray,
-    std::vector<Candidate> &stableParticleOutputArray,
-    std::vector<Candidate> &partonOutputArray);
+    CandidatesCollection &allParticleOutputArray,
+    CandidatesCollection &stableParticleOutputArray,
+    CandidatesCollection &partonOutputArray);
 
   void SkipBytes(int size);
   void SkipArray(int elsize);

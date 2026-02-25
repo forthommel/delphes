@@ -28,9 +28,8 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
-
-class Candidate;
 
 class SolGeom;
 class SolGridCov;
@@ -60,8 +59,8 @@ private:
 
   AcceptanceClx *fAcx;
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(TrackCovariance, 1)
 };

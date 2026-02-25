@@ -94,7 +94,7 @@ void AngularSmearing::Process()
   fOutputArray->clear();
   for(const auto &candidate : *fInputArray)
   {
-    const TLorentzVector &candidateMomentum = candidate.Momentum;
+    const TLorentzVector &candidateMomentum = candidate->Momentum;
     eta = candidateMomentum.Eta();
     phi = candidateMomentum.Phi();
     pt = candidateMomentum.Pt();
@@ -102,14 +102,14 @@ void AngularSmearing::Process()
     m = candidateMomentum.M();
 
     // apply smearing formula for eta,phi
-    eta = gRandom->Gaus(eta, fFormulaEta->Eval(pt, eta, phi, e, const_cast<Candidate *>(&candidate))); //TODO: const-qualified version?
-    phi = gRandom->Gaus(phi, fFormulaPhi->Eval(pt, eta, phi, e, const_cast<Candidate *>(&candidate)));
+    eta = gRandom->Gaus(eta, fFormulaEta->Eval(pt, eta, phi, e, const_cast<Candidate *>(candidate))); //TODO: const-qualified version?
+    phi = gRandom->Gaus(phi, fFormulaPhi->Eval(pt, eta, phi, e, const_cast<Candidate *>(candidate)));
 
     if(pt <= 0.0) continue;
 
-    auto new_candidate = candidate;
-    new_candidate.Momentum.SetPtEtaPhiM(pt, eta, phi, m);
-    new_candidate.AddCandidate(&candidate); // preserve parentage
+    auto new_candidate = static_cast<Candidate *>(candidate->Clone());
+    new_candidate->Momentum.SetPtEtaPhiM(pt, eta, phi, m);
+    new_candidate->AddCandidate(candidate); // preserve parentage
 
     fOutputArray->emplace_back(new_candidate);
   }

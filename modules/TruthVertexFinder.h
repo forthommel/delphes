@@ -27,9 +27,8 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
-
-class Candidate;
 
 class TruthVertexFinder : public DelphesModule
 {
@@ -43,8 +42,8 @@ public:
 private:
   Double_t fResolution; //!
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fVertexOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fVertexOutputArray; //!
 
   ClassDef(TruthVertexFinder, 1)
 };

@@ -25,9 +25,8 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
-
-class Candidate;
 
 class LeptonDressing : public DelphesModule
 {
@@ -41,9 +40,9 @@ public:
 private:
   Double_t fDeltaR;
 
-  InputHandle<std::vector<Candidate> > fDressingInputArray; //!
-  InputHandle<std::vector<Candidate> > fCandidateInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fDressingInputArray; //!
+  InputHandle<CandidatesCollection> fCandidateInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(LeptonDressing, 1)
 };

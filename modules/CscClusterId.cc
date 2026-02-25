@@ -98,11 +98,11 @@ void CscClusterId::Process()
   fOutputArray->clear();
   for(const auto &candidate : *fInputArray)
   {
-    const TLorentzVector &momentum = candidate.Momentum;
-    const TLorentzVector &candidateDecayPosition = candidate.DecayPosition;
+    const TLorentzVector &momentum = candidate->Momentum;
+    const TLorentzVector &candidateDecayPosition = candidate->DecayPosition;
     decayZ = abs(candidateDecayPosition.Z());
     decayR = sqrt(pow(candidateDecayPosition.X(), 2) + pow(candidateDecayPosition.Y(), 2));
-    Ehad = candidate.Ehad;
+    Ehad = candidate->Ehad;
 
     cosTheta = TMath::Abs(momentum.CosTheta());
     signPz = (momentum.Pz() >= 0.0) ? 1.0 : -1.0;

@@ -28,9 +28,9 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
-class Candidate;
 class TH2F;
 
 class ParticleDensity : public DelphesModule
@@ -43,8 +43,8 @@ public:
   void Finish();
 
 private:
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   Bool_t fUseMomentumVector; // !
   TH2F *fHisto; //!

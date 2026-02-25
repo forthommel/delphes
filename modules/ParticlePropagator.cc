@@ -123,20 +123,20 @@ void ParticlePropagator::Process()
   TLorentzVector beamSpotPosition;
   if(fBeamSpotInputArray && !fBeamSpotInputArray->empty())
   {
-    const auto &beamSpotCandidate = fBeamSpotInputArray->at(0);
-    beamSpotPosition = beamSpotCandidate.Position;
+    const auto *beamSpotCandidate = fBeamSpotInputArray->at(0);
+    beamSpotPosition = beamSpotCandidate->Position;
   }
 
   for(auto &candidate : *fInputArray) //TODO: ensure a const-qualified version cannot be used
   {
     Candidate *particle = nullptr;
-    if(candidate.GetCandidates().empty())
+    if(candidate->GetCandidates().empty())
     {
-      particle = &candidate;
+      particle = candidate;
     }
     else
     {
-      particle = static_cast<Candidate *>(candidate.GetCandidates().at(0));
+      particle = static_cast<Candidate *>(candidate->GetCandidates().at(0));
     }
 
     const auto &particlePosition = particle->Position;
@@ -172,14 +172,14 @@ void ParticlePropagator::Process()
 
     if(TMath::Hypot(x, y) > fRadius || TMath::Abs(z) > fHalfLength)
     {
-      auto new_candidate = candidate;
+      auto new_candidate = static_cast<Candidate *>(candidate->Clone());
 
-      new_candidate.InitialPosition = particlePosition;
-      new_candidate.Position = particlePosition;
-      new_candidate.L = 0.0;
+      new_candidate->InitialPosition = particlePosition;
+      new_candidate->Position = particlePosition;
+      new_candidate->L = 0.0;
 
-      new_candidate.Momentum = particleMomentum;
-      new_candidate.AddCandidate(&candidate); // preserve parentage
+      new_candidate->Momentum = particleMomentum;
+      new_candidate->AddCandidate(candidate); // preserve parentage
 
       fOutputArray->emplace_back(new_candidate);
     }
@@ -201,18 +201,18 @@ void ParticlePropagator::Process()
 
       auto new_candidate = candidate;
 
-      new_candidate.InitialPosition = particlePosition;
-      new_candidate.Position.SetXYZT(x_t * 1.0E3, y_t * 1.0E3, z_t * 1.0E3, particlePosition.T() + t * e * 1.0E3);
-      new_candidate.L = l * 1.0E3;
+      new_candidate->InitialPosition = particlePosition;
+      new_candidate->Position.SetXYZT(x_t * 1.0E3, y_t * 1.0E3, z_t * 1.0E3, particlePosition.T() + t * e * 1.0E3);
+      new_candidate->L = l * 1.0E3;
 
-      new_candidate.Momentum = particleMomentum;
-      new_candidate.AddCandidate(&candidate); // preserve parentage
+      new_candidate->Momentum = particleMomentum;
+      new_candidate->AddCandidate(candidate); // preserve parentage
 
       fOutputArray->emplace_back(new_candidate);
 
       if(TMath::Abs(q) > 1.0E-9)
       {
-        switch(TMath::Abs(candidate.PID))
+        switch(TMath::Abs(candidate->PID))
         {
         case 11:
           fElectronOutputArray->emplace_back(candidate);
@@ -310,7 +310,7 @@ void ParticlePropagator::Process()
       if(r_t > 0.0)
       {
         // store these variables before cloning
-        if(particle == &candidate)
+        if(particle == candidate)
         {
           particle->D0 = d0 * 1.0E3;
           particle->DZ = dz * 1.0E3;
@@ -322,21 +322,21 @@ void ParticlePropagator::Process()
 
         auto new_candidate = candidate;
 
-        new_candidate.InitialPosition = particlePosition;
-        new_candidate.Position.SetXYZT(x_t * 1.0E3, y_t * 1.0E3, z_t * 1.0E3, particlePosition.T() + t * c_light * 1.0E3);
+        new_candidate->InitialPosition = particlePosition;
+        new_candidate->Position.SetXYZT(x_t * 1.0E3, y_t * 1.0E3, z_t * 1.0E3, particlePosition.T() + t * c_light * 1.0E3);
 
-        new_candidate.Momentum = particleMomentum;
+        new_candidate->Momentum = particleMomentum;
 
-        new_candidate.L = l * 1.0E3;
+        new_candidate->L = l * 1.0E3;
 
-        new_candidate.Xd = xd * 1.0E3;
-        new_candidate.Yd = yd * 1.0E3;
-        new_candidate.Zd = zd * 1.0E3;
+        new_candidate->Xd = xd * 1.0E3;
+        new_candidate->Yd = yd * 1.0E3;
+        new_candidate->Zd = zd * 1.0E3;
 
-        new_candidate.AddCandidate(&candidate); // preserve parentage
+        new_candidate->AddCandidate(candidate); // preserve parentage
 
         fOutputArray->emplace_back(new_candidate);
-        switch(TMath::Abs(new_candidate.PID))
+        switch(TMath::Abs(new_candidate->PID))
         {
         case 11:
           fElectronOutputArray->emplace_back(new_candidate);

@@ -95,8 +95,8 @@ void MomentumSmearing::Process()
   fOutputArray->clear();
   for(const auto &candidate : *fInputArray)
   {
-    const TLorentzVector &candidatePosition = candidate.Position;
-    const TLorentzVector &candidateMomentum = candidate.Momentum;
+    const TLorentzVector &candidatePosition = candidate->Position;
+    const TLorentzVector &candidateMomentum = candidate->Momentum;
     eta = candidatePosition.Eta();
     phi = candidatePosition.Phi();
 
@@ -109,7 +109,7 @@ void MomentumSmearing::Process()
     pt = candidateMomentum.Pt();
     e = candidateMomentum.E();
     m = candidateMomentum.M();
-    res = fFormula->Eval(pt, eta, phi, e, const_cast<Candidate *>(&candidate)); //TODO: check if we can use const qualifier
+    res = fFormula->Eval(pt, eta, phi, e, const_cast<Candidate *>(candidate)); //TODO: check if we can use const qualifier
 
     // apply smearing formula
     //pt = gRandom->Gaus(pt, fFormula->Eval(pt, eta, phi, e) * pt);
@@ -120,13 +120,13 @@ void MomentumSmearing::Process()
 
     //if(pt <= 0.0) continue;
 
-    auto new_candidate = candidate;
+    auto *new_candidate = static_cast<Candidate *>(candidate->Clone());
     eta = candidateMomentum.Eta();
     phi = candidateMomentum.Phi();
-    new_candidate.Momentum.SetPtEtaPhiM(pt, eta, phi, m);
+    new_candidate->Momentum.SetPtEtaPhiM(pt, eta, phi, m);
     //new_candidate->TrackResolution = fFormula->Eval(pt, eta, phi, e);
-    new_candidate.TrackResolution = res;
-    new_candidate.AddCandidate(&candidate); // ensure parentage
+    new_candidate->TrackResolution = res;
+    new_candidate->AddCandidate(candidate); // ensure parentage
 
     fOutputArray->emplace_back(new_candidate);
   }

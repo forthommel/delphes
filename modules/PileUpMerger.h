@@ -27,9 +27,9 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
-class Candidate;
 class DelphesPileUpReader;
 class DelphesTF2;
 
@@ -59,9 +59,9 @@ private:
 
   DelphesPileUpReader *fReader; //!
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fParticleOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fVertexOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fParticleOutputArray; //!
+  OutputHandle<CandidatesCollection> fVertexOutputArray; //!
 
   ClassDef(PileUpMerger, 1)
 };

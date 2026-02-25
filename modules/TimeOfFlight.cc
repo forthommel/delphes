@@ -87,11 +87,11 @@ void TimeOfFlight::Process()
 
   for(const auto &candidate : *fInputArray) //TODO: ensure const-qualification of consumers
   {
-    auto *particle = static_cast<Candidate *>(candidate.GetCandidates().at(0));
+    auto *particle = static_cast<Candidate *>(candidate->GetCandidates().at(0));
 
     const TLorentzVector &candidateInitialPosition = particle->Position;
-    const TLorentzVector &candidateInitialPositionSmeared = candidate.InitialPosition;
-    const TLorentzVector &candidateFinalPosition = candidate.Position;
+    const TLorentzVector &candidateInitialPositionSmeared = candidate->InitialPosition;
+    const TLorentzVector &candidateFinalPosition = candidate->Position;
 
     // time at vertex from MC truth
     t_truth = candidateInitialPosition.T() * 1.0E-3 / c_light;
@@ -118,11 +118,11 @@ void TimeOfFlight::Process()
       beta = 1.;
       for(auto &vertex : *fVertexInputArray) //TODO: ensure const-qualification of consumers
       {
-        for(const auto &constituent : vertex.GetCandidates())
+        for(const auto &constituent : vertex->GetCandidates())
         {
           if(particle == constituent)
           {
-            beta = vertex.Momentum.Beta();
+            beta = vertex->Momentum.Beta();
             break;
           }
         }
@@ -140,21 +140,21 @@ void TimeOfFlight::Process()
     // calculate time-of-flight
     tof = tf - ti;
     // path length of the full helix
-    l = candidate.L * 1.0E-3;
+    l = candidate->L * 1.0E-3;
 
     // particle velocity
     beta = l / (c_light * tof);
 
     // calculate particle mass (i.e particle ID)
-    auto new_candidate = candidate;
+    auto *new_candidate = static_cast<Candidate *>(candidate->Clone());
 
     // update time at vertex based on option
-    new_candidate.InitialPosition.SetT(ti * 1.0E3 * c_light);
+    new_candidate->InitialPosition.SetT(ti * 1.0E3 * c_light);
 
     // update particle mass based on TOF-based PID (commented for now, assume this calculation is done offline)
-    //new_candidate.Momentum.SetVectM(candidateMomentum.Vect(), mass);
+    //new_candidate->Momentum.SetVectM(candidateMomentum.Vect(), mass);
 
-    new_candidate.AddCandidate(&candidate); // keep parentage
+    new_candidate->AddCandidate(candidate); // keep parentage
     fOutputArray->emplace_back(new_candidate);
   }
 }
@@ -165,14 +165,14 @@ void TimeOfFlight::ComputeVertexMomenta()
 {
   for(auto &vertex : *fVertexInputArray)
   {
-    for(const auto &constituent : vertex.GetCandidates())
+    for(const auto &constituent : vertex->GetCandidates())
     {
       for(auto &track : *fInputArray)
       {
         // get gen part that generated track
-        auto *particle = static_cast<Candidate *>(track.GetCandidates().at(0));
+        auto *particle = static_cast<Candidate *>(track->GetCandidates().at(0));
         if(particle == constituent)
-          vertex.Momentum += track.Momentum;
+          vertex->Momentum += track->Momentum;
       } // end track loop
     } // end vertex consitutent loop
   } // end vertex  loop

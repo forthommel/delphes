@@ -75,13 +75,13 @@ void LeptonDressing::Process()
   // loop over all input candidate
   for(const auto &candidate : *fCandidateInputArray)
   {
-    const TLorentzVector &candidateMomentum = candidate.Momentum;
+    const TLorentzVector &candidateMomentum = candidate->Momentum;
 
     // loop over all input tracks
     TLorentzVector momentum;
     for(const auto &dressing : *fDressingInputArray)
     {
-      const TLorentzVector &dressingMomentum = dressing.Momentum;
+      const TLorentzVector &dressingMomentum = dressing->Momentum;
       if(dressingMomentum.Pt() > 0.1)
       {
         if(candidateMomentum.DeltaR(dressingMomentum) <= fDeltaR)
@@ -91,9 +91,9 @@ void LeptonDressing::Process()
       }
     }
 
-    auto new_candidate = candidate;
-    new_candidate.Momentum += momentum;
-    new_candidate.AddCandidate(&candidate); // ensure parentage
+    auto *new_candidate = static_cast<Candidate *>(candidate->Clone());
+    new_candidate->Momentum += momentum;
+    new_candidate->AddCandidate(candidate); // ensure parentage
     fOutputArray->emplace_back(new_candidate);
   }
 }

@@ -104,9 +104,9 @@ void TrackPileUpSubtractor::Process()
   // find z position of primary vertex
   for(const auto &candidate : *fVertexInputArray)
   {
-    if(!candidate.IsPU)
+    if(!candidate->IsPU)
     {
-      zvtx = candidate.Position.Z();
+      zvtx = candidate->Position.Z();
       // break;
     }
   }
@@ -117,7 +117,7 @@ void TrackPileUpSubtractor::Process()
     // loop over all candidates
     for(auto &candidate : *input_collection)
     {
-      auto *particle = static_cast<Candidate *>(candidate.GetCandidates().at(0));
+      auto *particle = static_cast<Candidate *>(candidate->GetCandidates().at(0));
       const auto &candidateMomentum = particle->Momentum;
 
       eta = candidateMomentum.Eta();
@@ -130,14 +130,14 @@ void TrackPileUpSubtractor::Process()
       // apply pile-up subtraction
       // assume perfect pile-up subtraction for tracks outside fZVertexResolution
 
-      if(candidate.Charge != 0 && candidate.IsPU && TMath::Abs(z - zvtx) > fFormula->Eval(pt, eta, phi, e) * 1.0e3)
+      if(candidate->Charge != 0 && candidate->IsPU && TMath::Abs(z - zvtx) > fFormula->Eval(pt, eta, phi, e) * 1.0e3)
       {
-        candidate.IsRecoPU = 1;
+        candidate->IsRecoPU = 1;
       }
       else
       {
-        candidate.IsRecoPU = 0;
-        if(candidate.Momentum.Pt() > fPTMin) output_collection->emplace_back(candidate);
+        candidate->IsRecoPU = 0;
+        if(candidate->Momentum.Pt() > fPTMin) output_collection->emplace_back(candidate);
       }
     }
   }

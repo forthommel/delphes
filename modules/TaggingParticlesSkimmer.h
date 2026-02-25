@@ -30,11 +30,11 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 class ExRootSTLVectorFilter;
 
-class Candidate;
 class TauTaggingPartonClassifier;
 
 class TaggingParticlesSkimmer : public DelphesModule
@@ -55,9 +55,9 @@ private:
 
   ExRootSTLVectorFilter *fFilter;
 
-  InputHandle<std::vector<Candidate> > fPartonInputArray; //!
-  InputHandle<std::vector<Candidate> > fParticleInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fPartonInputArray; //!
+  InputHandle<CandidatesCollection> fParticleInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(TaggingParticlesSkimmer, 1)
 };

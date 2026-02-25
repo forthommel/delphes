@@ -194,7 +194,7 @@ void JetFlavorAssociation::Process()
 // Standard definition of jet flavor in
 // https://cmssdt.cern.ch/SDT/lxr/source/PhysicsTools/JetMCAlgos/plugins/JetPartonMatcher.cc?v=CMSSW_7_3_0_pre1
 
-void JetFlavorAssociation::GetAlgoFlavor(Candidate &jet, const CandidatesCollection &partonArray, const CandidatesCollection &partonLHEFArray)
+void JetFlavorAssociation::GetAlgoFlavor(Candidate *jet, const CandidatesCollection &partonArray, const CandidatesCollection &partonLHEFArray)
 {
   float maxPt = 0;
   int daughterCounter = 0;
@@ -204,9 +204,9 @@ void JetFlavorAssociation::GetAlgoFlavor(Candidate &jet, const CandidatesCollect
   for(const auto &parton : partonArray)
   {
     // default delphes method
-    pdgCode = TMath::Abs(parton.PID);
-    if(TMath::Abs(parton.PID) == 21) pdgCode = 0;
-    if(jet.Momentum.DeltaR(parton.Momentum) <= fDeltaR)
+    pdgCode = TMath::Abs(parton->PID);
+    if(TMath::Abs(parton->PID) == 21) pdgCode = 0;
+    if(jet->Momentum.DeltaR(parton->Momentum) <= fDeltaR)
     {
       if(pdgCodeMax < pdgCode) pdgCodeMax = pdgCode;
     }
@@ -215,50 +215,50 @@ void JetFlavorAssociation::GetAlgoFlavor(Candidate &jet, const CandidatesCollect
 
     for(const auto &partonLHEF : partonLHEFArray)
     {
-      if(parton.Momentum.DeltaR(partonLHEF.Momentum) < 0.001 && parton.PID == partonLHEF.PID && partonLHEF.Charge == parton.Charge)
+      if(parton->Momentum.DeltaR(partonLHEF->Momentum) < 0.001 && parton->PID == partonLHEF->PID && partonLHEF->Charge == parton->Charge)
       {
         break;
       }
 
       // check the daughter
       daughterCounter = 0;
-      if(parton.D1 != -1 || parton.D2 != -1)
+      if(parton->D1 != -1 || parton->D2 != -1)
       {
         // partons are only quarks || gluons
         int daughterFlavor1 = -1;
         int daughterFlavor2 = -1;
-        if(parton.D1 != -1) daughterFlavor1 = TMath::Abs(fParticleInputArray->at(parton.D1).PID);
-        if(parton.D2 != -1) daughterFlavor2 = TMath::Abs(fParticleInputArray->at(parton.D2).PID);
+        if(parton->D1 != -1) daughterFlavor1 = TMath::Abs(fParticleInputArray->at(parton->D1)->PID);
+        if(parton->D2 != -1) daughterFlavor2 = TMath::Abs(fParticleInputArray->at(parton->D2)->PID);
         if((daughterFlavor1 == 1 || daughterFlavor1 == 2 || daughterFlavor1 == 3 || daughterFlavor1 == 4 || daughterFlavor1 == 5 || daughterFlavor1 == 21)) daughterCounter++;
         if((daughterFlavor2 == 1 || daughterFlavor2 == 2 || daughterFlavor2 == 3 || daughterFlavor2 == 4 || daughterFlavor2 == 5 || daughterFlavor2 == 21)) daughterCounter++;
       }
       if(daughterCounter > 0) continue;
-      if(jet.Momentum.DeltaR(parton.Momentum) <= fDeltaR)
+      if(jet->Momentum.DeltaR(parton->Momentum) <= fDeltaR)
       {
         // if not yet found && pdgId is a c, take as c
-        if(TMath::Abs(parton.PID) == 4) tempParton = &parton;
-        if(TMath::Abs(parton.PID) == 5) tempParton = &parton;
-        if(parton.Momentum.Pt() > maxPt)
+        if(TMath::Abs(parton->PID) == 4) tempParton = parton;
+        if(TMath::Abs(parton->PID) == 5) tempParton = parton;
+        if(parton->Momentum.Pt() > maxPt)
         {
-          maxPt = parton.Momentum.Pt();
-          tempPartonHighestPt = &parton;
+          maxPt = parton->Momentum.Pt();
+          tempPartonHighestPt = parton;
         }
       }
     }
   }
 
   if(!tempParton) tempParton = tempPartonHighestPt;
-  jet.FlavorAlgo = tempParton ? TMath::Abs(tempParton->PID) : 0;
+  jet->FlavorAlgo = tempParton ? TMath::Abs(tempParton->PID) : 0;
 
   if(pdgCodeMax == 0) pdgCodeMax = 21;
   if(pdgCodeMax == -1) pdgCodeMax = 0;
 
-  jet.Flavor = pdgCodeMax;
+  jet->Flavor = pdgCodeMax;
 }
 
 //------------------------------------------------------------------------------
 
-void JetFlavorAssociation::GetPhysicsFlavor(Candidate &jet, const CandidatesCollection &partonArray, const CandidatesCollection &partonLHEFArray)
+void JetFlavorAssociation::GetPhysicsFlavor(Candidate *jet, const CandidatesCollection &partonArray, const CandidatesCollection &partonLHEFArray)
 {
   int partonCounter = 0;
   float biggerConeSize = 0.7;
@@ -271,22 +271,22 @@ void JetFlavorAssociation::GetPhysicsFlavor(Candidate &jet, const CandidatesColl
 
   for(const auto &partonLHEF : partonLHEFArray)
   {
-    dist = jet.Momentum.DeltaR(partonLHEF.Momentum); // take the DR
+    dist = jet->Momentum.DeltaR(partonLHEF->Momentum); // take the DR
 
-    if(partonLHEF.Status == 1 && dist <= fDeltaR)
+    if(partonLHEF->Status == 1 && dist <= fDeltaR)
     {
-      tempParton = &partonLHEF;
+      tempParton = partonLHEF;
       partonCounter++;
     }
   }
 
   for(const auto &parton : partonArray)
   {
-    dist = jet.Momentum.DeltaR(parton.Momentum); // take the DR
+    dist = jet->Momentum.DeltaR(parton->Momentum); // take the DR
     isGoodCandidate = true;
     for(const auto &partonLHEF : partonLHEFArray)
     {
-      if(parton.Momentum.DeltaR(partonLHEF.Momentum) < 0.01 && parton.PID == partonLHEF.PID && partonLHEF.Charge == parton.Charge)
+      if(parton->Momentum.DeltaR(partonLHEF->Momentum) < 0.01 && parton->PID == partonLHEF->PID && partonLHEF->Charge == parton->Charge)
       {
         isGoodCandidate = false;
         break;
@@ -295,24 +295,24 @@ void JetFlavorAssociation::GetPhysicsFlavor(Candidate &jet, const CandidatesColl
 
     if(!isGoodCandidate) continue;
 
-    if(parton.D1 != -1 || parton.D2 != -1)
+    if(parton->D1 != -1 || parton->D2 != -1)
     {
-      if((TMath::Abs(parton.PID) < 4 || TMath::Abs(parton.PID) == 21)) continue;
-      if(dist < biggerConeSize) contaminations.push_back(&parton);
+      if((TMath::Abs(parton->PID) < 4 || TMath::Abs(parton->PID) == 21)) continue;
+      if(dist < biggerConeSize) contaminations.push_back(parton);
     }
   }
 
   if(partonCounter != 1)
   {
-    jet.FlavorPhys = 0;
+    jet->FlavorPhys = 0;
   }
   else if(contaminations.size() == 0)
   {
-    jet.FlavorPhys = TMath::Abs(tempParton->PID);
+    jet->FlavorPhys = TMath::Abs(tempParton->PID);
   }
   else if(contaminations.size() > 0)
   {
-    jet.FlavorPhys = TMath::Abs(tempParton->PID);
+    jet->FlavorPhys = TMath::Abs(tempParton->PID);
 
     for(const auto *parton : contaminations)
     {
@@ -324,19 +324,19 @@ void JetFlavorAssociation::GetPhysicsFlavor(Candidate &jet, const CandidatesColl
       if(parton->M1 != -1)
       {
         const auto &mother1 = fParticleInputArray->at(parton->M1);
-        if(motherCounter > 0 && mother1.Momentum.DeltaR(tempParton->Momentum) < 0.001) continue;
+        if(motherCounter > 0 && mother1->Momentum.DeltaR(tempParton->Momentum) < 0.001) continue;
       }
       if(parton->M2 != -1)
       {
         const auto &mother2 = fParticleInputArray->at(parton->M2);
-        if(motherCounter > 0 && mother2.Momentum.DeltaR(tempParton->Momentum) < 0.001) continue;
+        if(motherCounter > 0 && mother2->Momentum.DeltaR(tempParton->Momentum) < 0.001) continue;
       }
       // mother is the initialParton --> OK
       if(TMath::Abs(tempParton->PID) == 4)
       {
         // keep association --> the initialParton is a c --> the contaminated parton is a c
         if(contaminatingFlavor == 4) continue;
-        jet.FlavorPhys = 0; // all the other cases reject!
+        jet->FlavorPhys = 0; // all the other cases reject!
         break;
       }
     }

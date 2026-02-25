@@ -136,11 +136,11 @@ void Weighter::Process()
   fCodeSet.clear();
   for(const auto &candidate : *fInputArray)
   {
-    if(candidate.Status != 3) continue;
+    if(candidate->Status != 3) continue;
 
-    if(fWeightSet.find(candidate.PID) == fWeightSet.end()) continue;
+    if(fWeightSet.find(candidate->PID) == fWeightSet.end()) continue;
 
-    fCodeSet.insert(candidate.PID);
+    fCodeSet.insert(candidate->PID);
   }
 
   // find default weight value
@@ -168,7 +168,7 @@ void Weighter::Process()
 
   auto *candidate = factory->NewCandidate();
   candidate->Momentum.SetPtEtaPhiE(weight, 0.0, 0.0, weight);
-  fOutputArray->emplace_back(*candidate);
+  fOutputArray->emplace_back(candidate);
 }
 
 //------------------------------------------------------------------------------

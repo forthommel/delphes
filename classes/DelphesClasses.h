@@ -860,6 +860,6 @@ private:
 
   ClassDef(Candidate, 6)
 };
-using CandidatesCollection = std::vector<Candidate>;
+using CandidatesCollection = std::vector<Candidate *>;
 
 #endif // DelphesClasses_h

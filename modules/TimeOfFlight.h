@@ -27,9 +27,8 @@
  *
 */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
-
-class Candidate;
 
 class TimeOfFlight : public DelphesModule
 {
@@ -44,9 +43,9 @@ public:
 private:
   Int_t fVertexTimeMode;
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  InputHandle<std::vector<Candidate> > fVertexInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  InputHandle<CandidatesCollection> fVertexInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(TimeOfFlight, 1)
 };

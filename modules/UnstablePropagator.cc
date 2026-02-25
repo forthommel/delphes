@@ -95,16 +95,16 @@ void UnstablePropagator::Process()
 
   for(auto &candidate : *fInputArray) //TODO: ensure const-qualification in consumer methods
   {
-    particlePosition = candidate.Position;
-    particleMomentum = candidate.Momentum;
+    particlePosition = candidate->Position;
+    particleMomentum = candidate->Momentum;
 
     x = particlePosition.X() * 1.0E-3;
     y = particlePosition.Y() * 1.0E-3;
     z = particlePosition.Z() * 1.0E-3;
     pt2 = particleMomentum.Perp2();
-    q = candidate.Charge;
+    q = candidate->Charge;
 
-    //if (fDebug) PrintPart("", &candidate);
+    //if (fDebug) PrintPart("", candidate);
 
     // check that particle position is inside the cylinder
     if(TMath::Hypot(x, y) > fRadiusMax || TMath::Abs(z) > fHalfLengthMax)
@@ -123,12 +123,12 @@ void UnstablePropagator::Process()
     }
 
     // pass if particle already processed
-    if(candidate.L > 1.0E-9)
+    if(candidate->L > 1.0E-9)
     {
       continue;
     }
 
-    std::vector<Int_t> daughters_indices = DaughterIndices(&candidate);
+    std::vector<Int_t> daughters_indices = DaughterIndices(candidate);
 
     if(daughters_indices.size() == 0)
     {
@@ -136,7 +136,7 @@ void UnstablePropagator::Process()
     }
 
     auto &daughter = fInputArray->at(daughters_indices.at(0));
-    lof = FlightDistance(&candidate, &daughter) * 1.0E-3;
+    lof = FlightDistance(candidate, daughter) * 1.0E-3;
 
     //fLmin = 0.01;
     if(lof < fLmin)
@@ -146,8 +146,8 @@ void UnstablePropagator::Process()
 
     if(fDebug) std::cout << " -- lof: " << lof << ", Lmin: " << fLmin << std::scientific << std::endl;
     TString prefix = " -- ";
-    ComputeChainFlightDistances(prefix, &candidate);
-    PropagateAndUpdateChain(prefix, &candidate);
+    ComputeChainFlightDistances(prefix, candidate);
+    PropagateAndUpdateChain(prefix, candidate);
   }
 }
 
@@ -217,12 +217,12 @@ void UnstablePropagator::ComputeChainFlightDistances(TString prefix, Candidate *
   else
   {
     auto &daughter = fInputArray->at(drange.at(0));
-    mother->L = FlightDistance(mother, &daughter);
+    mother->L = FlightDistance(mother, daughter);
     if(fDebug) cout << prefix << " flight distance: " << mother->L << endl;
     for(unsigned long i = 0; i < drange.size(); i++)
     {
-      auto &sub_daughter = fInputArray->at(drange.at(i));
-      ComputeChainFlightDistances(prefix, &sub_daughter);
+      auto *sub_daughter = fInputArray->at(drange.at(i));
+      ComputeChainFlightDistances(prefix, sub_daughter);
     }
   }
 }
@@ -254,10 +254,10 @@ void UnstablePropagator::PropagateAndUpdateChain(TString prefix, Candidate *cand
     {
       auto &daughter = fInputArray->at(drange.at(i));
       //  if (fDebug) cout<<prefix<<" propagating and updating chain, daughter:"<<endl;
-      if(fDebug) PrintPart(prefix, &daughter);
-      daughter.Position = updatedPosition;
-      //if (fDebug) cout<<prefix<<" propagated position: "<<daughter.Position.X()<<", "<<daughter.Position.Y()<<", "<<daughter.Position.Z()<<endl;
-      PropagateAndUpdateChain(prefix, &daughter);
+      if(fDebug) PrintPart(prefix, daughter);
+      daughter->Position = updatedPosition;
+      //if (fDebug) cout<<prefix<<" propagated position: "<<daughter->Position.X()<<", "<<daughter->Position.Y()<<", "<<daughter->Position.Z()<<endl;
+      PropagateAndUpdateChain(prefix, daughter);
     }
   }
 }
@@ -394,7 +394,7 @@ Int_t UnstablePropagator::Index(Candidate *particle)
   for (const auto& candidate : *fInputArray)
   {
     i++;
-    if(candidate.GetUniqueID() == particle->GetUniqueID())
+    if(candidate->GetUniqueID() == particle->GetUniqueID())
     {
       break;
     }
@@ -404,7 +404,7 @@ Int_t UnstablePropagator::Index(Candidate *particle)
   for(size_t i = 0; i < fInputArray->size(); ++i)
   {
     j = i;
-    if(fInputArray->at(i).GetUniqueID() == particle->GetUniqueID())
+    if(fInputArray->at(i)->GetUniqueID() == particle->GetUniqueID())
     {
       break;
     }

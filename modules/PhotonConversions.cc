@@ -115,14 +115,14 @@ void PhotonConversions::Process()
   fOutputArray->clear();
   for(const auto &candidate : *fInputArray)
   {
-    if(candidate.PID != 22)
+    if(candidate->PID != 22)
     {
       fOutputArray->emplace_back(candidate);
     }
     else
     {
-      candidatePosition = candidate.Position;
-      candidateMomentum = candidate.Momentum;
+      candidatePosition = candidate->Position;
+      candidateMomentum = candidate->Momentum;
       x = candidatePosition.X() * 1.0E-3;
       y = candidatePosition.Y() * 1.0E-3;
       z = candidatePosition.Z() * 1.0E-3;
@@ -210,8 +210,8 @@ void PhotonConversions::Process()
           x1 = fDecayXsec->GetRandom();
           x2 = 1 - x1;
 
-          auto *ep = static_cast<Candidate *>(candidate.Clone());
-          auto *em = static_cast<Candidate *>(candidate.Clone());
+          auto *ep = static_cast<Candidate *>(candidate->Clone());
+          auto *em = static_cast<Candidate *>(candidate->Clone());
 
           ep->Position.SetXYZT(x_i * 1.0E3, y_i * 1.0E3, z_i * 1.0E3, candidatePosition.T() + nsteps * dt * e * 1.0E3);
           em->Position.SetXYZT(x_i * 1.0E3, y_i * 1.0E3, z_i * 1.0E3, candidatePosition.T() + nsteps * dt * e * 1.0E3);
@@ -228,8 +228,8 @@ void PhotonConversions::Process()
           ep->IsFromConversion = 1;
           em->IsFromConversion = 1;
 
-          fOutputArray->emplace_back(*em);
-          fOutputArray->emplace_back(*ep);
+          fOutputArray->emplace_back(em);
+          fOutputArray->emplace_back(ep);
 
           break;
         }

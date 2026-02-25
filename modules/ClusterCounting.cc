@@ -28,7 +28,6 @@
  */
 
 #include "TrackCovariance/TrkUtil.h"
-#include "classes/DelphesClasses.h"
 #include "modules/ClusterCounting.h"
 
 #include "TLorentzVector.h"
@@ -103,27 +102,27 @@ void ClusterCounting::Process()
   for(const auto &candidate : *fInputArray)
   {
     // converting to meters
-    auto *particle = static_cast<Candidate *>(candidate.GetCandidates().at(0));
+    auto *particle = static_cast<Candidate *>(candidate->GetCandidates().at(0));
 
     // converting to meters
     const TLorentzVector &candidatePosition = particle->Position * 1e-03;
     const TLorentzVector &candidateMomentum = particle->Momentum;
 
-    TVectorD Par = TrkUtil::XPtoPar(candidatePosition.Vect(), candidateMomentum.Vect(), candidate.Charge, fBz);
+    TVectorD Par = TrkUtil::XPtoPar(candidatePosition.Vect(), candidateMomentum.Vect(), candidate->Charge, fBz);
     mass = candidateMomentum.M();
 
     trackLength = fTrackUtil->TrkLen(Par);
 
-    auto new_candidate = candidate;
+    auto *new_candidate = static_cast<Candidate *>(candidate->Clone());
 
     Ncl = 0.;
     if(fTrackUtil->IonClusters(Ncl, mass, Par))
     {
-      new_candidate.Nclusters = Ncl;
-      new_candidate.dNdx = (trackLength > 0.) ? Ncl / trackLength : -1;
+      new_candidate->Nclusters = Ncl;
+      new_candidate->dNdx = (trackLength > 0.) ? Ncl / trackLength : -1;
     }
 
-    new_candidate.AddCandidate(&candidate); // preserve parentage
+    new_candidate->AddCandidate(candidate); // preserve parentage
 
     fOutputArray->emplace_back(new_candidate);
   }

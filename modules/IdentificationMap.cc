@@ -109,15 +109,15 @@ void IdentificationMap::Process()
   fOutputArray->clear();
   for(const auto &candidate : *fInputArray)
   {
-    const TLorentzVector &candidatePosition = candidate.Position;
-    const TLorentzVector &candidateMomentum = candidate.Momentum;
+    const TLorentzVector &candidatePosition = candidate->Position;
+    const TLorentzVector &candidateMomentum = candidate->Momentum;
     eta = candidatePosition.Eta();
     phi = candidatePosition.Phi();
     pt = candidateMomentum.Pt();
     e = candidateMomentum.E();
 
-    pdgCodeIn = candidate.PID;
-    charge = candidate.Charge;
+    pdgCodeIn = candidate->PID;
+    charge = candidate->Charge;
 
     // first check that PID of this particle is specified in the map
     // otherwise, look for PID = 0
@@ -142,8 +142,8 @@ void IdentificationMap::Process()
       if(total <= r && r < total + p)
       {
         // change PID of particle
-        auto new_candidate = candidate;
-        if(pdgCodeOut != 0) new_candidate.PID = charge * pdgCodeOut;
+        auto new_candidate = static_cast<Candidate *>(candidate->Clone());
+        if(pdgCodeOut != 0) new_candidate->PID = charge * pdgCodeOut;
         fOutputArray->emplace_back(new_candidate);
         break;
       }

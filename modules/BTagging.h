@@ -29,11 +29,11 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 #include <map>
 
-class Candidate;
 class DelphesFormula;
 
 class BTagging : public DelphesModule
@@ -52,7 +52,7 @@ private:
   std::map<Int_t, DelphesFormula *> fEfficiencyMap; //!
 #endif
 
-  InputHandle<std::vector<Candidate> > fJetInputArray; //!
+  InputHandle<CandidatesCollection> fJetInputArray; //!
 
   ClassDef(BTagging, 1)
 };

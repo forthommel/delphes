@@ -79,8 +79,8 @@ void TruthVertexFinder::Process()
   for(const auto &candidate : *fInputArray)
   {
 
-    const TLorentzVector &candidatePosition = candidate.Position;
-    const TLorentzVector &candidateMomentum = candidate.Momentum;
+    const TLorentzVector &candidatePosition = candidate->Position;
+    const TLorentzVector &candidateMomentum = candidate->Momentum;
 
     pt = candidateMomentum.Pt();
 
@@ -88,16 +88,16 @@ void TruthVertexFinder::Process()
     Bool_t old_vertex = false;
     for(auto &vertex : *fVertexOutputArray)
     {
-      const TLorentzVector &vertexPosition = vertex.Position;
+      const TLorentzVector &vertexPosition = vertex->Position;
       // check whether spatial difference is < 1 um, in that case assume it is the same vertex
       if(TMath::Abs((candidatePosition.P() - vertexPosition.P())) < fResolution * 1.E3)
       {
         old_vertex = true;
-        vertex.AddCandidate(&candidate); // keep parentage
-        if(TMath::Abs(candidate.Charge) > 0)
+        vertex->AddCandidate(candidate); // keep parentage
+        if(TMath::Abs(candidate->Charge) > 0)
         {
-          vertex.ClusterNDF += 1;
-          vertex.GenSumPT2 += pt * pt;
+          vertex->ClusterNDF += 1;
+          vertex->GenSumPT2 += pt * pt;
         }
       }
     }
@@ -109,7 +109,7 @@ void TruthVertexFinder::Process()
       vertex->Position = candidatePosition;
       vertex->ClusterIndex = nvtx;
 
-      if(TMath::Abs(candidate.Charge) > 0)
+      if(TMath::Abs(candidate->Charge) > 0)
       {
         vertex->ClusterNDF = 1;
         vertex->GenSumPT2 = pt * pt;
@@ -119,7 +119,7 @@ void TruthVertexFinder::Process()
         vertex->ClusterNDF = 0;
         vertex->GenSumPT2 = 0.;
       }
-      fVertexOutputArray->emplace_back(*vertex);
+      fVertexOutputArray->emplace_back(vertex);
       nvtx++;
     }
   }

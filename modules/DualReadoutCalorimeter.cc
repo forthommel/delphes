@@ -32,7 +32,6 @@
 
 #include "modules/DualReadoutCalorimeter.h"
 
-#include "classes/DelphesClasses.h"
 #include "classes/DelphesFormula.h"
 
 #include "ExRootAnalysis/ExRootClassifier.h"
@@ -224,14 +223,14 @@ void DualReadoutCalorimeter::Process()
 
   for(const auto &particle : *fParticleInputArray)
   {
-    const TLorentzVector &particlePosition = particle.Position;
+    const TLorentzVector &particlePosition = particle->Position;
     ++number;
 
     // compute maximum radius (needed in FinalizeTower to assess whether barrel or endcap tower)
     if(particlePosition.Perp() > fTowerRmax)
       fTowerRmax = particlePosition.Perp();
 
-    pdgCode = TMath::Abs(particle.PID);
+    pdgCode = TMath::Abs(particle->PID);
 
     itFractionMap = fFractionMap.find(pdgCode);
     if(itFractionMap == fFractionMap.end())
@@ -273,10 +272,10 @@ void DualReadoutCalorimeter::Process()
   number = -1;
   for(const auto &track : *fTrackInputArray)
   {
-    const TLorentzVector &trackPosition = track.Position;
+    const TLorentzVector &trackPosition = track->Position;
     ++number;
 
-    pdgCode = TMath::Abs(track.PID);
+    pdgCode = TMath::Abs(track->PID);
 
     itFractionMap = fFractionMap.find(pdgCode);
     if(itFractionMap == fFractionMap.end())
@@ -379,8 +378,8 @@ void DualReadoutCalorimeter::Process()
       ++fTowerTrackHits;
 
       const auto &track = fTrackInputArray->at(number);
-      momentum = track.Momentum;
-      position = track.Position;
+      momentum = track->Momentum;
+      position = track->Position;
 
       ecalEnergy = momentum.E() * fECalTrackFractions[number];
       hcalEnergy = momentum.E() * fHCalTrackFractions[number];
@@ -390,7 +389,7 @@ void DualReadoutCalorimeter::Process()
       {
         if(fElectronsFromTrack)
         {
-          fTower->ECalEnergyTimePairs.push_back(make_pair<Float_t, Float_t>(ecalEnergy, track.Position.T()));
+          fTower->ECalEnergyTimePairs.push_back(make_pair<Float_t, Float_t>(ecalEnergy, track->Position.T()));
         }
       }
 
@@ -405,12 +404,12 @@ void DualReadoutCalorimeter::Process()
         else
           sigma = fECalResolutionFormula->Eval(0.0, fTowerEta, 0.0, momentum.E());
 
-        if(sigma / momentum.E() < track.TrackResolution)
+        if(sigma / momentum.E() < track->TrackResolution)
           energyGuess = ecalEnergy + hcalEnergy;
         else
           energyGuess = momentum.E();
 
-        fTrackSigma += (track.TrackResolution) * energyGuess * (track.TrackResolution) * energyGuess;
+        fTrackSigma += (track->TrackResolution) * energyGuess * (track->TrackResolution) * energyGuess;
         fTowerTrackArray.emplace_back(track);
       }
       else
@@ -425,8 +424,8 @@ void DualReadoutCalorimeter::Process()
     if(flags & 2) ++fTowerPhotonHits;
 
     const auto &particle = fParticleInputArray->at(number);
-    momentum = particle.Momentum;
-    position = particle.Position;
+    momentum = particle->Momentum;
+    position = particle->Position;
 
     // fill current tower
     ecalEnergy = momentum.E() * fECalTowerFractions[number];
@@ -439,7 +438,7 @@ void DualReadoutCalorimeter::Process()
     fTowerTime += (ecalEnergy + hcalEnergy) * position.T(); //sigma_t ~ 1/sqrt(E)
     fTowerTimeWeight += ecalEnergy + hcalEnergy;
 
-    fTower->AddCandidate(&particle); // keep parentage
+    fTower->AddCandidate(particle); // keep parentage
     fTower->Position = position;
   }
 
@@ -589,14 +588,14 @@ void DualReadoutCalorimeter::FinalizeTower()
   {
     if(fTowerPhotonHits > 0 && fTowerTrackHits == 0)
     {
-      fPhotonOutputArray->emplace_back(*fTower);
+      fPhotonOutputArray->emplace_back(fTower);
     }
 
     if(debug) cout << "   creating tower with energy: " << energy << endl;
     if(debug) cout << "   creating tower with PID: " << fTower->PID << endl;
     if(debug) cout << "   creating tower with track energy: " << fTower->Etrk << endl;
 
-    fTowerOutputArray->emplace_back(*fTower);
+    fTowerOutputArray->emplace_back(fTower);
   }
 
   // ---------------------------------------------------------------------------
@@ -641,7 +640,7 @@ void DualReadoutCalorimeter::FinalizeTower()
       tower->PID = 22;
       pt = neutralEnergy / TMath::CosH(eta);
       tower->Momentum.SetPtEtaPhiE(pt, eta, phi, neutralEnergy);
-      fEFlowPhotonOutputArray->emplace_back(*tower);
+      fEFlowPhotonOutputArray->emplace_back(tower);
     }
     else
     {
@@ -654,7 +653,7 @@ void DualReadoutCalorimeter::FinalizeTower()
       if(p > 0)
       {
         tower->Momentum.SetPtEtaPhiE(pt, eta, phi, neutralEnergy);
-        fEFlowNeutralHadronOutputArray->emplace_back(*tower);
+        fEFlowNeutralHadronOutputArray->emplace_back(tower);
       }
     }
 
@@ -666,8 +665,8 @@ void DualReadoutCalorimeter::FinalizeTower()
     // now clone tracks
     for(const auto &track : fTowerTrackArray)
     {
-      auto new_track = track;
-      new_track.AddCandidate(&track); // keep parentage
+      auto *new_track = static_cast<Candidate *>(track->Clone());
+      new_track->AddCandidate(track); // keep parentage
       fEFlowTrackOutputArray->emplace_back(new_track);
     }
   }
@@ -690,10 +689,10 @@ void DualReadoutCalorimeter::FinalizeTower()
     //rescale tracks
     for(const auto &track : fTowerTrackArray)
     {
-      auto new_track = track;
-      new_track.AddCandidate(&track); // keep parentage
-      new_track.Momentum.SetPtEtaPhiM(track.Momentum.Pt() * rescaleFactor, track.Momentum.Eta(), track.Momentum.Phi(), track.Momentum.M());
-      if(debug) cout << "  track Momentum: " << new_track.PID << ", " << new_track.Momentum.Pt() << ", " << new_track.Momentum.Eta() << ", " << new_track.Momentum.M() << endl;
+      auto *new_track = static_cast<Candidate *>(track->Clone());
+      new_track->AddCandidate(track); // keep parentage
+      new_track->Momentum.SetPtEtaPhiM(track->Momentum.Pt() * rescaleFactor, track->Momentum.Eta(), track->Momentum.Phi(), track->Momentum.M());
+      if(debug) cout << "  track Momentum: " << new_track->PID << ", " << new_track->Momentum.Pt() << ", " << new_track->Momentum.Eta() << ", " << new_track->Momentum.M() << endl;
       fEFlowTrackOutputArray->emplace_back(new_track);
     }
   }

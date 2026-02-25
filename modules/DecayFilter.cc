@@ -84,7 +84,7 @@ void DecayFilter::Process()
   for(const auto &candidate : *fInputArray)
   {
     // get particle information from PDG
-    TParticlePDG *pdg = pdgdb->GetParticle(candidate.PID);
+    TParticlePDG *pdg = pdgdb->GetParticle(candidate->PID);
     if(!pdg)
     { // don't know this particle
       fOutputArray->emplace_back(candidate);
@@ -99,11 +99,11 @@ void DecayFilter::Process()
     }
 
     // compute boosted decay length (beta gamma c tau)
-    p = candidate.P;
+    p = candidate->P;
     bgct = p / m * c * t; // [m]
 
     // get full trajectory length and generate random decay length
-    L = candidate.L * 1.0E-3; // [m]
+    L = candidate->L * 1.0E-3; // [m]
     l = gRandom->Exp(bgct);
 
     // if random decay happens before end of trajectory, reject track

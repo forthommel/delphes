@@ -104,8 +104,8 @@ void ExampleModule::Process()
   // loop over all input candidates
   for(const auto &candidate : *fInputArray)
   {
-    const auto &candidatePosition = candidate.Position;
-    const auto &candidateMomentum = candidate.Momentum;
+    const auto &candidatePosition = candidate->Position;
+    const auto &candidateMomentum = candidate->Momentum;
 
     // apply an efficency formula
     if(gRandom->Uniform() <= fFormula->Eval(candidateMomentum.Pt(), candidatePosition.Eta()))

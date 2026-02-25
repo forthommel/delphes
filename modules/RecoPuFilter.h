@@ -30,10 +30,10 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
-#include <vector>
 
-class Candidate;
+#include <vector>
 
 class RecoPuFilter : public DelphesModule
 {
@@ -45,8 +45,8 @@ public:
   void Finish();
 
 private:
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(RecoPuFilter, 1)
 };

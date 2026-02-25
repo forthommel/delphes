@@ -100,9 +100,9 @@ void ParticleDensity::Process()
   for(const auto &candidate : *fInputArray)
   {
     if(fUseMomentumVector)
-      fHisto->Fill(candidate.Momentum.Eta(), candidate.Momentum.Phi());
+      fHisto->Fill(candidate->Momentum.Eta(), candidate->Momentum.Phi());
     else
-      fHisto->Fill(candidate.Position.Eta(), candidate.Position.Phi());
+      fHisto->Fill(candidate->Position.Eta(), candidate->Position.Phi());
   }
 
   // normalise by bin width
@@ -114,15 +114,15 @@ void ParticleDensity::Process()
     Int_t ieta, iphi;
     if(fUseMomentumVector)
     {
-      ieta = fHisto->GetXaxis()->FindBin(candidate.Momentum.Eta());
-      iphi = fHisto->GetYaxis()->FindBin(candidate.Momentum.Phi());
+      ieta = fHisto->GetXaxis()->FindBin(candidate->Momentum.Eta());
+      iphi = fHisto->GetYaxis()->FindBin(candidate->Momentum.Phi());
     }
     else
     {
-      ieta = fHisto->GetXaxis()->FindBin(candidate.Position.Eta());
-      iphi = fHisto->GetYaxis()->FindBin(candidate.Position.Phi());
+      ieta = fHisto->GetXaxis()->FindBin(candidate->Position.Eta());
+      iphi = fHisto->GetYaxis()->FindBin(candidate->Position.Phi());
     }
-    candidate.ParticleDensity = fHisto->GetBinContent(ieta, iphi);
+    candidate->ParticleDensity = fHisto->GetBinContent(ieta, iphi);
     fOutputArray->emplace_back(candidate);
   }
 }

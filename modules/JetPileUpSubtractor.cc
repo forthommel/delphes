@@ -80,8 +80,8 @@ void JetPileUpSubtractor::Process()
   // loop over all input candidates
   for(const auto &candidate : *fJetInputArray)
   {
-    momentum = candidate.Momentum;
-    area = candidate.Area;
+    momentum = candidate->Momentum;
+    area = candidate->Area;
     eta = momentum.Eta();
 
     // find rho
@@ -90,9 +90,9 @@ void JetPileUpSubtractor::Process()
     {
       for(const auto &object : *fRhoInputArray)
       {
-        if(eta >= object.Edges[0] && eta < object.Edges[1])
+        if(eta >= object->Edges[0] && eta < object->Edges[1])
         {
-          rho = object.Momentum.Pt();
+          rho = object->Momentum.Pt();
         }
       }
     }
@@ -104,8 +104,8 @@ void JetPileUpSubtractor::Process()
 
     if(momentum.Pt() <= fJetPTMin) continue;
 
-    auto new_candidate = candidate;
-    new_candidate.Momentum = momentum;
+    auto new_candidate = static_cast<Candidate *>(candidate->Clone());
+    new_candidate->Momentum = momentum;
     fOutputArray->emplace_back(new_candidate);
   }
 }

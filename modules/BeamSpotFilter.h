@@ -11,9 +11,8 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
-
-class Candidate;
 
 class BeamSpotFilter : public DelphesModule
 {
@@ -27,8 +26,8 @@ public:
 private:
   Float_t fPassedOne;
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(BeamSpotFilter, 1)
 };

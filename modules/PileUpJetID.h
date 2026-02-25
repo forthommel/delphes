@@ -9,11 +9,11 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 #include <deque>
 
-class Candidate;
 class DelphesFormula;
 
 class PileUpJetID : public DelphesModule
@@ -87,11 +87,11 @@ MeanSqDeltaR
 
   Bool_t fAverageEachTower;
 
-  InputHandle<std::vector<Candidate> > fJetInputArray; //!
-  InputHandle<std::vector<Candidate> > fTrackInputArray; // SCZ
-  InputHandle<std::vector<Candidate> > fNeutralInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fNeutralsInPassingJets; // SCZ
+  InputHandle<CandidatesCollection> fJetInputArray; //!
+  InputHandle<CandidatesCollection> fTrackInputArray; // SCZ
+  InputHandle<CandidatesCollection> fNeutralInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
+  OutputHandle<CandidatesCollection> fNeutralsInPassingJets; // SCZ
 
   ClassDef(PileUpJetID, 2)
 };

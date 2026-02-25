@@ -86,20 +86,19 @@ void EnergyScale::Finish()
 
 void EnergyScale::Process()
 {
-  TLorentzVector momentum;
   Double_t scale;
 
   fOutputArray->clear();
   for(const auto &candidate : *fInputArray)
   {
-    momentum = candidate.Momentum;
+    auto momentum = candidate->Momentum;
 
     scale = fFormula->Eval(momentum.Pt(), momentum.Eta(), momentum.Phi(), momentum.E());
 
     if(scale > 0.0) momentum *= scale;
 
-    auto new_candidate = candidate;
-    new_candidate.Momentum = momentum;
+    auto *new_candidate = static_cast<Candidate *>(candidate->Clone());
+    new_candidate->Momentum = momentum;
     fOutputArray->emplace_back(new_candidate);
   }
 }

@@ -122,7 +122,7 @@ void TrackCovariance::Process()
   for(const auto &candidate : *fInputArray) //TODO: ensure const-qualification of consumers
   {
     // converting to meters
-    const auto *particle = candidate.GetCandidates().at(0);
+    const auto *particle = candidate->GetCandidates().at(0);
 
     // converting to meters
     const TLorentzVector &candidatePosition = particle->Position * 1e-03;
@@ -140,53 +140,53 @@ void TrackCovariance::Process()
 
     //
     // Standard implementation with grid
-    //ObsTrk track(candidatePosition.Vect(), candidateMomentum.Vect(), candidate.Charge, fCovariance, fGeometry);
+    //ObsTrk track(candidatePosition.Vect(), candidateMomentum.Vect(), candidate->Charge, fCovariance, fGeometry);
     //
     // Try Kalman without any grid
-    ObsTrk track(candidatePosition.Vect(), candidateMomentum.Vect(), candidate.Charge, mass, fGeometry);
+    ObsTrk track(candidatePosition.Vect(), candidateMomentum.Vect(), candidate->Charge, mass, fGeometry);
 
     // apply rescaling factors to resolution
-    auto &non_const_candidate = const_cast<Candidate &>(candidate); //TODO: ensure const-qualification for the formula evaluator
-    if(TMath::Abs(candidate.PID) == 11)
-      track.SetScale(fElectronScaleFactor->Eval(candidateMomentum.Pt(), candidateMomentum.Eta(), candidateMomentum.Phi(), candidateMomentum.E(), &non_const_candidate));
-    else if(TMath::Abs(candidate.PID) == 13)
-      track.SetScale(fMuonScaleFactor->Eval(candidateMomentum.Pt(), candidateMomentum.Eta(), candidateMomentum.Phi(), candidateMomentum.E(), &non_const_candidate));
+    auto *non_const_candidate = const_cast<Candidate *>(candidate); //TODO: ensure const-qualification for the formula evaluator
+    if(TMath::Abs(candidate->PID) == 11)
+      track.SetScale(fElectronScaleFactor->Eval(candidateMomentum.Pt(), candidateMomentum.Eta(), candidateMomentum.Phi(), candidateMomentum.E(), non_const_candidate));
+    else if(TMath::Abs(candidate->PID) == 13)
+      track.SetScale(fMuonScaleFactor->Eval(candidateMomentum.Pt(), candidateMomentum.Eta(), candidateMomentum.Phi(), candidateMomentum.E(), non_const_candidate));
     else
-      track.SetScale(fChargedHadronScaleFactor->Eval(candidateMomentum.Pt(), candidateMomentum.Eta(), candidateMomentum.Phi(), candidateMomentum.E(), &non_const_candidate));
+      track.SetScale(fChargedHadronScaleFactor->Eval(candidateMomentum.Pt(), candidateMomentum.Eta(), candidateMomentum.Phi(), candidateMomentum.E(), non_const_candidate));
 
-    auto new_candidate = candidate;
+    auto *new_candidate = static_cast<Candidate *>(candidate->Clone());
 
-    new_candidate.Momentum.SetVectM(track.GetObsP(), mass);
+    new_candidate->Momentum.SetVectM(track.GetObsP(), mass);
 
     // converting back to mm
-    new_candidate.InitialPosition.SetXYZT(track.GetObsX().X() * 1e03, track.GetObsX().Y() * 1e03, track.GetObsX().Z() * 1e03, candidatePosition.T() * 1e03);
+    new_candidate->InitialPosition.SetXYZT(track.GetObsX().X() * 1e03, track.GetObsX().Y() * 1e03, track.GetObsX().Z() * 1e03, candidatePosition.T() * 1e03);
 
     // save full covariance 5x5 matrix internally (D0, phi, Curvature, dz, ctg(theta))
-    new_candidate.TrackCovariance = track.GetCov();
+    new_candidate->TrackCovariance = track.GetCov();
 
-    pt = new_candidate.Momentum.Pt();
-    p = new_candidate.Momentum.P();
+    pt = new_candidate->Momentum.Pt();
+    p = new_candidate->Momentum.P();
     q = track.GetObsQ();
     ct = track.GetObsPar()[4];
 
-    new_candidate.Xd = track.GetObsX().X() * 1e03;
-    new_candidate.Yd = track.GetObsX().Y() * 1e03;
-    new_candidate.Zd = track.GetObsX().Z() * 1e03;
+    new_candidate->Xd = track.GetObsX().X() * 1e03;
+    new_candidate->Yd = track.GetObsX().Y() * 1e03;
+    new_candidate->Zd = track.GetObsX().Z() * 1e03;
 
-    new_candidate.XFirstHit = track.GetFirstHit().X() * 1e03;
-    new_candidate.YFirstHit = track.GetFirstHit().Y() * 1e03;
-    new_candidate.ZFirstHit = track.GetFirstHit().Z() * 1e03;
+    new_candidate->XFirstHit = track.GetFirstHit().X() * 1e03;
+    new_candidate->YFirstHit = track.GetFirstHit().Y() * 1e03;
+    new_candidate->ZFirstHit = track.GetFirstHit().Z() * 1e03;
 
-    new_candidate.D0 = track.GetObsPar()[0] * 1e03;
-    new_candidate.Phi = track.GetObsPar()[1];
+    new_candidate->D0 = track.GetObsPar()[0] * 1e03;
+    new_candidate->Phi = track.GetObsPar()[1];
 
     // inverse of curvature
-    new_candidate.C = track.GetObsPar()[2] * 1e-03;
-    new_candidate.DZ = track.GetObsPar()[3] * 1e03;
-    new_candidate.CtgTheta = track.GetObsPar()[4];
-    new_candidate.P = track.GetObsP().Mag();
-    new_candidate.PT = pt;
-    new_candidate.Charge = q;
+    new_candidate->C = track.GetObsPar()[2] * 1e-03;
+    new_candidate->DZ = track.GetObsPar()[3] * 1e03;
+    new_candidate->CtgTheta = track.GetObsPar()[4];
+    new_candidate->P = track.GetObsP().Mag();
+    new_candidate->PT = pt;
+    new_candidate->Charge = q;
 
     dd0 = TMath::Sqrt(track.GetCov()(0, 0)) * 1e03;
     ddz = TMath::Sqrt(track.GetCov()(3, 3)) * 1e03;
@@ -196,17 +196,17 @@ void TrackCovariance::Process()
     dp = TMath::Sqrt((1. + ct * ct) * dpt * dpt + 4 * pt * pt * ct * ct * dct * dct / (1. + ct * ct) / (1. + ct * ct));
     dC = TMath::Sqrt(track.GetCov()(2, 2)) * 1e-03;
 
-    new_candidate.ErrorD0 = dd0;
-    new_candidate.ErrorDZ = ddz;
-    new_candidate.ErrorP = dp;
-    new_candidate.ErrorC = dC;
-    new_candidate.ErrorCtgTheta = dct;
-    new_candidate.ErrorPhi = dphi;
-    new_candidate.ErrorPT = dpt;
+    new_candidate->ErrorD0 = dd0;
+    new_candidate->ErrorDZ = ddz;
+    new_candidate->ErrorP = dp;
+    new_candidate->ErrorC = dC;
+    new_candidate->ErrorCtgTheta = dct;
+    new_candidate->ErrorPhi = dphi;
+    new_candidate->ErrorPT = dpt;
     //new_candidate->TrackResolution = dpt / pt;
-    new_candidate.TrackResolution = dp / p;
+    new_candidate->TrackResolution = dp / p;
 
-    new_candidate.AddCandidate(&candidate); // mother particle
+    new_candidate->AddCandidate(candidate); // mother particle
 
     fOutputArray->emplace_back(new_candidate);
   }

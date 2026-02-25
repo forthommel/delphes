@@ -9,11 +9,10 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 #include <vector>
-
-class Candidate;
 
 class VertexFinderDA4D : public DelphesModule
 {
@@ -25,7 +24,7 @@ public:
   void Process();
   void Finish();
 
-  void clusterize(const std::vector<Candidate> &tracks, std::vector<Candidate> &clusters);
+  void clusterize(const CandidatesCollection &tracks, CandidatesCollection &clusters);
   std::vector<Candidate *> vertices();
 
 private:
@@ -43,9 +42,9 @@ private:
   Double_t fD0CutOff;
   Double_t fDtCutOff; // for when the beamspot has time
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fVertexOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
+  OutputHandle<CandidatesCollection> fVertexOutputArray; //!
 
   ClassDef(VertexFinderDA4D, 1)
 };

@@ -27,13 +27,13 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
 #include <map>
 #include <set>
 #include <vector>
 
-class Candidate;
 class DelphesFormula;
 
 class DenseTrackFilter : public DelphesModule
@@ -61,11 +61,11 @@ private:
 
   std::vector<Long64_t> fTowerHits;
 
-  InputHandle<std::vector<Candidate> > fTrackInputArray; //!
-  OutputHandle<std::vector<Candidate> > fTrackOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fChargedHadronOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fElectronOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fMuonOutputArray; //!
+  InputHandle<CandidatesCollection> fTrackInputArray; //!
+  OutputHandle<CandidatesCollection> fTrackOutputArray; //!
+  OutputHandle<CandidatesCollection> fChargedHadronOutputArray; //!
+  OutputHandle<CandidatesCollection> fElectronOutputArray; //!
+  OutputHandle<CandidatesCollection> fMuonOutputArray; //!
 
   void FillTrack();
   ClassDef(DenseTrackFilter, 1)

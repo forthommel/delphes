@@ -11,9 +11,9 @@
  *
  */
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
 
-class Candidate;
 class DelphesFormula;
 
 class TrackSmearing : public DelphesModule
@@ -58,9 +58,9 @@ private:
 
   Bool_t fApplyToPileUp;
 
-  InputHandle<std::vector<Candidate> > fInputArray; //!
-  InputHandle<std::vector<Candidate> > fBeamSpotInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
+  InputHandle<CandidatesCollection> fInputArray; //!
+  InputHandle<CandidatesCollection> fBeamSpotInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
 
   ClassDef(TrackSmearing, 1)
 };

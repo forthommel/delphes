@@ -96,8 +96,8 @@ void VertexSorter::Process()
   for(size_t iCluster = 0; iCluster < fInputArray->size(); iCluster++)
   {
     const auto &cluster = fInputArray->at(iCluster);
-    clusterIDToIndex[cluster.ClusterIndex] = iCluster;
-    clusterIDToSumPT2[cluster.ClusterIndex] = 0.0;
+    clusterIDToIndex[cluster->ClusterIndex] = iCluster;
+    clusterIDToSumPT2[cluster->ClusterIndex] = 0.0;
   }
 
   if(fMethod == "BTV")
@@ -110,18 +110,18 @@ void VertexSorter::Process()
 
     for(const auto &candidate : *fTrackInputArray)
     {
-      if(candidate.Momentum.Pt() < 1.0)
+      if(candidate->Momentum.Pt() < 1.0)
         continue;
-      if(candidate.ClusterIndex < 0)
+      if(candidate->ClusterIndex < 0)
         continue;
-      TLorentzVector p(candidate.Momentum.Px(), candidate.Momentum.Py(), candidate.Momentum.Pz(), candidate.Momentum.E());
+      TLorentzVector p(candidate->Momentum.Px(), candidate->Momentum.Py(), candidate->Momentum.Pz(), candidate->Momentum.E());
       Bool_t isInJet = false;
 
       for(const auto &jetCandidate : *fJetInputArray)
       {
-        if(jetCandidate.Momentum.Pt() < 30.0)
+        if(jetCandidate->Momentum.Pt() < 30.0)
           continue;
-        TLorentzVector q(jetCandidate.Momentum.Px(), jetCandidate.Momentum.Py(), jetCandidate.Momentum.Pz(), jetCandidate.Momentum.E());
+        TLorentzVector q(jetCandidate->Momentum.Px(), jetCandidate->Momentum.Py(), jetCandidate->Momentum.Pz(), jetCandidate->Momentum.E());
 
         if(p.DeltaR(q) > 0.4)
           continue;
@@ -131,7 +131,7 @@ void VertexSorter::Process()
       if(!isInJet)
         continue;
 
-      clusterIDToSumPT2.at(candidate.ClusterIndex) += candidate.Momentum.Pt() * candidate.Momentum.Pt();
+      clusterIDToSumPT2.at(candidate->ClusterIndex) += candidate->Momentum.Pt() * candidate->Momentum.Pt();
     }
 
     for(itClusterIDToSumPT2 = clusterIDToSumPT2.begin(); itClusterIDToSumPT2 != clusterIDToSumPT2.end(); ++itClusterIDToSumPT2)
@@ -155,7 +155,7 @@ void VertexSorter::Process()
     for(size_t iCluster = 0; iCluster < fInputArray->size(); iCluster++)
     {
       const auto &cluster = fInputArray->at(iCluster);
-      sortedClusterIDs.push_back(make_pair(cluster.ClusterIndex, fabs(cluster.Position.Z() - beamSpotCandidate.Position.Z())));
+      sortedClusterIDs.push_back(make_pair(cluster->ClusterIndex, fabs(cluster->Position.Z() - beamSpotCandidate->Position.Z())));
     }
     sort(sortedClusterIDs.begin(), sortedClusterIDs.end(), secondAscending);
   }
@@ -163,13 +163,13 @@ void VertexSorter::Process()
   {
     for(const auto &candidate : *fTrackInputArray)
     {
-      if(candidate.IsPU)
+      if(candidate->IsPU)
         continue;
       for(itClusterIDToIndex = clusterIDToIndex.begin(); itClusterIDToIndex != clusterIDToIndex.end(); ++itClusterIDToIndex)
       {
-        if(candidate.ClusterIndex != itClusterIDToIndex->first)
+        if(candidate->ClusterIndex != itClusterIDToIndex->first)
           continue;
-        clusterIDToSumPT2.at(itClusterIDToIndex->first) += candidate.Momentum.Pt() * candidate.Momentum.Pt();
+        clusterIDToSumPT2.at(itClusterIDToIndex->first) += candidate->Momentum.Pt() * candidate->Momentum.Pt();
       }
     }
 
@@ -190,11 +190,11 @@ void VertexSorter::Process()
   {
     auto &cluster = fInputArray->at(clusterIDToIndex.at(itSortedClusterIDs->first)); //TODO: do we want modification of input cluster?
     if(fMethod == "BTV")
-      cluster.BTVSumPT2 = itSortedClusterIDs->second;
+      cluster->BTVSumPT2 = itSortedClusterIDs->second;
     else if(fMethod == "GenClosest")
-      cluster.GenDeltaZ = itSortedClusterIDs->second;
+      cluster->GenDeltaZ = itSortedClusterIDs->second;
     else if(fMethod == "GenBest")
-      cluster.GenSumPT2 = itSortedClusterIDs->second;
+      cluster->GenSumPT2 = itSortedClusterIDs->second;
     fOutputArray->emplace_back(cluster);
   }
 }

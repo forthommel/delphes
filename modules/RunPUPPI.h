@@ -1,10 +1,11 @@
 #ifndef RunPUPPI_h
 #define RunPUPPI_h
 
+#include "classes/DelphesClasses.h"
 #include "classes/DelphesModule.h"
+
 #include <vector>
 
-class Candidate;
 class PuppiContainer;
 
 class RunPUPPI : public DelphesModule
@@ -38,12 +39,12 @@ private:
   std::vector<int> fMetricId;
   std::vector<int> fCombId;
 
-  InputHandle<std::vector<Candidate> > fTrackInputArray; //!
-  InputHandle<std::vector<Candidate> > fNeutralInputArray; //!
-  InputHandle<std::vector<Candidate> > fPVInputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputTrackArray; //!
-  OutputHandle<std::vector<Candidate> > fOutputNeutralArray; //!
+  InputHandle<CandidatesCollection> fTrackInputArray; //!
+  InputHandle<CandidatesCollection> fNeutralInputArray; //!
+  InputHandle<CandidatesCollection> fPVInputArray; //!
+  OutputHandle<CandidatesCollection> fOutputArray; //!
+  OutputHandle<CandidatesCollection> fOutputTrackArray; //!
+  OutputHandle<CandidatesCollection> fOutputNeutralArray; //!
 
   ClassDef(RunPUPPI, 1)
 };

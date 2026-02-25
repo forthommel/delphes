@@ -142,7 +142,7 @@ void DenseTrackFilter::Process()
   number = -1;
   for(const auto &track : *fTrackInputArray)
   {
-    const TLorentzVector &trackPosition = track.Position;
+    const TLorentzVector &trackPosition = track->Position;
     ++number;
 
     // find eta bin [1, fEtaBins.size - 1]
@@ -201,12 +201,12 @@ void DenseTrackFilter::Process()
     {
       ++fTowerTrackHits;
       const auto &track = fTrackInputArray->at(number);
-      momentum = track.Momentum;
+      momentum = track->Momentum;
 
       if(momentum.Pt() > ptmax)
       {
         ptmax = momentum.Pt();
-        fBestTrack = &track;
+        fBestTrack = track;
       }
       continue;
     }
@@ -241,16 +241,16 @@ void DenseTrackFilter::FillTrack()
   candidate->Momentum.SetPtEtaPhiM(pt, eta, phi, m);
   candidate->AddCandidate(track);
 
-  fTrackOutputArray->emplace_back(*candidate);
+  fTrackOutputArray->emplace_back(candidate);
   switch(TMath::Abs(candidate->PID))
   {
   case 11:
-    fElectronOutputArray->emplace_back(*candidate);
+    fElectronOutputArray->emplace_back(candidate);
     break;
   case 13:
-    fMuonOutputArray->emplace_back(*candidate);
+    fMuonOutputArray->emplace_back(candidate);
     break;
   default:
-    fChargedHadronOutputArray->emplace_back(*candidate);
+    fChargedHadronOutputArray->emplace_back(candidate);
   }
 }

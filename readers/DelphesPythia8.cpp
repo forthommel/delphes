@@ -128,17 +128,17 @@ void ConvertInput(Long64_t eventCounter, Pythia8::Pythia *pythia,
 
     candidate->Position.SetXYZT(x, y, z, t);
 
-    allParticleOutputArray.emplace_back(*candidate);
+    allParticleOutputArray.emplace_back(candidate);
 
     if(!pdgParticle) continue;
 
     if(status == 1)
     {
-      stableParticleOutputArray.emplace_back(*candidate);
+      stableParticleOutputArray.emplace_back(candidate);
     }
     else if(pdgCode <= 5 || pdgCode == 21 || pdgCode == 15)
     {
-      partonOutputArray.emplace_back(*candidate);
+      partonOutputArray.emplace_back(candidate);
     }
   }
 }
