@@ -50,13 +50,13 @@ private:
 
   Double_t fPTMin;
 
-  std::map<TIterator *, TObjArray *> fInputMap; //!
+  std::map<std::unique_ptr<TIterator>, TObjArray *> fInputMap; //!
 
-  ClassDef(TrackPileUpSubtractor, 1)
-
-    TIterator *fItVertexInputArray { nullptr }; //!
+  std::unique_ptr<TIterator> fItVertexInputArray{nullptr}; //!
 
   const TObjArray *fVertexInputArray{nullptr}; //!
+
+  ClassDef(TrackPileUpSubtractor, 1)
 };
 
 #endif

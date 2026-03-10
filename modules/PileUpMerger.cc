@@ -52,16 +52,11 @@ using namespace std;
 
 //------------------------------------------------------------------------------
 
-PileUpMerger::PileUpMerger() :
-  fFunction(std::unique_ptr<DelphesTF2>())
-{
-}
+PileUpMerger::PileUpMerger() : fFunction(std::unique_ptr<DelphesTF2>()) {}
 
 //------------------------------------------------------------------------------
 
-PileUpMerger::~PileUpMerger()
-{
-}
+PileUpMerger::~PileUpMerger() {}
 
 //------------------------------------------------------------------------------
 
@@ -91,7 +86,7 @@ void PileUpMerger::Init()
 
   // import input array
   fInputArray = ImportArray(GetString("InputArray", "Delphes/stableParticles"));
-  fItInputArray = fInputArray->MakeIterator();
+  fItInputArray.reset(fInputArray->MakeIterator());
 
   // create output arrays
   fParticleOutputArray = ExportArray(GetString("ParticleOutputArray", "stableParticles"));

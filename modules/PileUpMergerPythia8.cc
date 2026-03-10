@@ -54,16 +54,11 @@ using namespace std;
 
 //------------------------------------------------------------------------------
 
-PileUpMergerPythia8::PileUpMergerPythia8() :
-  fFunction(std::make_unique<DelphesTF2>())
-{
-}
+PileUpMergerPythia8::PileUpMergerPythia8() : fFunction(std::make_unique<DelphesTF2>()) {}
 
 //------------------------------------------------------------------------------
 
-PileUpMergerPythia8::~PileUpMergerPythia8()
-{
-}
+PileUpMergerPythia8::~PileUpMergerPythia8() {}
 
 //------------------------------------------------------------------------------
 
@@ -94,7 +89,7 @@ void PileUpMergerPythia8::Init()
 
   // import input array
   fInputArray = ImportArray(GetString("InputArray", "Delphes/stableParticles"));
-  fItInputArray = fInputArray->MakeIterator();
+  fItInputArray.reset(fInputArray->MakeIterator());
 
   // create output arrays
   fParticleOutputArray = ExportArray(GetString("ParticleOutputArray", "stableParticles"));
