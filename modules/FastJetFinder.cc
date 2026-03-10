@@ -50,7 +50,6 @@
 
 #include "fastjet/ClusterSequence.hh"
 #include "fastjet/ClusterSequenceArea.hh"
-#include "fastjet/JetDefinition.hh"
 #include "fastjet/PseudoJet.hh"
 #include "fastjet/Selector.hh"
 #include "fastjet/tools/JetMedianBackgroundEstimator.hh"
@@ -86,8 +85,6 @@ FastJetFinder::~FastJetFinder() {}
 
 void FastJetFinder::Init()
 {
-  JetDefinition::Plugin *plugin = nullptr;
-  JetDefinition::Recombiner *recomb = nullptr;
   ExRootConfParam param;
   Long_t i, size;
   Double_t etaMin, etaMax;
@@ -208,16 +205,16 @@ void FastJetFinder::Init()
   switch(fJetAlgorithm)
   {
   case 1:
-    plugin = new CDFJetCluPlugin(fSeedThreshold, fConeRadius, fAdjacencyCut, fMaxIterations, fIratch, fOverlapThreshold);
-    fDefinition = std::make_unique<JetDefinition>(plugin);
+    fPlugin = std::make_unique<CDFJetCluPlugin>(fSeedThreshold, fConeRadius, fAdjacencyCut, fMaxIterations, fIratch, fOverlapThreshold);
+    fDefinition = std::make_unique<JetDefinition>(fPlugin.get());
     break;
   case 2:
-    plugin = new CDFMidPointPlugin(fSeedThreshold, fConeRadius, fConeAreaFraction, fMaxPairSize, fMaxIterations, fOverlapThreshold);
-    fDefinition = std::make_unique<JetDefinition>(plugin);
+    fPlugin = std::make_unique<CDFMidPointPlugin>(fSeedThreshold, fConeRadius, fConeAreaFraction, fMaxPairSize, fMaxIterations, fOverlapThreshold);
+    fDefinition = std::make_unique<JetDefinition>(fPlugin.get());
     break;
   case 3:
-    plugin = new SISConePlugin(fConeRadius, fOverlapThreshold, fMaxIterations, fJetPTMin);
-    fDefinition = std::make_unique<JetDefinition>(plugin);
+    fPlugin = std::make_unique<SISConePlugin>(fConeRadius, fOverlapThreshold, fMaxIterations, fJetPTMin);
+    fDefinition = std::make_unique<JetDefinition>(fPlugin.get());
     break;
   case 4:
     fDefinition = std::make_unique<JetDefinition>(kt_algorithm, fParameterR);
@@ -230,8 +227,8 @@ void FastJetFinder::Init()
     fDefinition = std::make_unique<JetDefinition>(antikt_algorithm, fParameterR);
     break;
   case 7:
-    recomb = new WinnerTakeAllRecombiner();
-    fDefinition = std::make_unique<JetDefinition>(antikt_algorithm, fParameterR, recomb, Best);
+    fRecomb = std::make_unique<WinnerTakeAllRecombiner>();
+    fDefinition = std::make_unique<JetDefinition>(antikt_algorithm, fParameterR, fRecomb.get(), Best);
     break;
   case 8:
     fNjettinessPlugin = std::make_unique<NjettinessPlugin>(fN, Njettiness::wta_kt_axes, Njettiness::unnormalized_cutoff_measure, fBeta, fRcutOff);
@@ -252,9 +249,6 @@ void FastJetFinder::Init()
     fDefinition = std::make_unique<JetDefinition>(ee_kt_algorithm);
     break;
   }
-
-  fPlugin = plugin;
-  fRecomb = recomb;
 
   ClusterSequence::print_banner();
 
@@ -298,8 +292,6 @@ void FastJetFinder::Finish()
   fEstimators.clear();
 
   if(fItInputArray) delete fItInputArray;
-  if(fPlugin) delete static_cast<JetDefinition::Plugin *>(fPlugin);
-  if(fRecomb) delete static_cast<JetDefinition::Recombiner *>(fRecomb);
 }
 
 //------------------------------------------------------------------------------

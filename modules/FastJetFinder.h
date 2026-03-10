@@ -28,6 +28,7 @@
  */
 
 #include "classes/DelphesModule.h"
+#include "fastjet/JetDefinition.hh"
 
 #include <vector>
 
@@ -36,7 +37,6 @@ class TIterator;
 
 namespace fastjet
 {
-class JetDefinition;
 class AreaDefinition;
 class JetMedianBackgroundEstimator;
 namespace contrib
@@ -59,15 +59,15 @@ public:
   void Finish();
 
 private:
-  void *fPlugin{nullptr}; //!
-  void *fRecomb{nullptr}; //!
-
   std::unique_ptr<fastjet::contrib::AxesDefinition> fAxesDef;
   std::unique_ptr<fastjet::contrib::MeasureDefinition> fMeasureDef;
 
   std::unique_ptr<fastjet::contrib::NjettinessPlugin> fNjettinessPlugin; //!
   std::unique_ptr<fastjet::contrib::ValenciaPlugin> fValenciaPlugin; //!
+
   std::unique_ptr<fastjet::JetDefinition> fDefinition; //!
+  std::unique_ptr<fastjet::JetDefinition::Plugin> fPlugin; //!
+  std::unique_ptr<fastjet::JetDefinition::Recombiner> fRecomb; //!
 
   Int_t fJetAlgorithm;
   Double_t fParameterR;
