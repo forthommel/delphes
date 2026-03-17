@@ -30,16 +30,12 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "classes/DelphesReader.h"
 #include "classes/DelphesXDRReader.h"
 
-class TObjArray;
-class TStopwatch;
 class TDatabasePDG;
-class ExRootTreeBranch;
-class DelphesFactory;
-class DelphesXDRReader;
 
-class DelphesSTDHEPReader
+class DelphesSTDHEPReader : public DelphesReader
 {
 public:
   enum STDHEPBlock
@@ -59,16 +55,16 @@ public:
 
   void SetInputFile(FILE *inputFile);
 
-  void Clear();
-  bool EventReady();
+  void Clear() override;
+  bool EventReady() override;
 
   bool ReadBlock(DelphesFactory *factory,
     TObjArray *allParticleOutputArray,
     TObjArray *stableParticleOutputArray,
-    TObjArray *partonOutputArray);
+    TObjArray *partonOutputArray) override;
 
   void AnalyzeEvent(ExRootTreeBranch *branch, long long eventNumber,
-    TStopwatch *readStopWatch, TStopwatch *procStopWatch);
+    TStopwatch *readStopWatch, TStopwatch *procStopWatch) override;
 
 private:
   void AnalyzeParticles(DelphesFactory *factory,

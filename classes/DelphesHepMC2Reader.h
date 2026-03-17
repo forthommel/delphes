@@ -32,13 +32,11 @@
 
 #include <stdio.h>
 
-class TObjArray;
-class TStopwatch;
-class TDatabasePDG;
-class ExRootTreeBranch;
-class DelphesFactory;
+#include "classes/DelphesReader.h"
 
-class DelphesHepMC2Reader
+class TDatabasePDG;
+
+class DelphesHepMC2Reader : public DelphesReader
 {
 public:
   DelphesHepMC2Reader();
@@ -46,18 +44,18 @@ public:
 
   void SetInputFile(FILE *inputFile);
 
-  void Clear();
-  bool EventReady();
+  void Clear() override;
+  bool EventReady() override;
 
   bool ReadBlock(DelphesFactory *factory,
     TObjArray *allParticleOutputArray,
     TObjArray *stableParticleOutputArray,
-    TObjArray *partonOutputArray);
+    TObjArray *partonOutputArray) override;
 
   void AnalyzeEvent(ExRootTreeBranch *branch, long long eventNumber,
-    TStopwatch *readStopWatch, TStopwatch *procStopWatch);
+    TStopwatch *readStopWatch, TStopwatch *procStopWatch) override;
 
-  void AnalyzeWeight(ExRootTreeBranch *branch);
+  void AnalyzeWeight(ExRootTreeBranch *branch) override;
 
 private:
   void AnalyzeParticle(DelphesFactory *factory,
