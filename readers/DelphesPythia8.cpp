@@ -23,18 +23,15 @@
 
 #include <signal.h>
 
-#include "Pythia.h"
-#include "Pythia8Plugins/CombineMatchingInput.h"
+#include <Pythia.h>
+#include <Pythia8Plugins/CombineMatchingInput.h>
 
-#include "TApplication.h"
-#include "TROOT.h"
-
-#include "TDatabasePDG.h"
-#include "TFile.h"
-#include "TLorentzVector.h"
-#include "TObjArray.h"
-#include "TParticlePDG.h"
-#include "TStopwatch.h"
+#include <TApplication.h>
+#include <TDatabasePDG.h>
+#include <TFile.h>
+#include <TParticlePDG.h>
+#include <TROOT.h>
+#include <TStopwatch.h>
 
 #include "classes/DelphesClasses.h"
 #include "classes/DelphesFactory.h"
@@ -51,7 +48,9 @@ using namespace std;
 
 void ConvertInput(Long64_t eventCounter, Pythia8::Pythia *pythia,
   ExRootTreeBranch *branch, DelphesFactory *factory,
-  TObjArray *allParticleOutputArray, TObjArray *stableParticleOutputArray, TObjArray *partonOutputArray,
+  CandidatesCollection &stableParticleOutputArray,
+  CandidatesCollection &allParticleOutputArray,
+  CandidatesCollection &partonOutputArray,
   TStopwatch *readStopWatch, TStopwatch *procStopWatch)
 {
   int i;
@@ -129,17 +128,17 @@ void ConvertInput(Long64_t eventCounter, Pythia8::Pythia *pythia,
 
     candidate->Position.SetXYZT(x, y, z, t);
 
-    allParticleOutputArray->Add(candidate);
+    allParticleOutputArray->emplace_back(candidate);
 
     if(!pdgParticle) continue;
 
     if(status == 1)
     {
-      stableParticleOutputArray->Add(candidate);
+      stableParticleOutputArray->emplace_back(candidate);
     }
     else if(pdgCode <= 5 || pdgCode == 21 || pdgCode == 15)
     {
-      partonOutputArray->Add(candidate);
+      partonOutputArray->emplace_back(candidate);
     }
   }
 }
@@ -232,8 +231,8 @@ int main(int argc, char *argv[])
   ExRootConfReader *confReader = 0;
   Delphes *modularDelphes = 0;
   DelphesFactory *factory = 0;
-  TObjArray *stableParticleOutputArray = 0, *allParticleOutputArray = 0, *partonOutputArray = 0;
-  TObjArray *stableParticleOutputArrayLHEF = 0, *allParticleOutputArrayLHEF = 0, *partonOutputArrayLHEF = 0;
+  CandidatesCollection stableParticleOutputArray, allParticleOutputArray, partonOutputArray;
+  CandidatesCollection stableParticleOutputArrayLHEF, allParticleOutputArrayLHEF, partonOutputArrayLHEF;
   DelphesLHEFReader *reader = 0;
   Long64_t eventCounter, errorCounter;
   Long64_t numberOfEvents, timesAllowErrors;
