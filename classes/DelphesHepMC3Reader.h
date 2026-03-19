@@ -41,8 +41,7 @@ public:
   DelphesHepMC3Reader();
   ~DelphesHepMC3Reader();
 
-  void SetInputFile(FILE *inputFile);
-
+  void SetInputFile(FILE *inputFile) override;
   void Clear() override;
   bool EventReady() override;
 
