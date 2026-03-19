@@ -29,6 +29,7 @@
  */
 
 #include "classes/DelphesClasses.h"
+#include "classes/DelphesModuleFactory.h"
 
 class DelphesFactory;
 
@@ -55,5 +56,17 @@ public:
 
   virtual void AnalyzeWeight(ExRootTreeBranch *branch) {}
 };
+
+/// Add an event reader to the list of handled modules
+#define REGISTER_READER(name, obj)                                                 \
+  struct BUILDER_NAME(obj)                                                         \
+  {                                                                                \
+    BUILDER_NAME(obj)() { DelphesReaderFactory::Get().RegisterModule<obj>(name); } \
+  };                                                                               \
+  static const BUILDER_NAME(obj) gDelphesReader##obj;                              \
+  static_assert(true, "")
+
+/// A documentation generator factory
+DEFINE_FACTORY(DelphesReaderFactory, DelphesReader, "Event readers factory");
 
 #endif // DelphesReader_h
