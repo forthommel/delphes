@@ -27,18 +27,13 @@
  *
  */
 
-#include "classes/DelphesClasses.h"
+#include "classes/DelphesReader.h"
 
-#include <stdio.h>
-#include <utility>
 #include <vector>
 
-class TStopwatch;
 class TDatabasePDG;
-class ExRootTreeBranch;
-class DelphesFactory;
 
-class DelphesLHEFReader
+class DelphesLHEFReader: public DelphesReader
 {
 public:
   DelphesLHEFReader();
@@ -46,16 +41,16 @@ public:
 
   void SetInputFile(FILE *inputFile);
 
-  void Clear();
-  bool EventReady();
+  void Clear() override;
+  bool EventReady() override;
 
   bool ReadBlock(DelphesFactory *factory,
     CandidatesCollection &allParticleOutputArray,
     CandidatesCollection &stableParticleOutputArray,
-    CandidatesCollection &partonOutputArray);
+    CandidatesCollection &partonOutputArray) override;
 
   void AnalyzeEvent(ExRootTreeBranch *branch, long long eventNumber,
-    TStopwatch *readStopWatch, TStopwatch *procStopWatch);
+    TStopwatch *readStopWatch, TStopwatch *procStopWatch) override;
 
   void AnalyzeWeight(ExRootTreeBranch *branch);
 
