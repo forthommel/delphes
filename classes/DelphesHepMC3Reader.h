@@ -38,7 +38,7 @@ class TLorentzVector;
 class DelphesHepMC3Reader: public DelphesReader
 {
 public:
-  DelphesHepMC3Reader();
+  explicit DelphesHepMC3Reader(const DelphesParameters &);
 
   void SetFactory(DelphesFactory *factory) override;
 
