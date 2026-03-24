@@ -28,11 +28,12 @@
 #include "classes/DelphesClasses.h"
 #include "classes/DelphesFactory.h"
 #include "classes/DelphesHepMC2Reader.h"
+#include "classes/DelphesTCLConfReader.h"
 #include "modules/Delphes.h"
 
-#include "ExRootAnalysis/ExRootProgressBar.h"
-#include "ExRootAnalysis/ExRootTreeBranch.h"
-#include "ExRootAnalysis/ExRootTreeWriter.h"
+#include <ExRootAnalysis/ExRootProgressBar.h>
+#include <ExRootAnalysis/ExRootTreeBranch.h>
+#include <ExRootAnalysis/ExRootTreeWriter.h>
 
 using namespace std;
 
@@ -72,15 +73,16 @@ int main(int argc, char *argv[])
 
   try
   {
-    const auto confReader = std::make_unique<ExRootConfReader>();
+    const auto confReader = std::make_unique<DelphesTCLConfReader>();
     confReader->ReadFile(argv[1]);
 
     const auto modularDelphes = std::make_unique<Delphes>("Delphes");
     modularDelphes->SetConfReader(confReader.get());
 
-    const auto reader = std::make_unique<DelphesHepMC2Reader>();
-    reader->SetMaxEvents(confReader->GetInt("::MaxEvents", 0));
-    reader->SetSkipEvents(confReader->GetInt("::SkipEvents", 0));
+    const auto reader = std::make_unique<DelphesHepMC2Reader>(DelphesParameters{});
+    const auto userParams = confReader->Parameters();
+    reader->SetMaxEvents(userParams.Get<int>("MaxEvents", 0));
+    reader->SetSkipEvents(userParams.Get<int>("SkipEvents", 0));
 
     modularDelphes->InitTask();
 

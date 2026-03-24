@@ -34,13 +34,13 @@
 class DelphesWriter: public DelphesModule
 {
 public:
-  DelphesWriter() = default;
+  using DelphesModule::DelphesModule;
   virtual ~DelphesWriter() = default;
 
   void SetOutputFile(std::string_view outputFile) { fOutputFile = outputFile; }
   const std::string &GetOutputFile() const { return fOutputFile; }
 
-  void AddInfo(const char *name, Double_t value);
+  virtual void AddInfo(std::string_view name, double value) {}
 
   bool IsWriter() const override { return true; }
 

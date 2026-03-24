@@ -35,6 +35,7 @@
 #include "classes/DelphesClasses.h"
 #include "classes/DelphesFactory.h"
 #include "classes/DelphesLHEFReader.h"
+#include "classes/DelphesTCLConfReader.h"
 #include "modules/Delphes.h"
 
 #include "ExRootAnalysis/ExRootProgressBar.h"
@@ -241,7 +242,7 @@ int main(int argc, char *argv[])
 
   try
   {
-    const auto confReader = std::make_unique<ExRootConfReader>();
+    const auto confReader = std::make_unique<DelphesTCLConfReader>();
     confReader->ReadFile(argv[1]);
 
     const auto modularDelphes = std::make_unique<Delphes>("Delphes");
@@ -304,7 +305,7 @@ int main(int argc, char *argv[])
     {
       if(const auto inputFile = pythia->word("Beams:LHEF"); !inputFile.empty())
       {
-        reader = std::make_unique<DelphesLHEFReader>();
+        reader = std::make_unique<DelphesLHEFReader>(DelphesParameters{});
         reader->LoadInputFile(inputFile);
 
         eventInfoLHEF = modularDelphes->GetFactory()->Book<HepMCEvent>("EventLHEF");
