@@ -28,7 +28,6 @@
  */
 
 #include "classes/DelphesClasses.h"
-#include "classes/DelphesFactory.h"
 #include "classes/DelphesFormula.h"
 #include "classes/DelphesModule.h"
 
@@ -113,7 +112,7 @@ private:
   const std::unordered_map<double, std::vector<double> > fPhiBins;
   std::vector<double> fEtaBins;
 
-  Candidate *fTower{nullptr};
+  std::unique_ptr<Candidate> fTower;
   double fTowerEta, fTowerPhi, fTowerEdges[4];
 
   double fTowerEnergy;
@@ -189,7 +188,6 @@ void SimpleCalorimeter::Process()
 
   std::vector<unsigned long long>::iterator itTowerHits;
 
-  DelphesFactory *factory = GetFactory();
   fTowerHits.clear();
   fTowerFractions.clear();
   fTrackFractions.clear();
@@ -284,7 +282,7 @@ void SimpleCalorimeter::Process()
     fTowerHits.push_back(towerHit);
     // skip insensitive calo bins entirely for particles
     if(IsTowerInsensitive(etaBin, phiBin))
-      fTower = nullptr;
+      fTower.reset();
   }
 
   // all hits are sorted first by eta bin number, then by phi bin number,
@@ -293,7 +291,6 @@ void SimpleCalorimeter::Process()
 
   // loop over all hits
   towerEtaPhi = 0;
-  fTower = nullptr;
   for(itTowerHits = fTowerHits.begin(); itTowerHits != fTowerHits.end(); ++itTowerHits)
   {
     towerHit = (*itTowerHits);
@@ -310,16 +307,14 @@ void SimpleCalorimeter::Process()
       if(fTower) FinalizeTower();
 
       // create new tower
-      fTower = factory->NewCandidate();
+      fTower = std::make_unique<Candidate>();
       const short phiBin = (towerHit >> 32) & 0x000000000000FFFFLL;
       const short etaBin = (towerHit >> 48) & 0x000000000000FFFFLL;
 
       //mark fTower nullptr
       if(IsTowerInsensitive(etaBin, phiBin))
-      {
-        fTower = nullptr; // insensitive tower: no creation
-        // do NOT continue here! preserve hit loop for ordering
-      }
+        fTower.reset(); // insensitive tower: no creation
+      // do NOT continue here! preserve hit loop for ordering
 
       // phi bins for given eta bin
       const std::vector<double> &phiBins = fPhiBins.at(fEtaBins.at(etaBin));

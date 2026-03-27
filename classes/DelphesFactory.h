@@ -33,8 +33,6 @@
 #include <string>
 #include <vector>
 
-class Candidate;
-
 class DelphesFactory
 {
 public:
@@ -70,14 +68,11 @@ public:
   /// Retrieve the list of collections to be exported automatically
   const std::vector<std::pair<std::string, const std::type_info *> > &GetExportCollections() const { return fExportCollections; }
 
-  Candidate *NewCandidate(); ///< Construct a new candidate to fill a collection
-
 private:
   void ThrowAttachingFailure(std::string_view collectionName) const;
 
   std::map<std::string, void *> fMemorySlots;
   std::vector<std::pair<std::string, const std::type_info *> > fExportCollections;
-  std::vector<std::unique_ptr<Candidate> > fCandidates;
 };
 
 #endif /* DelphesFactory */

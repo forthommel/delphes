@@ -39,8 +39,6 @@
 
 #include "classes/SortableObject.h"
 
-class DelphesFactory;
-
 class Candidate;
 
 //---------------------------------------------------------------------------
@@ -736,8 +734,6 @@ public:
 
 class Candidate: public SortableObject
 {
-  friend class DelphesFactory;
-
 public:
   Candidate() = default;
 
@@ -887,16 +883,12 @@ public:
   Bool_t Overlaps(const Candidate *object) const;
 
   virtual void Copy(TObject &object) const;
-  virtual TObject *Clone(const char *newname = "") const;
   virtual void Clear(Option_t *option = "");
 
 private:
-  DelphesFactory *fFactory{nullptr}; //!
   std::vector<Candidate *> fArray{}; //!
 
-  void SetFactory(DelphesFactory *factory) { fFactory = factory; }
-
-  ClassDef(Candidate, 7)
+  ClassDef(Candidate, 8)
 };
 
 using CandidatesCollection = std::shared_ptr<std::vector<Candidate> >;

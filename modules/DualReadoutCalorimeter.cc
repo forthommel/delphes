@@ -26,7 +26,6 @@
  */
 
 #include "classes/DelphesClasses.h"
-#include "classes/DelphesFactory.h"
 #include "classes/DelphesFormula.h"
 #include "classes/DelphesModule.h"
 
@@ -108,7 +107,7 @@ private:
   const std::unique_ptr<DelphesFormula> fECalResolutionFormula; //!
   const std::unique_ptr<DelphesFormula> fHCalResolutionFormula; //!
 
-  Candidate *fTower{nullptr};
+  std::unique_ptr<Candidate> fTower;
   double fTowerEta, fTowerPhi, fTowerEdges[4];
   double fECalTowerEnergy, fHCalTowerEnergy;
   double fECalTrackEnergy, fHCalTrackEnergy;
@@ -159,7 +158,6 @@ void DualReadoutCalorimeter::Process()
   fEFlowPhotonOutputArray->clear();
   fEFlowNeutralHadronOutputArray->clear();
 
-  DelphesFactory *factory = GetFactory();
   fTowerHits.clear();
   fECalTowerFractions.clear();
   fHCalTowerFractions.clear();
@@ -262,7 +260,7 @@ void DualReadoutCalorimeter::Process()
 
   // loop over all hits
   unsigned long long towerEtaPhi = 0;
-  fTower = 0;
+  fTower.reset();
   for(const unsigned long long &towerHit : fTowerHits)
   {
     const short flags = (towerHit >> 24) & 0x00000000000000FFLL;
@@ -278,7 +276,7 @@ void DualReadoutCalorimeter::Process()
       FinalizeTower();
 
       // create new tower
-      fTower = factory->NewCandidate();
+      fTower = std::make_unique<Candidate>();
 
       const short phiBin = (towerHit >> 32) & 0x000000000000FFFFLL;
       const short etaBin = (towerHit >> 48) & 0x000000000000FFFFLL;

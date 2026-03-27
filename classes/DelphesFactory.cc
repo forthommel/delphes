@@ -31,17 +31,6 @@
 void DelphesFactory::Clear()
 {
   TProcessID::SetObjectCount(0);
-  fCandidates.clear();
-}
-
-//------------------------------------------------------------------------------
-
-Candidate *DelphesFactory::NewCandidate()
-{
-  Candidate *object = static_cast<Candidate *>(fCandidates.emplace_back(std::make_unique<Candidate>()).get());
-  object->SetFactory(this);
-  TProcessID::AssignID(object);
-  return object;
 }
 
 //------------------------------------------------------------------------------

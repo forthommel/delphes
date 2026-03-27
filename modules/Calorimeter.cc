@@ -26,7 +26,6 @@
  */
 
 #include "classes/DelphesClasses.h"
-#include "classes/DelphesFactory.h"
 #include "classes/DelphesFormula.h"
 #include "classes/DelphesModule.h"
 
@@ -124,7 +123,7 @@ private:
   double fECalTrackSigma;
   double fHCalTrackSigma;
 
-  Candidate *fTower{nullptr};
+  std::unique_ptr<Candidate> fTower;
   double fTowerEta, fTowerPhi, fTowerEdges[4];
   double fECalTowerEnergy, fHCalTowerEnergy;
   double fECalTrackEnergy, fHCalTrackEnergy;
@@ -176,7 +175,6 @@ void Calorimeter::Process()
 
   vector<Long64_t>::iterator itTowerHits;
 
-  DelphesFactory *factory = GetFactory();
   fTowerHits.clear();
   fECalTowerFractions.clear();
   fHCalTowerFractions.clear();
@@ -281,7 +279,7 @@ void Calorimeter::Process()
 
   // loop over all hits
   towerEtaPhi = 0;
-  fTower = 0;
+  fTower.reset();
   for(itTowerHits = fTowerHits.begin(); itTowerHits != fTowerHits.end(); ++itTowerHits)
   {
     towerHit = (*itTowerHits);
@@ -298,7 +296,7 @@ void Calorimeter::Process()
       FinalizeTower();
 
       // create new tower
-      fTower = factory->NewCandidate();
+      fTower = std::make_unique<Candidate>();
 
       phiBin = (towerHit >> 32) & 0x000000000000FFFFLL;
       etaBin = (towerHit >> 48) & 0x000000000000FFFFLL;

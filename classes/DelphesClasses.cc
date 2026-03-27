@@ -27,7 +27,6 @@
  */
 
 #include "classes/DelphesClasses.h"
-#include "classes/DelphesFactory.h"
 #include "classes/SortableObject.h"
 
 static constexpr Double_t c_light = 2.99792458E8;
@@ -55,25 +54,12 @@ Bool_t Candidate::Overlaps(const Candidate *object) const
   if(object->GetUniqueID() == GetUniqueID()) return true;
 
   for(const Candidate *candidate : fArray)
-  {
     if(candidate->Overlaps(object)) return true;
-  }
 
   for(const Candidate *candidate : object->fArray)
-  {
     if(candidate->Overlaps(this)) return true;
-  }
 
   return false;
-}
-
-//------------------------------------------------------------------------------
-
-TObject *Candidate::Clone(const char * /*newname*/) const
-{
-  Candidate *object = fFactory->NewCandidate();
-  Copy(*object);
-  return object;
 }
 
 //------------------------------------------------------------------------------
@@ -82,7 +68,6 @@ void Candidate::Copy(TObject &obj) const
 {
   Candidate &object = static_cast<Candidate &>(obj);
   object = *this;
-  object.fFactory = fFactory;
   object.fArray.clear();
 
   // copy cluster timing info
