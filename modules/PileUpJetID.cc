@@ -123,12 +123,12 @@ void PileUpJetID::Process()
   TLorentzVector momentum, area;
 
   // loop over all input candidates
-  for(Candidate *const &candidate : *fJetInputArray)
+  for(Candidate &candidate : *fJetInputArray)
   {
-    momentum = candidate->Momentum;
-    area = candidate->Area;
+    momentum = candidate.Momentum;
+    area = candidate.Area;
 
-    candidate->NTimeHits = 0;
+    candidate.NTimeHits = 0;
 
     float sumpt = 0.;
     float sumptch = 0.;
@@ -141,16 +141,14 @@ void PileUpJetID::Process()
     float pt_ann[5];
 
     for(int i = 0; i < 5; i++)
-    {
       pt_ann[i] = 0.;
-    }
 
     if(fUseConstituents)
     {
-      for(Candidate *const &constituent : candidate->GetCandidates())
+      for(const Candidate *const &constituent : candidate.GetCandidates())
       {
         float pt = constituent->Momentum.Pt();
-        float dr = candidate->Momentum.DeltaR(constituent->Momentum);
+        float dr = candidate.Momentum.DeltaR(constituent->Momentum);
         //	cout << " There exists a constituent with dr=" << dr << endl;
         sumpt += pt;
         sumdrsqptsq += dr * dr * pt * pt;
@@ -162,89 +160,71 @@ void PileUpJetID::Process()
         else
         {
           if(constituent->IsRecoPU)
-          {
             sumptchpu += pt;
-          }
           else
-          {
             sumptchpv += pt;
-          }
           sumptch += pt;
           nc++;
         }
         for(int i = 0; i < 5; i++)
         {
           if(dr > 0.1 * i && dr < 0.1 * (i + 1))
-          {
             pt_ann[i] += pt;
-          }
         }
         float tow_sumW = 0;
         for(size_t i = 0; i < constituent->ECalEnergyTimePairs.size(); i++)
         {
           float w = std::sqrt(constituent->ECalEnergyTimePairs[i].first);
           if(fAverageEachTower)
-          {
             tow_sumW += w;
-          }
           else
-          {
-            candidate->NTimeHits++;
-          }
+            candidate.NTimeHits++;
         }
         if(fAverageEachTower && tow_sumW > 0.)
         {
-          candidate->NTimeHits++;
+          candidate.NTimeHits++;
         }
       }
     }
     else
     {
       // Not using constituents, using dr
-      for(Candidate *const &trk : *fTrackInputArray)
+      for(const Candidate &trk : *fTrackInputArray)
       {
-        if(trk->Momentum.DeltaR(candidate->Momentum) < fParameterR)
+        if(trk.Momentum.DeltaR(candidate.Momentum) < fParameterR)
         {
-          float pt = trk->Momentum.Pt();
+          float pt = trk.Momentum.Pt();
           sumpt += pt;
           sumptch += pt;
-          if(trk->IsRecoPU)
-          {
+          if(trk.IsRecoPU)
             sumptchpu += pt;
-          }
           else
-          {
             sumptchpv += pt;
-          }
-          float dr = candidate->Momentum.DeltaR(trk->Momentum);
+          float dr = candidate.Momentum.DeltaR(trk.Momentum);
           sumdrsqptsq += dr * dr * pt * pt;
           sumptsq += pt * pt;
           nc++;
           for(int i = 0; i < 5; i++)
           {
             if(dr > 0.1 * i && dr < 0.1 * (i + 1))
-            {
               pt_ann[i] += pt;
-            }
           }
         }
       }
-      for(Candidate *const &constituent : *fNeutralInputArray)
+      for(const Candidate &constituent : *fNeutralInputArray)
       {
-        if(constituent->Momentum.DeltaR(candidate->Momentum) < fParameterR)
+        if(constituent.Momentum.DeltaR(candidate.Momentum) < fParameterR)
         {
-          float pt = constituent->Momentum.Pt();
+          float pt = constituent.Momentum.Pt();
           sumpt += pt;
-          float dr = candidate->Momentum.DeltaR(constituent->Momentum);
+          float dr = candidate.Momentum.DeltaR(constituent.Momentum);
           sumdrsqptsq += dr * dr * pt * pt;
           sumptsq += pt * pt;
           nn++;
           for(int i = 0; i < 5; i++)
           {
             if(dr > 0.1 * i && dr < 0.1 * (i + 1))
-            {
               pt_ann[i] += pt;
-            }
           }
         }
       }
@@ -252,39 +232,35 @@ void PileUpJetID::Process()
 
     if(sumptch > 0.)
     {
-      candidate->Beta = sumptchpv / sumptch;
-      candidate->BetaStar = sumptchpu / sumptch;
+      candidate.Beta = sumptchpv / sumptch;
+      candidate.BetaStar = sumptchpu / sumptch;
     }
     else
     {
-      candidate->Beta = -999.;
-      candidate->BetaStar = -999.;
+      candidate.Beta = -999.;
+      candidate.BetaStar = -999.;
     }
     if(sumptsq > 0.)
     {
-      candidate->MeanSqDeltaR = sumdrsqptsq / sumptsq;
+      candidate.MeanSqDeltaR = sumdrsqptsq / sumptsq;
     }
     else
     {
-      candidate->MeanSqDeltaR = -999.;
+      candidate.MeanSqDeltaR = -999.;
     }
-    candidate->NCharged = nc;
-    candidate->NNeutrals = nn;
+    candidate.NCharged = nc;
+    candidate.NNeutrals = nn;
     if(sumpt > 0.)
     {
-      candidate->PTD = std::sqrt(sumptsq) / sumpt;
+      candidate.PTD = std::sqrt(sumptsq) / sumpt;
       for(int i = 0; i < 5; i++)
-      {
-        candidate->FracPt[i] = pt_ann[i] / sumpt;
-      }
+        candidate.FracPt[i] = pt_ann[i] / sumpt;
     }
     else
     {
-      candidate->PTD = -999.;
+      candidate.PTD = -999.;
       for(int i = 0; i < 5; i++)
-      {
-        candidate->FracPt[i] = -999.;
-      }
+        candidate.FracPt[i] = -999.;
     }
 
     fOutputArray->emplace_back(candidate);
@@ -299,47 +275,37 @@ void PileUpJetID::Process()
     */
 
     bool passId = false;
-    if(candidate->Momentum.Pt() > fJetPTMinForNeutrals && candidate->MeanSqDeltaR > -0.1)
+    if(candidate.Momentum.Pt() > fJetPTMinForNeutrals && candidate.MeanSqDeltaR > -0.1)
     {
-      if(fabs(candidate->Momentum.Eta()) < 1.5)
-      {
-        passId = ((candidate->Beta > fBetaMinBarrel) && (candidate->MeanSqDeltaR < fMeanSqDeltaRMaxBarrel));
-      }
-      else if(fabs(candidate->Momentum.Eta()) < 4.0)
-      {
-        passId = ((candidate->Beta > fBetaMinEndcap) && (candidate->MeanSqDeltaR < fMeanSqDeltaRMaxEndcap));
-      }
+      if(fabs(candidate.Momentum.Eta()) < 1.5)
+        passId = ((candidate.Beta > fBetaMinBarrel) && (candidate.MeanSqDeltaR < fMeanSqDeltaRMaxBarrel));
+      else if(fabs(candidate.Momentum.Eta()) < 4.0)
+        passId = ((candidate.Beta > fBetaMinEndcap) && (candidate.MeanSqDeltaR < fMeanSqDeltaRMaxEndcap));
       else
-      {
-        passId = (candidate->MeanSqDeltaR < fMeanSqDeltaRMaxForward);
-      }
+        passId = (candidate.MeanSqDeltaR < fMeanSqDeltaRMaxForward);
     }
 
-    //    cout << " Pt Eta MeanSqDeltaR Beta PassId " << candidate->Momentum.Pt()
-    //	 << " " << candidate->Momentum.Eta() << " " << candidate->MeanSqDeltaR << " " << candidate->Beta << " " << passId << endl;
+    //    cout << " Pt Eta MeanSqDeltaR Beta PassId " << candidate.Momentum.Pt()
+    //	 << " " << candidate.Momentum.Eta() << " " << candidate.MeanSqDeltaR << " " << candidate.Beta << " " << passId << endl;
 
     if(passId)
     {
       if(fUseConstituents)
       {
-        for(Candidate *const &constituent : candidate->GetCandidates())
+        for(const Candidate *const &constituent : candidate.GetCandidates())
         {
           if(constituent->Charge == 0 && constituent->Momentum.Pt() > fNeutralPTMin)
-          {
-            fNeutralsInPassingJets->emplace_back(constituent);
-            //	    cout << "    Constitutent added Pt Eta Charge " << constituent->Momentum.Pt() << " " << constituent->Momentum.Eta() << " " << constituent->Charge << endl;
-          }
+            fNeutralsInPassingJets->emplace_back(*constituent);
+          //	    cout << "    Constitutent added Pt Eta Charge " << constituent->Momentum.Pt() << " " << constituent->Momentum.Eta() << " " << constituent->Charge << endl;
         }
       }
       else
       { // use DeltaR
-        for(Candidate *const &constituent : *fNeutralInputArray)
+        for(const Candidate &constituent : *fNeutralInputArray)
         {
-          if(constituent->Momentum.DeltaR(candidate->Momentum) < fParameterR && constituent->Momentum.Pt() > fNeutralPTMin)
-          {
+          if(constituent.Momentum.DeltaR(candidate.Momentum) < fParameterR && constituent.Momentum.Pt() > fNeutralPTMin)
             fNeutralsInPassingJets->emplace_back(constituent);
-            //            cout << "    Constitutent added Pt Eta Charge " << constituent->Momentum.Pt() << " " << constituent->Momentum.Eta() << " " << constituent->Charge << endl;
-          }
+          //            cout << "    Constitutent added Pt Eta Charge " << constituent.Momentum.Pt() << " " << constituent.Momentum.Eta() << " " << constituent.Charge << endl;
         }
       }
     }

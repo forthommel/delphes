@@ -72,7 +72,7 @@ PYBIND11_MODULE(DelphesPython, m)
     .def_property_readonly("vertex", [](const Candidate &self) { return std::array{self.Position.X(), self.Position.Y(), self.Position.Z()}; }, "Candidate vertex position (in m)");
 
   py::class_<PyDelphesEvent>(m, "_DelphesEvent", py::dynamic_attr(), "Event collections content")
-    .def("__getitem__", &PyDelphesEvent::Get<std::vector<Candidate *> >, py::return_value_policy::reference, "Retrieve a collection from the event");
+    .def("__getitem__", &PyDelphesEvent::Get<std::vector<Candidate> >, "Retrieve a collection from the event");
 
   py::class_<PyDelphesParameters>(m, "PyDelphesParameters")
     .def("__getitem__", &PyDelphesParameters::get_item)

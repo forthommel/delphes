@@ -90,35 +90,29 @@ void TaggingParticlesSkimmer::Process()
     if(tau->D1 < 0) continue;
 
     if(tau->D1 >= static_cast<int>(fParticleInputArray->size()) || tau->D2 >= static_cast<int>(fParticleInputArray->size()))
-    {
-      throw runtime_error("tau's daughter index is greater than the ParticleInputArray size");
-    }
+      throw std::runtime_error("tau's daughter index is greater than the ParticleInputArray size");
 
-    TLorentzVector tauMomentum;
+    Candidate &candidate = fOutputArray->emplace_back(*tau);
+    candidate.Momentum.Clear();
     for(int i = tau->D1; i <= tau->D2; ++i)
     {
-      Candidate *daughter = static_cast<Candidate *>(fParticleInputArray->at(i));
-      if(std::abs(daughter->PID) == 16) continue;
-      tauMomentum += daughter->Momentum;
+      const Candidate &daughter = fParticleInputArray->at(i);
+      if(std::abs(daughter.PID) == 16) continue;
+      candidate.Momentum += daughter.Momentum;
     }
-
-    Candidate *candidate = static_cast<Candidate *>(tau->Clone());
-    candidate->Momentum = tauMomentum;
-
-    fOutputArray->emplace_back(candidate);
   }
 
   // then add all other partons (except tau's to avoid double counting)
 
-  for(Candidate *const &candidate : *fPartonInputArray)
+  for(const Candidate &candidate : *fPartonInputArray)
   {
-    const int pdgCode = std::abs(candidate->PID);
+    const int pdgCode = std::abs(candidate.PID);
     if(pdgCode == 15) continue;
 
-    const double pt = candidate->Momentum.Pt();
+    const double pt = candidate.Momentum.Pt();
     if(pt < fPTMin) continue;
 
-    const double eta = std::fabs(candidate->Momentum.Eta());
+    const double eta = std::fabs(candidate.Momentum.Eta());
     if(eta > fEtaMax) continue;
 
     fOutputArray->emplace_back(candidate);

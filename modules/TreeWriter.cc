@@ -36,11 +36,6 @@
 
 #include <set>
 
-struct SortCandidates
-{
-  bool operator()(const Candidate *lhs, const Candidate *rhs) const { return lhs->Compare(rhs); }
-};
-
 class TreeWriter: public DelphesWriter
 {
 public:
@@ -105,7 +100,12 @@ public:
   }
 
 private:
-  void FillParticles(Candidate *const &candidate, TRefArray *array);
+  struct SortCandidates
+  {
+    bool operator()(const Candidate &lhs, const Candidate &rhs) const { return lhs.Compare(&rhs); }
+  };
+
+  void FillParticles(const Candidate &candidate, TRefArray *array);
 
   void ProcessParticles(ExRootTreeBranch *branch, const CandidatesCollection &array);
   void ProcessVertices(ExRootTreeBranch *branch, const CandidatesCollection &array);
@@ -207,10 +207,10 @@ void TreeWriter::Init()
 
 //------------------------------------------------------------------------------
 
-void TreeWriter::FillParticles(Candidate *const &candidate, TRefArray *array)
+void TreeWriter::FillParticles(const Candidate &candidate, TRefArray *array)
 {
-  std::set<Candidate *> unique_particles;
-  for(Candidate *const &sub_candidate : candidate->GetCandidates())
+  std::set<const Candidate *> unique_particles;
+  for(const Candidate *const &sub_candidate : candidate.GetCandidates())
   {
     // particle
     if(sub_candidate->GetCandidates().empty())
@@ -220,7 +220,7 @@ void TreeWriter::FillParticles(Candidate *const &candidate, TRefArray *array)
     }
 
     // track
-    if(Candidate *const &sub_sub_candidate = static_cast<Candidate *>(sub_candidate->GetCandidates().at(0));
+    if(const Candidate *const &sub_sub_candidate = sub_candidate->GetCandidates().at(0);
       sub_sub_candidate->GetCandidates().empty())
     {
       unique_particles.insert(sub_sub_candidate);
@@ -228,18 +228,18 @@ void TreeWriter::FillParticles(Candidate *const &candidate, TRefArray *array)
     }
 
     // tower
-    for(Candidate *const &sub_sub_candidate : sub_candidate->GetCandidates())
+    for(const Candidate *const &sub_sub_candidate : sub_candidate->GetCandidates())
     {
       if(sub_sub_candidate->GetCandidates().empty()) continue;
-      if(Candidate *sub_sub_sub_candidate = static_cast<Candidate *>(sub_sub_candidate->GetCandidates().at(0));
+      if(const Candidate *sub_sub_sub_candidate = sub_sub_candidate->GetCandidates().at(0);
         sub_sub_sub_candidate && sub_sub_sub_candidate->GetCandidates().empty())
         unique_particles.insert(sub_sub_sub_candidate);
     }
   }
 
   array->Clear();
-  for(Candidate *const &item : unique_particles)
-    array->Add(item);
+  for(const Candidate *item : unique_particles)
+    array->Add(const_cast<Candidate *>(item));
 }
 
 //------------------------------------------------------------------------------
@@ -247,10 +247,10 @@ void TreeWriter::FillParticles(Candidate *const &candidate, TRefArray *array)
 void TreeWriter::ProcessParticles(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   // loop over all particles
-  for(Candidate *const &candidate : *array)
+  for(const Candidate &candidate : *array)
   {
     GenParticle *entry = static_cast<GenParticle *>(branch->NewEntry());
-    *entry = GenParticle(*candidate);
+    *entry = GenParticle(candidate);
   }
 }
 
@@ -264,10 +264,10 @@ void TreeWriter::ProcessVertices(ExRootTreeBranch *branch, const CandidatesColle
   Candidate::fgCompare = compare;
 
   // loop over all vertices
-  for(Candidate *const &candidate : *array)
+  for(const Candidate &candidate : *array)
   {
     Vertex *entry = static_cast<Vertex *>(branch->NewEntry());
-    *entry = Vertex(*candidate);
+    *entry = Vertex(candidate);
   }
 }
 
@@ -276,10 +276,10 @@ void TreeWriter::ProcessVertices(ExRootTreeBranch *branch, const CandidatesColle
 void TreeWriter::ProcessTracks(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   // loop over all tracks
-  for(Candidate *const &candidate : *array)
+  for(const Candidate &candidate : *array)
   {
     Track *entry = static_cast<Track *>(branch->NewEntry());
-    *entry = Track(*candidate);
+    *entry = Track(candidate);
   }
 }
 
@@ -288,10 +288,10 @@ void TreeWriter::ProcessTracks(ExRootTreeBranch *branch, const CandidatesCollect
 void TreeWriter::ProcessTowers(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   // loop over all towers
-  for(Candidate *const &candidate : *array)
+  for(const Candidate &candidate : *array)
   {
     Tower *entry = static_cast<Tower *>(branch->NewEntry());
-    *entry = Tower(*candidate);
+    *entry = Tower(candidate);
     FillParticles(candidate, &entry->Particles);
   }
 }
@@ -301,10 +301,10 @@ void TreeWriter::ProcessTowers(ExRootTreeBranch *branch, const CandidatesCollect
 void TreeWriter::ProcessParticleFlowCandidates(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   // loop over all tracks
-  for(Candidate *const &candidate : *array)
+  for(const Candidate &candidate : *array)
   {
     ParticleFlowCandidate *entry = static_cast<ParticleFlowCandidate *>(branch->NewEntry());
-    *entry = ParticleFlowCandidate(*candidate);
+    *entry = ParticleFlowCandidate(candidate);
     FillParticles(candidate, &entry->Particles);
   }
 }
@@ -316,10 +316,10 @@ void TreeWriter::ProcessPhotons(ExRootTreeBranch *branch, const CandidatesCollec
   std::sort(array->begin(), array->end(), SortCandidates{});
 
   // loop over all photons
-  for(Candidate *const &candidate : *array)
+  for(const Candidate &candidate : *array)
   {
     Photon *entry = static_cast<Photon *>(branch->NewEntry());
-    *entry = Photon(*candidate);
+    *entry = Photon(candidate);
     FillParticles(candidate, &entry->Particles);
   }
 }
@@ -331,10 +331,10 @@ void TreeWriter::ProcessElectrons(ExRootTreeBranch *branch, const CandidatesColl
   std::sort(array->begin(), array->end(), SortCandidates{});
 
   // loop over all electrons
-  for(Candidate *const &candidate : *array)
+  for(const Candidate &candidate : *array)
   {
     Electron *entry = static_cast<Electron *>(branch->NewEntry());
-    *entry = Electron(*candidate);
+    *entry = Electron(candidate);
   }
 }
 
@@ -345,10 +345,10 @@ void TreeWriter::ProcessMuons(ExRootTreeBranch *branch, const CandidatesCollecti
   std::sort(array->begin(), array->end(), SortCandidates{});
 
   // loop over all muons
-  for(Candidate *const &candidate : *array)
+  for(const Candidate &candidate : *array)
   {
     Muon *entry = static_cast<Muon *>(branch->NewEntry());
-    *entry = Muon(*candidate);
+    *entry = Muon(candidate);
   }
 }
 
@@ -359,10 +359,10 @@ void TreeWriter::ProcessJets(ExRootTreeBranch *branch, const CandidatesCollectio
   std::sort(array->begin(), array->end(), SortCandidates{});
 
   // loop over all jets
-  for(Candidate *const &candidate : *array)
+  for(const Candidate &candidate : *array)
   {
     Jet *entry = static_cast<Jet *>(branch->NewEntry());
-    *entry = Jet(*candidate);
+    *entry = Jet(candidate);
     FillParticles(candidate, &entry->Particles);
   }
 }
@@ -374,7 +374,7 @@ void TreeWriter::ProcessMissingET(ExRootTreeBranch *branch, const CandidatesColl
   if(!array->empty())
   {
     MissingET *entry = static_cast<MissingET *>(branch->NewEntry());
-    *entry = MissingET(*array->at(0)); // get the first entry
+    *entry = MissingET(array->at(0)); // get the first entry
   }
 }
 //------------------------------------------------------------------------------
@@ -384,10 +384,10 @@ void TreeWriter::ProcessCscCluster(ExRootTreeBranch *branch, const CandidatesCol
   std::sort(array->begin(), array->end(), SortCandidates{});
 
   // loop over all clusters
-  for(Candidate *const &candidate : *array)
+  for(const Candidate &candidate : *array)
   {
     CscCluster *entry = static_cast<CscCluster *>(branch->NewEntry());
-    *entry = CscCluster(*candidate);
+    *entry = CscCluster(candidate);
   }
 }
 
@@ -398,7 +398,7 @@ void TreeWriter::ProcessScalarHT(ExRootTreeBranch *branch, const CandidatesColle
   if(!array->empty())
   {
     ScalarHT *entry = static_cast<ScalarHT *>(branch->NewEntry());
-    *entry = ScalarHT(*array->at(0)); // get the first entry
+    *entry = ScalarHT(array->at(0)); // get the first entry
   }
 }
 
@@ -407,15 +407,15 @@ void TreeWriter::ProcessScalarHT(ExRootTreeBranch *branch, const CandidatesColle
 void TreeWriter::ProcessRho(ExRootTreeBranch *branch, const CandidatesCollection &array)
 { // has to stay like this w/o constructor from Candidate, as Rho.Rho exists...
   // loop over all rho
-  for(Candidate *const &candidate : *array)
+  for(const Candidate &candidate : *array)
   {
-    const TLorentzVector &momentum = candidate->Momentum;
+    const TLorentzVector &momentum = candidate.Momentum;
 
     Rho *entry = static_cast<Rho *>(branch->NewEntry());
 
     entry->Rho = momentum.E();
-    entry->Edges[0] = candidate->Edges[0];
-    entry->Edges[1] = candidate->Edges[1];
+    entry->Edges[0] = candidate.Edges[0];
+    entry->Edges[1] = candidate.Edges[1];
   }
 }
 
@@ -472,10 +472,10 @@ void TreeWriter::ProcessLHCOEvent(ExRootTreeBranch *branch, void *const &array)
 void TreeWriter::ProcessHectorHit(ExRootTreeBranch *branch, const CandidatesCollection &array)
 {
   // loop over all roman pot hits
-  for(Candidate *const &candidate : *array)
+  for(const Candidate &candidate : *array)
   {
     HectorHit *entry = static_cast<HectorHit *>(branch->NewEntry());
-    *entry = HectorHit(*candidate);
+    *entry = HectorHit(candidate);
   }
 }
 

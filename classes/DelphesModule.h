@@ -44,8 +44,8 @@ public:
   virtual void Process() {}
   virtual void Finish() {}
 
-  std::shared_ptr<std::vector<Candidate *> > ImportArray(std::string_view name);
-  std::shared_ptr<std::vector<Candidate *> > ExportArray(std::string_view name);
+  std::shared_ptr<std::vector<Candidate> > ImportArray(std::string_view name);
+  std::shared_ptr<std::vector<Candidate> > ExportArray(std::string_view name);
 
   void SetName(std::string_view moduleName) { fName = moduleName; }
   const std::string &GetName() const { return fName; }

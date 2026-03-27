@@ -40,40 +40,31 @@ TauTaggingPartonClassifier::TauTaggingPartonClassifier(const CandidatesCollectio
 Int_t TauTaggingPartonClassifier::GetCategory(TObject *object)
 {
   Candidate *tau = static_cast<Candidate *>(object);
-  Candidate *daughter1 = 0;
-  Candidate *daughter2 = 0;
 
   const TLorentzVector &momentum = tau->Momentum;
-  Int_t pdgCode, i, j;
 
-  pdgCode = std::abs(tau->PID);
-  if(pdgCode != 15) return -1;
+  if(const unsigned short pdgCode = std::abs(tau->PID); pdgCode != 15) return -1;
 
   if(momentum.Pt() <= fPTMin || std::fabs(momentum.Eta()) > fEtaMax) return -1;
 
   if(tau->D1 < 0) return -1;
-
   if(tau->D2 < tau->D1) return -1;
-
   if(tau->D1 >= static_cast<int>(fParticleInputArray->size()) || tau->D2 >= static_cast<int>(fParticleInputArray->size()))
-  {
     throw std::runtime_error("tau's daughter index is greater than the ParticleInputArray size");
-  }
 
-  for(i = tau->D1; i <= tau->D2; ++i)
+  for(int i = tau->D1; i <= tau->D2; ++i)
   {
-    daughter1 = static_cast<Candidate *>(fParticleInputArray->at(i));
-    pdgCode = std::abs(daughter1->PID);
+    const Candidate &daughter1 = fParticleInputArray->at(i);
+    const unsigned short pdgCode = std::abs(daughter1.PID);
     //if(pdgCode == 11 || pdgCode == 13 || pdgCode == 15)
     //  return -1;
     if(pdgCode == 24)
     {
-      if(daughter1->D1 < 0) return -1;
-      for(j = daughter1->D1; j <= daughter1->D2; ++j)
+      if(daughter1.D1 < 0) return -1;
+      for(int j = daughter1.D1; j <= daughter1.D2; ++j)
       {
-        daughter2 = static_cast<Candidate *>(fParticleInputArray->at(j));
-        pdgCode = std::abs(daughter2->PID);
-        if(pdgCode == 11 || pdgCode == 13) return -1;
+        const Candidate &daughter2 = fParticleInputArray->at(j);
+        if(const unsigned short pdgCode = std::abs(daughter2.PID); pdgCode == 11 || pdgCode == 13) return -1;
       }
     }
   }

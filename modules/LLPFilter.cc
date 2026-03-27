@@ -103,51 +103,49 @@ void LLPFilter::Process()
 
   // loop over particles to find LLP
   int index = -1;
-  for(Candidate *const &candidate : *fInputArray)
+  for(Candidate &candidate : *fInputArray)
   {
     index++;
 
     //all distance units are in mm
-    const int pdgCode = candidate->PID;
-    const TLorentzVector &candidateMomentum = candidate->Momentum;
-    const TLorentzVector &candidateDecayPosition = candidate->DecayPosition;
+    const int pdgCode = candidate.PID;
+    const TLorentzVector &candidateMomentum = candidate.Momentum;
+    const TLorentzVector &candidateDecayPosition = candidate.DecayPosition;
 
     if(const double pt = candidateMomentum.Pt(); pt < fPTMin) continue;
 
     //require at least fDaughterNumber daughters
-    if(fDaughterNumber > 0 && candidate->D2 - candidate->D1 != fDaughterNumber) continue;
+    if(fDaughterNumber > 0 && candidate.D2 - candidate.D1 != fDaughterNumber) continue;
 
     const double eta = candidateMomentum.Eta();
     if(std::find(fPdgCodes.begin(), fPdgCodes.end(), pdgCode) == fPdgCodes.end()) continue; //require pdgID is one of the LLP id
-    if(fRequireStatus && (candidate->Status != fStatus)) continue;
+    if(fRequireStatus && (candidate.Status != fStatus)) continue;
 
     // loop over particles to find LLP daughters and assign EM and hadronic energy
-    candidate->Eem = 0.0;
-    candidate->Ehad = 0.0;
+    candidate.Eem = 0.0;
+    candidate.Ehad = 0.0;
 
-    for(Candidate *const &daughter : *fParticleInputArray)
+    for(const Candidate &daughter : *fParticleInputArray)
     {
-      const int daughterPdg = daughter->PID;
-      if(daughter->Status != 1) continue;
-      if(daughter->IsPU) continue;
+      const int daughterPdg = daughter.PID;
+      if(daughter.Status != 1) continue;
+      if(daughter.IsPU) continue;
       if(std::abs(daughterPdg) == 12 || std::abs(daughterPdg) == 14 || std::abs(daughterPdg) == 16 || std::abs(daughterPdg) == 13) continue; // ignore neutrinos and muons
       if(std::abs(daughterPdg) > 1000000) continue; //ignore BSM particles
 
-      const TLorentzVector &daughterMomentum = daughter->Momentum;
+      const TLorentzVector &daughterMomentum = daughter.Momentum;
 
       // look for mother until find LLP or reach the top of the tree
-      Candidate *tempCandidate = daughter;
+      const Candidate *tempCandidate = &daughter;
       while(tempCandidate->M1 != -1 && tempCandidate->M1 != index)
-      {
-        tempCandidate = static_cast<Candidate *>(fParticleInputArray->at(tempCandidate->M1));
-      }
+        tempCandidate = &fParticleInputArray->at(tempCandidate->M1);
       if(tempCandidate->M1 == -1) continue;
 
       // assign LLP EM or hadronic energy, depending on the daughter ID
       if(std::abs(daughterPdg) == 11 || std::abs(daughterPdg) == 22 || std::abs(daughterPdg) == 111)
-        candidate->Eem += daughterMomentum.E();
+        candidate.Eem += daughterMomentum.E();
       else
-        candidate->Ehad += daughterMomentum.E();
+        candidate.Ehad += daughterMomentum.E();
     }
 
     if(fRequireDecayRegion)

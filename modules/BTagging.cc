@@ -82,16 +82,16 @@ void BTagging::Process()
   std::map<Int_t, std::unique_ptr<DelphesFormula> >::iterator itEfficiencyMap;
 
   // loop over all input jets
-  for(Candidate *const &jet : *fJetInputArray)
+  for(Candidate &jet : *fJetInputArray)
   {
-    const TLorentzVector &jetMomentum = jet->Momentum;
+    const TLorentzVector &jetMomentum = jet.Momentum;
     eta = jetMomentum.Eta();
     phi = jetMomentum.Phi();
     pt = jetMomentum.Pt();
     e = jetMomentum.E();
 
     // find an efficiency formula
-    itEfficiencyMap = fEfficiencyMap.find(jet->Flavor);
+    itEfficiencyMap = fEfficiencyMap.find(jet.Flavor);
     if(itEfficiencyMap == fEfficiencyMap.end())
     {
       itEfficiencyMap = fEfficiencyMap.find(0);
@@ -100,11 +100,11 @@ void BTagging::Process()
       std::unique_ptr<DelphesFormula> &formula = itEfficiencyMap->second;
 
       // apply an efficiency formula
-      jet->BTag |= (gRandom->Uniform() <= formula->Eval(pt, eta, phi, e)) << fBitNumber;
+      jet.BTag |= (gRandom->Uniform() <= formula->Eval(pt, eta, phi, e)) << fBitNumber;
     }
 
     // find an efficiency formula for algo flavor definition
-    itEfficiencyMap = fEfficiencyMap.find(jet->FlavorAlgo);
+    itEfficiencyMap = fEfficiencyMap.find(jet.FlavorAlgo);
     if(itEfficiencyMap == fEfficiencyMap.end())
     {
       itEfficiencyMap = fEfficiencyMap.find(0);
@@ -113,11 +113,11 @@ void BTagging::Process()
       std::unique_ptr<DelphesFormula> &formula = itEfficiencyMap->second;
 
       // apply an efficiency formula
-      jet->BTagAlgo |= (gRandom->Uniform() <= formula->Eval(pt, eta, phi, e)) << fBitNumber;
+      jet.BTagAlgo |= (gRandom->Uniform() <= formula->Eval(pt, eta, phi, e)) << fBitNumber;
     }
 
     // find an efficiency formula for phys flavor definition
-    itEfficiencyMap = fEfficiencyMap.find(jet->FlavorPhys);
+    itEfficiencyMap = fEfficiencyMap.find(jet.FlavorPhys);
     if(itEfficiencyMap == fEfficiencyMap.end())
     {
       itEfficiencyMap = fEfficiencyMap.find(0);
@@ -126,7 +126,7 @@ void BTagging::Process()
       std::unique_ptr<DelphesFormula> &formula = itEfficiencyMap->second;
 
       // apply an efficiency formula
-      jet->BTagPhys |= (gRandom->Uniform() <= formula->Eval(pt, eta, phi, e)) << fBitNumber;
+      jet.BTagPhys |= (gRandom->Uniform() <= formula->Eval(pt, eta, phi, e)) << fBitNumber;
     }
   }
 }

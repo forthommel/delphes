@@ -123,14 +123,20 @@ bool isTauDaughter(int pdgCode, int M1, const CandidatesCollection &fInputArray)
   //not needed, just to speed up the code - can be further refined but gives only negligible improvement:
   if(pdgCode == 15 || pdgCode < 11 || (pdgCode > 22 && pdgCode < 100) || pdgCode > 1000) return false;
   if(M1 < 0) return false;
-  if(Candidate *mother = static_cast<Candidate *>(fInputArray->at(M1)); std::abs(mother->PID) == 15) return true;
+  if(static_cast<int>(fInputArray->size()) > M1)
+  {
+    if(const Candidate &mother = fInputArray->at(M1); std::abs(mother.PID) == 15) return true;
+  }
   return false;
 }
 
 bool isWDaughter(int M1, const CandidatesCollection &fInputArray)
 {
   if(M1 < 0) return false;
-  if(Candidate *mother = static_cast<Candidate *>(fInputArray->at(M1)); std::abs(mother->PID) == 24) return true;
+  if(static_cast<int>(fInputArray->size()) > M1)
+  {
+    if(const Candidate &mother = fInputArray->at(M1); std::abs(mother.PID) == 24) return true;
+  }
   return false;
 }
 
@@ -142,10 +148,10 @@ void StatusPidFilter::Process()
 {
   fOutputArray->clear();
 
-  for(Candidate *const &candidate : *fInputArray)
+  for(const Candidate &candidate : *fInputArray)
   {
-    const int status = candidate->Status;
-    const int pdgCode = std::abs(candidate->PID);
+    const int status = candidate.Status;
+    const int pdgCode = std::abs(candidate.PID);
 
     bool pass = false;
 
@@ -172,7 +178,7 @@ void StatusPidFilter::Process()
     bool is_b_hadron = hasBottom(pdgCode);
     bool is_b_quark = (pdgCode == 5);
 
-    bool is_tau_daughter = isTauDaughter(pdgCode, candidate->M1, fInputArray);
+    bool is_tau_daughter = isTauDaughter(pdgCode, candidate.M1, fInputArray);
 
     if(is_b_hadron)
       pass = true;
@@ -180,16 +186,16 @@ void StatusPidFilter::Process()
     if(is_tau_daughter)
       pass = true;
 
-    bool is_W_daughter = isWDaughter(candidate->M1, fInputArray);
+    bool is_W_daughter = isWDaughter(candidate.M1, fInputArray);
     if(is_W_daughter)
       pass = true;
 
     // fPTMin not applied to b_hadrons / b_quarks to allow for b-enriched sample stitching
     // fPTMin not applied to tau decay products to allow visible-tau four momentum determination
-    if(!pass || (candidate->Momentum.Pt() < fPTMin && !(is_b_hadron || is_b_quark || is_tau_daughter || is_W_daughter))) continue;
+    if(!pass || (candidate.Momentum.Pt() < fPTMin && !(is_b_hadron || is_b_quark || is_tau_daughter || is_W_daughter))) continue;
 
     // not pileup particles
-    if(fRequireNotPileup && (candidate->IsPU > 0)) continue;
+    if(fRequireNotPileup && (candidate.IsPU > 0)) continue;
 
     fOutputArray->emplace_back(candidate);
   }

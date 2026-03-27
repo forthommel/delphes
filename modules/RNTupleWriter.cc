@@ -35,11 +35,6 @@
 
 #include <functional>
 
-struct SortCandidates
-{
-  bool operator()(const Candidate *lhs, const Candidate *rhs) const { return lhs->Compare(rhs); }
-};
-
 class RNTupleWriter: public DelphesWriter
 {
 public:
@@ -150,6 +145,11 @@ public:
   }
 
 private:
+  struct SortCandidates
+  {
+    bool operator()(const Candidate &lhs, const Candidate &rhs) const { return lhs.Compare(&rhs); }
+  };
+
   std::unique_ptr<TFile> fOutputFile;
   std::unique_ptr<ROOT::RNTupleWriter> fEventWriter;
   std::unordered_map<std::string, std::pair<std::string, std::string> > fObjTypes;
@@ -158,85 +158,85 @@ private:
     {"CscCluster", [](ROOT::REntry &entry, std::string_view collName, const CandidatesCollection &array) {
        std::sort(array->begin(), array->end(), SortCandidates{});
        std::shared_ptr<std::vector<CscCluster> > cscClusters = entry.GetPtr<std::vector<CscCluster> >(collName);
-       for(Candidate *const &candidate : *array)
-         cscClusters->emplace_back(*candidate);
+       for(const Candidate &candidate : *array)
+         cscClusters->emplace_back(candidate);
      }},
     {"Electron", [](ROOT::REntry &entry, std::string_view collName, const CandidatesCollection &array) {
        std::sort(array->begin(), array->end(), SortCandidates{});
        std::shared_ptr<std::vector<DelphesRNTuple::Electron> > electrons =
          entry.GetPtr<std::vector<DelphesRNTuple::Electron> >(collName);
-       for(Candidate *const &candidate : *array)
-         electrons->emplace_back(*candidate);
+       for(const Candidate &candidate : *array)
+         electrons->emplace_back(candidate);
      }},
     {"GenParticle", [](ROOT::REntry &entry, std::string_view collName, const CandidatesCollection &array) {
        std::shared_ptr<std::vector<DelphesRNTuple::GenParticle> > genParts =
          entry.GetPtr<std::vector<DelphesRNTuple::GenParticle> >(collName);
-       for(Candidate *const &candidate : *array)
-         genParts->emplace_back(*candidate);
+       for(const Candidate &candidate : *array)
+         genParts->emplace_back(candidate);
      }},
     {"HectorHit", [](ROOT::REntry &entry, std::string_view collName, const CandidatesCollection &array) {
        std::shared_ptr<std::vector<HectorHit> > hectorHits = entry.GetPtr<std::vector<HectorHit> >(collName);
-       for(Candidate *const &candidate : *array)
-         hectorHits->emplace_back(*candidate);
+       for(const Candidate &candidate : *array)
+         hectorHits->emplace_back(candidate);
      }},
     {"Jet", [](ROOT::REntry &entry, std::string_view collName, const CandidatesCollection &array) {
        std::sort(array->begin(), array->end(), SortCandidates{});
        std::shared_ptr<std::vector<DelphesRNTuple::Jet> > jets = entry.GetPtr<std::vector<DelphesRNTuple::Jet> >(collName);
-       for(Candidate *const &candidate : *array)
-         jets->emplace_back(*candidate);
+       for(const Candidate &candidate : *array)
+         jets->emplace_back(candidate);
      }},
     {"MissingET", [](ROOT::REntry &entry, std::string_view collName, const CandidatesCollection &array) {
        std::shared_ptr<MissingET> missingET = entry.GetPtr<MissingET>(collName);
-       *missingET = MissingET(*array->at(0));
+       *missingET = MissingET(array->at(0));
      }},
     {"Muon", [](ROOT::REntry &entry, std::string_view collName, const CandidatesCollection &array) {
        std::sort(array->begin(), array->end(), SortCandidates{});
        std::shared_ptr<std::vector<DelphesRNTuple::Muon> > muons =
          entry.GetPtr<std::vector<DelphesRNTuple::Muon> >(collName);
-       for(Candidate *const &candidate : *array)
-         muons->emplace_back(*candidate);
+       for(const Candidate &candidate : *array)
+         muons->emplace_back(candidate);
      }},
     {"ParticleFlowCandidate", [](ROOT::REntry &entry, std::string_view collName, const CandidatesCollection &array) {
        std::shared_ptr<std::vector<ParticleFlowCandidate> > pfCands =
          entry.GetPtr<std::vector<ParticleFlowCandidate> >(collName);
-       for(Candidate *const &candidate : *array)
-         pfCands->emplace_back(*candidate);
+       for(const Candidate &candidate : *array)
+         pfCands->emplace_back(candidate);
      }},
     {"Photon", [](ROOT::REntry &entry, std::string_view collName, const CandidatesCollection &array) {
        std::sort(array->begin(), array->end(), SortCandidates{});
        std::shared_ptr<std::vector<DelphesRNTuple::Photon> > photons =
          entry.GetPtr<std::vector<DelphesRNTuple::Photon> >(collName);
-       for(Candidate *const &candidate : *array)
-         photons->emplace_back(*candidate);
+       for(const Candidate &candidate : *array)
+         photons->emplace_back(candidate);
      }},
     {"Rho", [](ROOT::REntry &entry, std::string_view collName, const CandidatesCollection &array) {
        std::shared_ptr<Rho> rho = entry.GetPtr<Rho>(collName);
-       const Candidate &rhoValue = *array->at(0);
+       const Candidate &rhoValue = array->at(0);
        rho->Rho = rhoValue.Momentum.E();
        for(size_t i = 0; i < 2; ++i) rho->Edges[i] = rhoValue.Edges[i];
      }},
     {"ScalarHT", [](ROOT::REntry &entry, std::string_view collName, const CandidatesCollection &array) {
        std::shared_ptr<ScalarHT> scalarHT = entry.GetPtr<ScalarHT>(collName);
-       *scalarHT = ScalarHT(*array->at(0));
+       *scalarHT = ScalarHT(array->at(0));
      }},
     {"TauJet", [](ROOT::REntry &entry, std::string_view collName, const CandidatesCollection &array) {
        // empty, for now
      }},
     {"Tower", [](ROOT::REntry &entry, std::string_view collName, const CandidatesCollection &array) {
        std::shared_ptr<std::vector<DelphesRNTuple::Tower> > towers = entry.GetPtr<std::vector<DelphesRNTuple::Tower> >(collName);
-       for(Candidate *const &candidate : *array)
-         towers->emplace_back(*candidate);
+       for(const Candidate &candidate : *array)
+         towers->emplace_back(candidate);
      }},
     {"Track", [](ROOT::REntry &entry, std::string_view collName, const CandidatesCollection &array) {
        std::shared_ptr<std::vector<DelphesRNTuple::Track> > tracks = entry.GetPtr<std::vector<DelphesRNTuple::Track> >(collName);
-       for(Candidate *const &candidate : *array)
-         tracks->emplace_back(*candidate);
+       for(const Candidate &candidate : *array)
+         tracks->emplace_back(candidate);
      }},
     {"Vertices", [](ROOT::REntry &entry, std::string_view collName, const CandidatesCollection &array) {
        std::sort(array->begin(), array->end(), SortCandidates{});
        std::shared_ptr<std::vector<Vertex> > vertices = entry.GetPtr<std::vector<Vertex> >(collName);
-       for(Candidate *const &candidate : *array)
-         vertices->emplace_back(*candidate);
+       for(const Candidate &candidate : *array)
+         vertices->emplace_back(candidate);
      }}};
 };
 

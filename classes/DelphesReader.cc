@@ -47,9 +47,9 @@ DelphesReader::~DelphesReader()
 void DelphesReader::SetFactory(DelphesFactory *factory)
 {
   DelphesModule::SetFactory(factory);
-  fAllParticleOutputArray = GetFactory()->Book<std::vector<Candidate *> >("Delphes/allParticles", false);
-  fStableParticleOutputArray = GetFactory()->Book<std::vector<Candidate *> >("Delphes/stableParticles", false);
-  fPartonOutputArray = GetFactory()->Book<std::vector<Candidate *> >("Delphes/partons", false);
+  fAllParticleOutputArray = GetFactory()->Book<std::vector<Candidate> >("Delphes/allParticles", false);
+  fStableParticleOutputArray = GetFactory()->Book<std::vector<Candidate> >("Delphes/stableParticles", false);
+  fPartonOutputArray = GetFactory()->Book<std::vector<Candidate> >("Delphes/partons", false);
 }
 
 //---------------------------------------------------------------------------

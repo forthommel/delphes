@@ -23,10 +23,10 @@ public:
   {
     fOutputArray->clear();
     Bool_t passed = false;
-    for(Candidate *const &candidate : *fInputArray)
+    for(const Candidate &candidate : *fInputArray)
     {
       if(passed) break;
-      if(candidate->IsPU == 0) passed = true;
+      if(candidate.IsPU == 0) passed = true;
       fOutputArray->emplace_back(candidate);
     }
   }

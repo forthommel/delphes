@@ -88,10 +88,10 @@ void Hector::Process()
 
   const double c_light = 2.99792458E8;
 
-  for(Candidate *const &candidate : *fInputArray)
+  for(const Candidate &candidate : *fInputArray)
   {
-    const TLorentzVector &candidatePosition = candidate->Position;
-    const TLorentzVector &candidateMomentum = candidate->Momentum;
+    const TLorentzVector &candidatePosition = candidate.Position;
+    const TLorentzVector &candidateMomentum = candidate.Momentum;
     const double pz = candidateMomentum.Pz();
 
     if(std::fabs(candidateMomentum.Eta()) <= fEtaMin || pz * fDirection / std::abs(fDirection) != pz) continue;
@@ -109,7 +109,7 @@ void Hector::Process()
     const double distance = (fDistance - 1.0E-3 * candidatePosition.Z()) / std::cos(theta);
     const double time = gRandom->Gaus((distance + 1.0E-3 * candidatePosition.T()) / c_light, fSigmaT);
 
-    H_BeamParticle particle(candidate->Mass, candidate->Charge);
+    H_BeamParticle particle(candidate.Mass, candidate.Charge);
     //    particle.set4Momentum(candidateMomentum);
     particle.set4Momentum(candidateMomentum.Px(), candidateMomentum.Py(),
       candidateMomentum.Pz(), candidateMomentum.E());
@@ -124,12 +124,10 @@ void Hector::Process()
 
     particle.propagate(fDistance);
 
-    Candidate *new_candidate = static_cast<Candidate *>(candidate->Clone());
-    new_candidate->Position.SetXYZT(particle.getX(), particle.getY(), particle.getS(), time);
-    new_candidate->Momentum.SetPxPyPzE(particle.getTX(), particle.getTY(), 0.0, particle.getE());
-    new_candidate->AddCandidate(candidate);
-
-    fOutputArray->emplace_back(new_candidate);
+    Candidate &new_candidate = fOutputArray->emplace_back(candidate);
+    new_candidate.Position.SetXYZT(particle.getX(), particle.getY(), particle.getS(), time);
+    new_candidate.Momentum.SetPxPyPzE(particle.getTX(), particle.getTY(), 0.0, particle.getE());
+    new_candidate.AddCandidate(&candidate);
   }
 }
 

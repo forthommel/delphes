@@ -63,7 +63,7 @@ private:
 
   typedef std::map<double, std::set<double> > TBinMap; //!
 
-  Candidate *fBestTrack{nullptr};
+  const Candidate *fBestTrack{nullptr};
 
   int fTowerTrackHits;
 
@@ -95,9 +95,9 @@ void DenseTrackFilter::Process()
 
   // loop over all tracks
   size_t number = 0;
-  for(Candidate *const &track : *fTrackInputArray)
+  for(const Candidate &track : *fTrackInputArray)
   {
-    const TLorentzVector &trackPosition = track->Position;
+    const TLorentzVector &trackPosition = track.Position;
 
     // find eta bin [1, fEtaBins.size - 1]
     std::set<double>::iterator itEtaBin = std::lower_bound(fEtaBins.begin(), fEtaBins.end(), trackPosition.Eta());
@@ -127,7 +127,7 @@ void DenseTrackFilter::Process()
 
   // loop over all hits
   unsigned long long towerEtaPhi = 0;
-  fBestTrack = 0;
+  fBestTrack = nullptr;
   double ptmax = 0.;
   fTowerTrackHits = 0;
 
@@ -147,20 +147,20 @@ void DenseTrackFilter::Process()
 
       ptmax = 0.;
       fTowerTrackHits = 0;
-      fBestTrack = 0;
+      fBestTrack = nullptr;
     }
     // check for track hits
 
     if(flags & 1)
     {
       ++fTowerTrackHits;
-      Candidate *track = static_cast<Candidate *>(fTrackInputArray->at(number));
-      const TLorentzVector &momentum = track->Momentum;
+      const Candidate &track = fTrackInputArray->at(number);
+      const TLorentzVector &momentum = track.Momentum;
 
       if(momentum.Pt() > ptmax)
       {
         ptmax = momentum.Pt();
-        fBestTrack = track;
+        fBestTrack = &track;
       }
       continue;
     }
@@ -181,17 +181,17 @@ void DenseTrackFilter::FillTrack()
   if(numberOfCandidates < 1) return;
 
   Candidate *track = static_cast<Candidate *>(fBestTrack->GetCandidates().at(numberOfCandidates - 1));
-  Candidate *new_candidate = static_cast<Candidate *>(track->Clone());
+  Candidate new_candidate = *track;
 
-  const double pt = new_candidate->Momentum.Pt();
-  const double eta = gRandom->Gaus(new_candidate->Momentum.Eta(), fEtaPhiRes);
-  const double phi = gRandom->Gaus(new_candidate->Momentum.Phi(), fEtaPhiRes);
-  const double m = new_candidate->Momentum.M();
-  new_candidate->Momentum.SetPtEtaPhiM(pt, eta, phi, m);
-  new_candidate->AddCandidate(track);
+  const double pt = new_candidate.Momentum.Pt();
+  const double eta = gRandom->Gaus(new_candidate.Momentum.Eta(), fEtaPhiRes);
+  const double phi = gRandom->Gaus(new_candidate.Momentum.Phi(), fEtaPhiRes);
+  const double m = new_candidate.Momentum.M();
+  new_candidate.Momentum.SetPtEtaPhiM(pt, eta, phi, m);
+  new_candidate.AddCandidate(track);
 
   fTrackOutputArray->emplace_back(new_candidate);
-  switch(std::abs(new_candidate->PID))
+  switch(std::abs(new_candidate.PID))
   {
   case 11:
     fElectronOutputArray->emplace_back(new_candidate);

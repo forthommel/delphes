@@ -41,9 +41,9 @@ public:
   void Process() override
   {
     fOutputArray->clear();
-    for(Candidate *const &candidate : *fInputArray)
+    for(const Candidate &candidate : *fInputArray)
     {
-      if(candidate->IsRecoPU) continue;
+      if(candidate.IsRecoPU) continue;
       fOutputArray->emplace_back(candidate);
     }
   }

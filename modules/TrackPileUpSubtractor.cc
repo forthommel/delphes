@@ -68,27 +68,24 @@ private:
 
 void TrackPileUpSubtractor::Process()
 {
-  for(const auto &[input_collection, output_collection] : fInputMap)
-    output_collection->clear();
+  for(const std::pair<CandidatesCollection, CandidatesCollection> &collObjs : fInputMap)
+    collObjs.second->clear();
 
   double zvtx = 0.;
   // find z position of primary vertex
-  for(Candidate *const &candidate : *fVertexInputArray)
+  for(Candidate &candidate : *fVertexInputArray)
   {
-    if(!candidate->IsPU)
-    {
-      zvtx = candidate->Position.Z();
-      // break;
-    }
+    if(!candidate.IsPU)
+      zvtx = candidate.Position.Z(); // break;
   }
 
   // loop over all input arrays
-  for(const auto &[input_collection, output_collection] : fInputMap)
+  for(const auto &[inputCollection, outputCollection] : fInputMap)
   {
     // loop over all candidates
-    for(Candidate *const &candidate : *input_collection)
+    for(Candidate &candidate : *inputCollection)
     {
-      Candidate *particle = static_cast<Candidate *>(candidate->GetCandidates().at(0));
+      const Candidate *particle = candidate.GetCandidates().at(0);
       const TLorentzVector &candidateMomentum = particle->Momentum;
 
       const double eta = candidateMomentum.Eta();
@@ -101,14 +98,12 @@ void TrackPileUpSubtractor::Process()
       // apply pile-up subtraction
       // assume perfect pile-up subtraction for tracks outside fZVertexResolution
 
-      if(candidate->Charge != 0 && candidate->IsPU && std::fabs(z - zvtx) > fFormula->Eval(pt, eta, phi, e) * 1.0e3)
-      {
-        candidate->IsRecoPU = 1;
-      }
+      if(candidate.Charge != 0 && candidate.IsPU && std::fabs(z - zvtx) > fFormula->Eval(pt, eta, phi, e) * 1.0e3)
+        candidate.IsRecoPU = 1;
       else
       {
-        candidate->IsRecoPU = 0;
-        if(candidate->Momentum.Pt() > fPTMin) output_collection->emplace_back(candidate);
+        candidate.IsRecoPU = 0;
+        if(candidate.Momentum.Pt() > fPTMin) outputCollection->emplace_back(candidate);
       }
     }
   }

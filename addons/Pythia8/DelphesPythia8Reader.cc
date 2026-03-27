@@ -221,8 +221,6 @@ bool DelphesPythia8Reader::ReadEvent()
 
   if(!fPythia->next()) return false;
 
-  DelphesFactory *factory = GetFactory();
-
   fEventInfo->Number += 1;
 #if PYTHIA_VERSION_INTEGER > 8300
   for(const double &weight : fPythia->info.weightValueVector())
@@ -232,24 +230,22 @@ bool DelphesPythia8Reader::ReadEvent()
   for(int i = 1 /*skip the two-beam system*/; i < fPythia->event.size(); ++i)
   {
     Pythia8::Particle &pyPart = fPythia->event[i];
-    Candidate *candidate = factory->NewCandidate();
-    candidate->PID = pyPart.id();
-    candidate->Status = pyPart.statusHepMC();
-    candidate->Charge = pyPart.charge();
-    candidate->Mass = pyPart.mCalc();
+    Candidate &candidate = fAllParticleOutputArray->emplace_back();
+    candidate.PID = pyPart.id();
+    candidate.Status = pyPart.statusHepMC();
+    candidate.Charge = pyPart.charge();
+    candidate.Mass = pyPart.mCalc();
 
-    candidate->Momentum.SetPxPyPzE(pyPart.px(), pyPart.py(), pyPart.pz(), pyPart.e());
-    candidate->Position.SetXYZT(pyPart.xProd(), pyPart.yProd(), pyPart.zProd(), pyPart.tProd());
+    candidate.Momentum.SetPxPyPzE(pyPart.px(), pyPart.py(), pyPart.pz(), pyPart.e());
+    candidate.Position.SetXYZT(pyPart.xProd(), pyPart.yProd(), pyPart.zProd(), pyPart.tProd());
 
-    candidate->M1 = pyPart.mother1() - 1;
-    candidate->M2 = pyPart.mother2() - 1;
+    candidate.M1 = pyPart.mother1() - 1;
+    candidate.M2 = pyPart.mother2() - 1;
 
-    candidate->D1 = pyPart.daughter1() - 1;
-    candidate->D2 = pyPart.daughter2() - 1;
+    candidate.D1 = pyPart.daughter1() - 1;
+    candidate.D2 = pyPart.daughter2() - 1;
 
-    fAllParticleOutputArray->emplace_back(candidate);
-
-    if(candidate->Status == 1) fStableParticleOutputArray->emplace_back(candidate);
+    if(candidate.Status == 1) fStableParticleOutputArray->emplace_back(candidate);
     if(pyPart.isParton()) fPartonOutputArray->emplace_back(candidate);
   }
   SetReadoutTime(ElapsedTime());

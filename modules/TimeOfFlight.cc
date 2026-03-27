@@ -69,13 +69,13 @@ void TimeOfFlight::Process()
   // first compute momenta of vertices based on reconstructed tracks
   ComputeVertexMomenta();
 
-  for(Candidate *const &candidate : *fInputArray)
+  for(const Candidate &candidate : *fInputArray)
   {
-    Candidate *particle = static_cast<Candidate *>(candidate->GetCandidates().at(0));
+    const Candidate *particle = candidate.GetCandidates().at(0);
 
     const TLorentzVector &candidateInitialPosition = particle->Position;
-    const TLorentzVector &candidateInitialPositionSmeared = candidate->InitialPosition;
-    //const TLorentzVector &candidateFinalPosition = candidate->Position;
+    const TLorentzVector &candidateInitialPositionSmeared = candidate.InitialPosition;
+    //const TLorentzVector &candidateFinalPosition = candidate.Position;
 
     // time at vertex from MC truth
     const double t_truth = candidateInitialPosition.T() * 1.0E-3 / c_light;
@@ -103,13 +103,13 @@ void TimeOfFlight::Process()
     {
       // same as 2 but attempt at estimate beta from vertex mass and momentum
       double beta = 1.;
-      for(Candidate *const &vertex : *fVertexInputArray)
+      for(const Candidate &vertex : *fVertexInputArray)
       {
-        for(Candidate *const &constituent : vertex->GetCandidates())
+        for(const Candidate *const &constituent : vertex.GetCandidates())
         {
           if(particle == constituent)
           {
-            beta = vertex->Momentum.Beta();
+            beta = vertex.Momentum.Beta();
             break;
           }
         }
@@ -133,16 +133,15 @@ void TimeOfFlight::Process()
     //const double beta = l / (c_light * tof);
 
     // calculate particle mass (i.e particle ID)
-    Candidate *new_candidate = static_cast<Candidate *>(candidate->Clone());
+    Candidate &new_candidate = fOutputArray->emplace_back(candidate);
 
     // update time at vertex based on option
-    new_candidate->InitialPosition.SetT(ti * 1.0E3 * c_light);
+    new_candidate.InitialPosition.SetT(ti * 1.0E3 * c_light);
 
     // update particle mass based on TOF-based PID (commented for now, assume this calculation is done offline)
-    //new_candidate->Momentum.SetVectM(candidateMomentum.Vect(), mass);
+    //new_candidate.Momentum.SetVectM(candidateMomentum.Vect(), mass);
 
-    new_candidate->AddCandidate(candidate);
-    fOutputArray->emplace_back(new_candidate);
+    new_candidate.AddCandidate(&candidate);
   }
 }
 
@@ -150,16 +149,15 @@ void TimeOfFlight::Process()
 
 void TimeOfFlight::ComputeVertexMomenta()
 {
-  for(Candidate *const &vertex : *fVertexInputArray)
+  for(Candidate &vertex : *fVertexInputArray)
   {
-    for(Candidate *const &constituent : vertex->GetCandidates())
+    for(const Candidate *const &constituent : vertex.GetCandidates())
     {
-      for(Candidate *const &track : *fInputArray)
+      for(const Candidate &track : *fInputArray)
       {
         // get gen part that generated track
-        if(Candidate *particle = static_cast<Candidate *>(track->GetCandidates().at(0)); particle == constituent)
-          vertex->Momentum += track->Momentum;
-
+        if(const Candidate *particle = track.GetCandidates().at(0); particle == constituent)
+          vertex.Momentum += track.Momentum;
       } // end track loop
     } // end vertex consitutent loop
   } // end vertex  loop

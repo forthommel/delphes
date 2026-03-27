@@ -104,8 +104,6 @@ void PileUpMerger::Process()
   double dz, dphi, dt, sumpt2, dz0, dt0;
   int numberOfEvents, event, numberOfParticles;
   Long64_t allEntries, entry;
-  Candidate *candidate, *vertex;
-  DelphesFactory *factory;
 
   const double c_light = 2.99792458E8;
 
@@ -128,16 +126,14 @@ void PileUpMerger::Process()
   nch = 0;
   sumpt2 = 0.0;
 
-  factory = GetFactory();
-  vertex = factory->NewCandidate();
-
-  for(Candidate *const &candidate : *fInputArray)
+  Candidate &vertex = fVertexOutputArray->emplace_back();
+  for(const Candidate &candidate : *fInputArray)
   {
-    vx += candidate->Position.X();
-    vy += candidate->Position.Y();
-    z = candidate->Position.Z();
-    t = candidate->Position.T();
-    pt = candidate->Momentum.Pt();
+    vx += candidate.Position.X();
+    vy += candidate.Position.Y();
+    z = candidate.Position.Z();
+    t = candidate.Position.T();
+    pt = candidate.Momentum.Pt();
 
     // take postion and time from first stable particle
     if(dz0 < -999999.0)
@@ -146,18 +142,16 @@ void PileUpMerger::Process()
       dt0 = t;
 
     // cancel any possible offset in position and time the input file
-    candidate->Position.SetZ(z - dz0 + dz);
-    candidate->Position.SetT(t - dt0 + dt);
+    Candidate &new_candidate = fParticleOutputArray->emplace_back(candidate);
+    new_candidate.Position.SetZ(z - dz0 + dz);
+    new_candidate.Position.SetT(t - dt0 + dt);
+    new_candidate.IsPU = 0;
 
-    candidate->IsPU = 0;
-
-    fParticleOutputArray->emplace_back(candidate);
-
-    if(std::fabs(candidate->Charge) > 1.0E-9)
+    if(std::fabs(candidate.Charge) > 1.0E-9)
     {
       nch++;
       sumpt2 += pt * pt;
-      vertex->AddCandidate(candidate);
+      vertex.AddCandidate(&new_candidate);
     }
   }
 
@@ -168,12 +162,11 @@ void PileUpMerger::Process()
   }
 
   nvtx++;
-  vertex->Position.SetXYZT(vx, vy, dz, dt);
-  vertex->ClusterIndex = nvtx;
-  vertex->ClusterNDF = nch;
-  vertex->SumPT2 = sumpt2;
-  vertex->GenSumPT2 = sumpt2;
-  fVertexOutputArray->emplace_back(vertex);
+  vertex.Position.SetXYZT(vx, vy, dz, dt);
+  vertex.ClusterIndex = nvtx;
+  vertex.ClusterNDF = nch;
+  vertex.SumPT2 = sumpt2;
+  vertex.GenSumPT2 = sumpt2;
 
   // --- Then with pile-up vertices  ------
 
@@ -219,42 +212,39 @@ void PileUpMerger::Process()
     numberOfParticles = 0;
     sumpt2 = 0.0;
 
-    //factory = GetFactory();
-    vertex = factory->NewCandidate();
-
+    Candidate &vertex = fVertexOutputArray->emplace_back();
     while(fReader->ReadParticle(pid, x, y, z, t, px, py, pz, e))
     {
-      candidate = factory->NewCandidate();
+      Candidate candidate;
+      candidate.PID = pid;
 
-      candidate->PID = pid;
-
-      candidate->Status = 1;
+      candidate.Status = 1;
 
       pdgParticle = pdg->GetParticle(pid);
-      candidate->Charge = pdgParticle ? int(pdgParticle->Charge() / 3.0) : -999;
-      candidate->Mass = pdgParticle ? pdgParticle->Mass() : -999.9;
+      candidate.Charge = pdgParticle ? int(pdgParticle->Charge() / 3.0) : -999;
+      candidate.Mass = pdgParticle ? pdgParticle->Mass() : -999.9;
 
-      candidate->IsPU = 1;
+      candidate.IsPU = 1;
 
-      candidate->Momentum.SetPxPyPzE(px, py, pz, e);
-      candidate->Momentum.RotateZ(dphi);
-      pt = candidate->Momentum.Pt();
+      candidate.Momentum.SetPxPyPzE(px, py, pz, e);
+      candidate.Momentum.RotateZ(dphi);
+      pt = candidate.Momentum.Pt();
 
       x -= fInputBeamSpotX;
       y -= fInputBeamSpotY;
-      candidate->Position.SetXYZT(x, y, z + dz, t + dt);
-      candidate->Position.RotateZ(dphi);
-      candidate->Position += TLorentzVector(fOutputBeamSpotX, fOutputBeamSpotY, 0.0, 0.0);
+      candidate.Position.SetXYZT(x, y, z + dz, t + dt);
+      candidate.Position.RotateZ(dphi);
+      candidate.Position += TLorentzVector(fOutputBeamSpotX, fOutputBeamSpotY, 0.0, 0.0);
 
-      vx += candidate->Position.X();
-      vy += candidate->Position.Y();
+      vx += candidate.Position.X();
+      vy += candidate.Position.Y();
 
       ++numberOfParticles;
-      if(std::fabs(candidate->Charge) > 1.0E-9)
+      if(std::fabs(candidate.Charge) > 1.0E-9)
       {
         nch++;
         sumpt2 += pt * pt;
-        vertex->AddCandidate(candidate);
+        vertex.AddCandidate(&candidate);
       }
 
       fParticleOutputArray->emplace_back(candidate);
@@ -268,16 +258,14 @@ void PileUpMerger::Process()
 
     nvtx++;
 
-    vertex->Position.SetXYZT(vx, vy, dz, dt);
+    vertex.Position.SetXYZT(vx, vy, dz, dt);
 
-    vertex->ClusterIndex = nvtx;
-    vertex->ClusterNDF = nch;
-    vertex->SumPT2 = sumpt2;
-    vertex->GenSumPT2 = sumpt2;
+    vertex.ClusterIndex = nvtx;
+    vertex.ClusterNDF = nch;
+    vertex.SumPT2 = sumpt2;
+    vertex.GenSumPT2 = sumpt2;
 
-    vertex->IsPU = 1;
-
-    fVertexOutputArray->emplace_back(vertex);
+    vertex.IsPU = 1;
   }
 }
 

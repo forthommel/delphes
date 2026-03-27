@@ -50,7 +50,6 @@ int main(int argc, char *argv[])
   char appName[] = "DelphesROOT";
   stringstream message;
   GenParticle *gen;
-  Candidate *candidate;
   Int_t pdgCode;
 
   const Double_t c_light = 2.99792458E8;
@@ -84,7 +83,6 @@ int main(int argc, char *argv[])
 
     const auto chain = std::make_unique<TChain>("Delphes");
 
-    DelphesFactory *factory = modularDelphes->GetFactory();
     CandidatesCollection allParticleOutputArray = modularDelphes->ExportArray("allParticles"),
                          stableParticleOutputArray = modularDelphes->ExportArray("stableParticles"),
                          partonOutputArray = modularDelphes->ExportArray("partons");
@@ -150,24 +148,23 @@ int main(int argc, char *argv[])
         for(Int_t j = 0; j < branchParticle->GetEntriesFast(); j++)
         {
           gen = (GenParticle *)branchParticle->At(j);
-          candidate = factory->NewCandidate();
 
-          candidate->Momentum = gen->P4();
-          candidate->Position.SetXYZT(gen->X, gen->Y, gen->Z, gen->T * 1.0E3 * c_light);
+          Candidate &candidate = allParticleOutputArray->emplace_back();
 
-          candidate->PID = gen->PID;
-          candidate->Status = gen->Status;
+          candidate.Momentum = gen->P4();
+          candidate.Position.SetXYZT(gen->X, gen->Y, gen->Z, gen->T * 1.0E3 * c_light);
 
-          candidate->M1 = gen->M1;
-          candidate->M2 = gen->M2;
+          candidate.PID = gen->PID;
+          candidate.Status = gen->Status;
 
-          candidate->D1 = gen->D1;
-          candidate->D2 = gen->D2;
+          candidate.M1 = gen->M1;
+          candidate.M2 = gen->M2;
 
-          candidate->Charge = gen->Charge;
-          candidate->Mass = gen->Mass;
+          candidate.D1 = gen->D1;
+          candidate.D2 = gen->D2;
 
-          allParticleOutputArray->emplace_back(candidate);
+          candidate.Charge = gen->Charge;
+          candidate.Mass = gen->Mass;
 
           pdgCode = TMath::Abs(gen->PID);
 

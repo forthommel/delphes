@@ -122,18 +122,18 @@ void Isolation::Process()
   std::vector<Candidate *> isolationArray = fFilter->GetSubArray(fClassifier.get(), 0);
 
   // loop over all input jets
-  for(Candidate *const &candidate : *fCandidateInputArray)
+  for(const Candidate &candidate : *fCandidateInputArray)
   {
-    const TLorentzVector &candidateMomentum = candidate->Momentum;
+    const TLorentzVector &candidateMomentum = candidate.Momentum;
     eta = std::fabs(candidateMomentum.Eta());
 
     // find rho
     rho = 0.;
     if(fRhoInputArray)
     {
-      for(Candidate *const &object : *fRhoInputArray)
-        if(eta >= object->Edges[0] && eta < object->Edges[1])
-          rho = object->Momentum.Pt();
+      for(const Candidate &object : *fRhoInputArray)
+        if(eta >= object.Edges[0] && eta < object.Edges[1])
+          rho = object.Momentum.Pt();
     }
 
     // loop over all input tracks
@@ -150,7 +150,7 @@ void Isolation::Process()
       if(fUseMiniCone)
         pass = candidateMomentum.DeltaR(isolationMomentum) <= fDeltaRMax && candidateMomentum.DeltaR(isolationMomentum) > fDeltaRMin;
       else
-        pass = candidateMomentum.DeltaR(isolationMomentum) <= fDeltaRMax && candidate->GetUniqueID() != isolation->GetUniqueID();
+        pass = candidateMomentum.DeltaR(isolationMomentum) <= fDeltaRMax && candidate.GetUniqueID() != isolation->GetUniqueID();
 
       if(pass)
       {
@@ -171,9 +171,9 @@ void Isolation::Process()
     rho = 0.0;
     if(fRhoInputArray)
     {
-      for(Candidate *const &object : *fRhoInputArray)
-        if(eta >= object->Edges[0] && eta < object->Edges[1])
-          rho = object->Momentum.Pt();
+      for(const Candidate &object : *fRhoInputArray)
+        if(eta >= object.Edges[0] && eta < object.Edges[1])
+          rho = object.Momentum.Pt();
     }
 
     // correct sum for pile-up contamination
@@ -182,12 +182,13 @@ void Isolation::Process()
     ratioDBeta = sumDBeta / candidateMomentum.Pt();
     ratioRhoCorr = sumRhoCorr / candidateMomentum.Pt();
 
-    candidate->IsolationVar = ratioDBeta;
-    candidate->IsolationVarRhoCorr = ratioRhoCorr;
-    candidate->SumPtCharged = sumChargedNoPU;
-    candidate->SumPtNeutral = sumNeutral;
-    candidate->SumPtChargedPU = sumChargedPU;
-    candidate->SumPt = sumAllParticles;
+    Candidate new_candidate = candidate;
+    new_candidate.IsolationVar = ratioDBeta;
+    new_candidate.IsolationVarRhoCorr = ratioRhoCorr;
+    new_candidate.SumPtCharged = sumChargedNoPU;
+    new_candidate.SumPtNeutral = sumNeutral;
+    new_candidate.SumPtChargedPU = sumChargedPU;
+    new_candidate.SumPt = sumAllParticles;
 
     sum = fUseRhoCorrection ? sumRhoCorr : sumDBeta;
     if(fUsePTSum && sum > fPTSumMax) continue;
@@ -195,7 +196,7 @@ void Isolation::Process()
     ratio = fUseRhoCorrection ? ratioRhoCorr : ratioDBeta;
     if(!fUsePTSum && ratio > fPTRatioMax) continue;
 
-    fOutputArray->emplace_back(candidate);
+    fOutputArray->emplace_back(new_candidate);
   }
 }
 

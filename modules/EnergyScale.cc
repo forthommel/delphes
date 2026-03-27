@@ -52,17 +52,15 @@ public:
   void Process() override
   {
     fOutputArray->clear();
-    for(Candidate *const &candidate : *fInputArray)
+    for(const Candidate &candidate : *fInputArray)
     {
-      TLorentzVector momentum = candidate->Momentum;
+      TLorentzVector momentum = candidate.Momentum;
 
       const double scale = fFormula->Eval(momentum.Pt(), momentum.Eta(), momentum.Phi(), momentum.E());
       if(scale > 0.0) momentum *= scale;
 
-      Candidate *new_candidate = static_cast<Candidate *>(candidate->Clone());
-      new_candidate->Momentum = momentum;
-
-      fOutputArray->emplace_back(new_candidate);
+      Candidate &new_candidate = fOutputArray->emplace_back(candidate);
+      new_candidate.Momentum = momentum;
     }
   }
 

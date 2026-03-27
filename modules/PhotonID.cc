@@ -85,13 +85,13 @@ void PhotonID::Process()
 
   //cout<< "----  new event ---------"<<endl;
 
-  for(Candidate *const &candidate : *fInputPhotonArray)
+  for(const Candidate &candidate : *fInputPhotonArray)
   {
-    Candidate *new_candidate = static_cast<Candidate *>(candidate->Clone());
-    new_candidate->AddCandidate(candidate);
+    Candidate new_candidate = candidate;
+    new_candidate.AddCandidate(&candidate);
 
-    const TLorentzVector &candidatePosition = new_candidate->Position;
-    const TLorentzVector &candidateMomentum = new_candidate->Momentum;
+    const TLorentzVector &candidatePosition = new_candidate.Position;
+    const TLorentzVector &candidateMomentum = new_candidate.Momentum;
     const double eta = candidatePosition.Eta();
     const double phi = candidatePosition.Phi();
     const double pt = candidateMomentum.Pt();
@@ -102,20 +102,20 @@ void PhotonID::Process()
     //cout<< "              ---- photon -----: "<<pt<<","<<eta<<","<<phi<<endl;
 
     // find out if photon matches does not match photon in gen collection and apply fae efficiency
-    if(isFake(new_candidate))
+    if(isFake(&new_candidate))
     {
       //cout<<"                    Fake!"<<endl;
 
       if(gRandom->Uniform() > fFakeFormula->Eval(pt, eta, phi, e)) continue;
       //cout<<"                    passed"<<endl;
-      new_candidate->Status = 3;
+      new_candidate.Status = 3;
       fOutputArray->emplace_back(new_candidate);
     }
 
     // if matches photon in gen collection
     else
     {
-      const double relIso = new_candidate->IsolationVar;
+      const double relIso = new_candidate.IsolationVar;
       const bool isolated = (relIso < 0.3);
       //cout<<"                    Prompt!:   "<<relIso<<endl;
 
@@ -125,7 +125,7 @@ void PhotonID::Process()
         //cout<<"                       isolated!:   "<<relIso<<endl;
         if(gRandom->Uniform() > fPromptFormula->Eval(pt, eta, phi, e)) continue;
         //cout<<"                       passed"<<endl;
-        new_candidate->Status = 1;
+        new_candidate.Status = 1;
         fOutputArray->emplace_back(new_candidate);
       }
 
@@ -135,7 +135,7 @@ void PhotonID::Process()
         //cout<<"                       non-isolated!:   "<<relIso<<endl;
         if(gRandom->Uniform() > fNonPromptFormula->Eval(pt, eta, phi, e)) continue;
         //cout<<"                       passed"<<endl;
-        new_candidate->Status = 2;
+        new_candidate.Status = 2;
         fOutputArray->emplace_back(new_candidate);
       }
     }
@@ -149,11 +149,11 @@ bool PhotonID::isFake(const Candidate *obj)
   const TLorentzVector &mom_rec = obj->Momentum;
 
   bool matches = false;
-  for(Candidate *const &gen : *fInputGenArray)
+  for(const Candidate &gen : *fInputGenArray)
   {
-    const TLorentzVector &mom_gen = gen->Momentum;
-    int status = gen->Status;
-    int pdgCode = std::abs(gen->PID);
+    const TLorentzVector &mom_gen = gen.Momentum;
+    int status = gen.Status;
+    int pdgCode = std::abs(gen.PID);
     float dPtOverPt = std::fabs((mom_gen.Pt() - mom_rec.Pt()) / mom_rec.Pt());
     float deltaR = mom_gen.DeltaR(mom_rec);
 

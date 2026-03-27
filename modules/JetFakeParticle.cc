@@ -92,9 +92,9 @@ void JetFakeParticle::Process()
   fPhotonOutputArray->clear();
   fJetOutputArray->clear();
 
-  for(Candidate *const &candidate : *fInputArray)
+  for(const Candidate &candidate : *fInputArray)
   {
-    const TLorentzVector &candidateMomentum = candidate->Momentum;
+    const TLorentzVector &candidateMomentum = candidate.Momentum;
     const double eta = candidateMomentum.Eta();
     const double phi = candidateMomentum.Phi();
     const double pt = candidateMomentum.Pt();
@@ -102,7 +102,7 @@ void JetFakeParticle::Process()
 
     const double r = gRandom->Uniform();
     double total = 0.;
-    Candidate *fake = nullptr;
+    bool foundCandidate = false;
 
     // loop over map for this jet
     for(const std::pair<const int, std::unique_ptr<DelphesFormula> > &efficiencyMap : fEfficiencyMap)
@@ -112,33 +112,34 @@ void JetFakeParticle::Process()
 
       if(total <= r && r < total + p)
       {
-        fake = static_cast<Candidate *>(candidate->Clone());
+        Candidate fake = candidate;
 
         // convert jet
 
         if(std::abs(pdgCodeOut) == 11 || std::abs(pdgCodeOut) == 13)
         {
-          if(candidate->Charge != 0)
-            fake->Charge = candidate->Charge / std::abs(candidate->Charge);
+          if(candidate.Charge != 0)
+            fake.Charge = candidate.Charge / std::abs(candidate.Charge);
           else
           {
             const double rs = gRandom->Uniform();
-            fake->Charge = (rs < 0.5) ? -1 : 1;
+            fake.Charge = (rs < 0.5) ? -1 : 1;
           }
         }
 
-        if(std::abs(pdgCodeOut) == 22) fake->PID = 22;
+        if(std::abs(pdgCodeOut) == 22) fake.PID = 22;
 
         if(std::abs(pdgCodeOut) == 11) fElectronOutputArray->emplace_back(fake);
         if(std::abs(pdgCodeOut) == 13) fMuonOutputArray->emplace_back(fake);
         if(std::abs(pdgCodeOut) == 22) fPhotonOutputArray->emplace_back(fake);
 
+        foundCandidate = true;
         break;
       }
       total += p;
     }
 
-    if(!fake) fJetOutputArray->emplace_back(candidate);
+    if(!foundCandidate) fJetOutputArray->emplace_back(candidate);
   }
 }
 

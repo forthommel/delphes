@@ -77,10 +77,10 @@ void ExampleModule::Process()
   fOutputArray->clear();
 
   // loop over all input candidates
-  for(Candidate *const &candidate : *fInputArray)
+  for(const Candidate &candidate : *fInputArray)
   {
     // apply an efficency formula
-    if(gRandom->Uniform() <= fFormula->Eval(candidate->Momentum.Pt(), candidate->Position.Eta()))
+    if(gRandom->Uniform() <= fFormula->Eval(candidate.Momentum.Pt(), candidate.Position.Eta()))
       fOutputArray->emplace_back(candidate);
   }
 }

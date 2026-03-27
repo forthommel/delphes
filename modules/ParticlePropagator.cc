@@ -103,17 +103,17 @@ void ParticlePropagator::Process()
   TLorentzVector beamSpotPosition;
   if(fBeamSpotInputArray && !fBeamSpotInputArray->empty())
   {
-    Candidate &beamSpotCandidate = *((Candidate *)fBeamSpotInputArray->at(0));
+    const Candidate &beamSpotCandidate = fBeamSpotInputArray->at(0);
     beamSpotPosition = beamSpotCandidate.Position;
   }
 
   Candidate *particle = nullptr;
-  for(const Candidate *candidate : *fInputArray)
+  for(Candidate &candidate : *fInputArray)
   {
-    if(candidate->GetCandidates().empty())
-      particle = const_cast<Candidate *>(candidate);
+    if(candidate.GetCandidates().empty())
+      particle = const_cast<Candidate *>(&candidate);
     else
-      particle = static_cast<Candidate *>(candidate->GetCandidates().at(0));
+      particle = static_cast<Candidate *>(candidate.GetCandidates().at(0));
 
     const TLorentzVector &particlePosition = particle->Position, &particleMomentum = particle->Momentum;
 
@@ -139,16 +139,14 @@ void ParticlePropagator::Process()
 
     if(std::hypot(x, y) > fRadius || std::fabs(z) > fHalfLength)
     {
-      Candidate *new_candidate = static_cast<Candidate *>(candidate->Clone());
+      Candidate &new_candidate = fOutputArray->emplace_back(candidate);
 
-      new_candidate->InitialPosition = particlePosition;
-      new_candidate->Position = particlePosition;
-      new_candidate->L = 0.0;
+      new_candidate.InitialPosition = particlePosition;
+      new_candidate.Position = particlePosition;
+      new_candidate.L = 0.0;
 
-      new_candidate->Momentum = particleMomentum;
-      new_candidate->AddCandidate(candidate);
-
-      fOutputArray->emplace_back(new_candidate);
+      new_candidate.Momentum = particleMomentum;
+      new_candidate.AddCandidate(&candidate);
     }
     else if(std::fabs(q) < 1.0E-9 || std::fabs(fBz) < 1.0E-9)
     {
@@ -163,20 +161,18 @@ void ParticlePropagator::Process()
 
       const double l = std::sqrt((x_t - x) * (x_t - x) + (y_t - y) * (y_t - y) + (z_t - z) * (z_t - z));
 
-      Candidate *new_candidate = static_cast<Candidate *>(candidate->Clone());
+      Candidate &new_candidate = fOutputArray->emplace_back(candidate);
 
-      new_candidate->InitialPosition = particlePosition;
-      new_candidate->Position.SetXYZT(x_t * 1.0E3, y_t * 1.0E3, z_t * 1.0E3, particlePosition.T() + t * e * 1.0E3);
-      new_candidate->L = l * 1.0E3;
+      new_candidate.InitialPosition = particlePosition;
+      new_candidate.Position.SetXYZT(x_t * 1.0E3, y_t * 1.0E3, z_t * 1.0E3, particlePosition.T() + t * e * 1.0E3);
+      new_candidate.L = l * 1.0E3;
 
-      new_candidate->Momentum = particleMomentum;
-      new_candidate->AddCandidate(candidate);
-
-      fOutputArray->emplace_back(new_candidate);
+      new_candidate.Momentum = particleMomentum;
+      new_candidate.AddCandidate(&candidate);
 
       if(std::fabs(q) > 1.0E-9)
       {
-        switch(std::abs(new_candidate->PID))
+        switch(std::abs(new_candidate.PID))
         {
         case 11:
           fElectronOutputArray->emplace_back(new_candidate);
@@ -189,9 +185,7 @@ void ParticlePropagator::Process()
         }
       }
       else
-      {
         fNeutralOutputArray->emplace_back(new_candidate);
-      }
     }
     else
     {
@@ -273,7 +267,7 @@ void ParticlePropagator::Process()
       if(r_t > 0.0)
       {
         // store these variables before cloning
-        if(particle == candidate)
+        if(particle == &candidate)
         {
           particle->D0 = d0 * 1.0E3;
           particle->DZ = dz * 1.0E3;
@@ -283,23 +277,22 @@ void ParticlePropagator::Process()
           particle->Phi = particleMomentumAst.Phi();
         }
 
-        Candidate *new_candidate = static_cast<Candidate *>(candidate->Clone());
+        Candidate &new_candidate = fOutputArray->emplace_back(candidate);
 
-        new_candidate->InitialPosition = particlePosition;
-        new_candidate->Position.SetXYZT(x_t * 1.0E3, y_t * 1.0E3, z_t * 1.0E3, particlePosition.T() + t * c_light * 1.0E3);
+        new_candidate.InitialPosition = particlePosition;
+        new_candidate.Position.SetXYZT(x_t * 1.0E3, y_t * 1.0E3, z_t * 1.0E3, particlePosition.T() + t * c_light * 1.0E3);
 
-        new_candidate->Momentum = particleMomentumAst;
+        new_candidate.Momentum = particleMomentumAst;
 
-        new_candidate->L = l * 1.0E3;
+        new_candidate.L = l * 1.0E3;
 
-        new_candidate->Xd = xd * 1.0E3;
-        new_candidate->Yd = yd * 1.0E3;
-        new_candidate->Zd = zd * 1.0E3;
+        new_candidate.Xd = xd * 1.0E3;
+        new_candidate.Yd = yd * 1.0E3;
+        new_candidate.Zd = zd * 1.0E3;
 
-        new_candidate->AddCandidate(candidate);
+        new_candidate.AddCandidate(&candidate);
 
-        fOutputArray->emplace_back(new_candidate);
-        switch(std::abs(new_candidate->PID))
+        switch(std::abs(new_candidate.PID))
         {
         case 11:
           fElectronOutputArray->emplace_back(new_candidate);

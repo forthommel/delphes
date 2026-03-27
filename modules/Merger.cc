@@ -73,15 +73,13 @@ void Merger::Process()
   TLorentzVector momentum;
   double sumPT = 0., sumE = 0.;
 
-  DelphesFactory *factory = GetFactory();
-
   // loop over all input arrays
   for(const auto &input_collection : fInputList)
   {
     // loop over all candidates
-    for(Candidate *const &candidate : *input_collection)
+    for(const Candidate &candidate : *input_collection)
     {
-      const TLorentzVector &candidateMomentum = candidate->Momentum;
+      const TLorentzVector &candidateMomentum = candidate.Momentum;
 
       momentum += candidateMomentum;
       sumPT += candidateMomentum.Pt();
@@ -92,20 +90,14 @@ void Merger::Process()
   }
 
   {
-    Candidate *candidate = factory->NewCandidate();
-
-    candidate->Position.SetXYZT(0.0, 0.0, 0.0, 0.0);
-    candidate->Momentum = momentum;
-
-    fMomentumOutputArray->emplace_back(candidate);
+    Candidate &candidate = fMomentumOutputArray->emplace_back();
+    candidate.Position.SetXYZT(0.0, 0.0, 0.0, 0.0);
+    candidate.Momentum = momentum;
   }
   {
-    Candidate *candidate = factory->NewCandidate();
-
-    candidate->Position.SetXYZT(0.0, 0.0, 0.0, 0.0);
-    candidate->Momentum.SetPtEtaPhiE(sumPT, 0.0, 0.0, sumE);
-
-    fEnergyOutputArray->emplace_back(candidate);
+    Candidate &candidate = fEnergyOutputArray->emplace_back();
+    candidate.Position.SetXYZT(0.0, 0.0, 0.0, 0.0);
+    candidate.Momentum.SetPtEtaPhiE(sumPT, 0.0, 0.0, sumE);
   }
 }
 

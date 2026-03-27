@@ -59,30 +59,27 @@ void TruthVertexFinder::Process()
 {
   fVertexOutputArray->clear();
 
-  DelphesFactory *factory = GetFactory();
-
-  int nvtx = 0;
-  for(Candidate *const &candidate : *fInputArray)
+  for(const Candidate &candidate : *fInputArray)
   {
-    const TLorentzVector &candidatePosition = candidate->Position;
-    const TLorentzVector &candidateMomentum = candidate->Momentum;
+    const TLorentzVector &candidatePosition = candidate.Position;
+    const TLorentzVector &candidateMomentum = candidate.Momentum;
 
     const double pt = candidateMomentum.Pt();
 
     // check whether vertex already included, if so add particle
     bool old_vertex = false;
-    for(Candidate *const &vertex : *fVertexOutputArray)
+    for(Candidate &vertex : *fVertexOutputArray)
     {
-      const TLorentzVector &vertexPosition = vertex->Position;
+      const TLorentzVector &vertexPosition = vertex.Position;
       // check whether spatial difference is < 1 um, in that case assume it is the same vertex
       if(std::fabs((candidatePosition.P() - vertexPosition.P())) < fResolution * 1.E3)
       {
         old_vertex = true;
-        vertex->AddCandidate(candidate);
-        if(std::fabs(candidate->Charge) > 0)
+        vertex.AddCandidate(&candidate);
+        if(std::fabs(candidate.Charge) > 0)
         {
-          vertex->ClusterNDF += 1;
-          vertex->GenSumPT2 += pt * pt;
+          vertex.ClusterNDF += 1;
+          vertex.GenSumPT2 += pt * pt;
         }
       }
     }
@@ -90,22 +87,20 @@ void TruthVertexFinder::Process()
     // else fill new vertex
     if(!old_vertex)
     {
-      Candidate *vertex = factory->NewCandidate();
-      vertex->Position = candidatePosition;
-      vertex->ClusterIndex = nvtx;
+      Candidate &vertex = fVertexOutputArray->emplace_back();
+      vertex.Position = candidatePosition;
+      vertex.ClusterIndex = fVertexOutputArray->size() - 1;
 
-      if(std::fabs(candidate->Charge) > 0)
+      if(std::fabs(candidate.Charge) > 0)
       {
-        vertex->ClusterNDF = 1;
-        vertex->GenSumPT2 = pt * pt;
+        vertex.ClusterNDF = 1;
+        vertex.GenSumPT2 = pt * pt;
       }
       else
       {
-        vertex->ClusterNDF = 0;
-        vertex->GenSumPT2 = 0.;
+        vertex.ClusterNDF = 0;
+        vertex.GenSumPT2 = 0.;
       }
-      fVertexOutputArray->emplace_back(vertex);
-      nvtx++;
     }
   }
 }

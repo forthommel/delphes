@@ -64,30 +64,25 @@ void FastJetGridMedianEstimator::Process()
 {
   fRhoOutputArray->clear();
 
-  DelphesFactory *factory = GetFactory();
-
   std::vector<fastjet::PseudoJet> inputList;
   size_t number = 0;
-  for(Candidate *const &candidate : *fInputArray) // loop over input objects
+  for(const Candidate &candidate : *fInputArray) // loop over input objects
   {
-    TLorentzVector &momentum = candidate->Momentum;
+    const TLorentzVector &momentum = candidate.Momentum;
     fastjet::PseudoJet &jet = inputList.emplace_back(momentum.Px(), momentum.Py(), momentum.Pz(), momentum.E());
     jet.set_user_index(number++);
   }
 
   // compute rho and store it
-  for(std::vector<std::unique_ptr<fastjet::GridMedianBackgroundEstimator> >::iterator itEstimators = fEstimators.begin();
-    itEstimators != fEstimators.end(); ++itEstimators)
+  for(const std::unique_ptr<fastjet::GridMedianBackgroundEstimator> &estimator : fEstimators)
   {
-    (*itEstimators)->set_particles(inputList);
+    estimator->set_particles(inputList);
+    const double rho = estimator->rho();
 
-    double rho = (*itEstimators)->rho();
-
-    Candidate *candidate = factory->NewCandidate();
-    candidate->Momentum.SetPtEtaPhiE(rho, 0.0, 0.0, rho);
-    candidate->Edges[0] = (*itEstimators)->rapmin();
-    candidate->Edges[1] = (*itEstimators)->rapmax();
-    fRhoOutputArray->emplace_back(candidate);
+    Candidate &candidate = fRhoOutputArray->emplace_back();
+    candidate.Momentum.SetPtEtaPhiE(rho, 0.0, 0.0, rho);
+    candidate.Edges[0] = estimator->rapmin();
+    candidate.Edges[1] = estimator->rapmax();
   }
 }
 

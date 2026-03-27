@@ -51,7 +51,7 @@ public:
 
 private:
   using InputMap = std::vector<std::pair<CandidatesCollection, CandidatesCollection> >;
-  bool Unique(Candidate *candidate, InputMap::const_iterator itInputMap);
+  bool Unique(const Candidate *candidate, InputMap::const_iterator itInputMap);
 
   const bool fUseUniqueID;
 
@@ -67,9 +67,9 @@ void UniqueObjectFinder::Process()
 
   for(auto itInputMap = fInputMap.cbegin(); itInputMap != fInputMap.cend(); ++itInputMap) // loop over all input arrays
   {
-    for(Candidate *const &candidate : *(itInputMap->first)) // loop over all candidates
+    for(const Candidate &candidate : *itInputMap->first) // loop over all candidates
     {
-      if(Unique(candidate, itInputMap))
+      if(Unique(&candidate, itInputMap))
         itInputMap->second->emplace_back(candidate);
     }
   }
@@ -77,16 +77,16 @@ void UniqueObjectFinder::Process()
 
 //------------------------------------------------------------------------------
 
-bool UniqueObjectFinder::Unique(Candidate *candidate, InputMap::const_iterator itInputMap)
+bool UniqueObjectFinder::Unique(const Candidate *candidate, InputMap::const_iterator itInputMap)
 {
   for(auto previousItInputMap = fInputMap.cbegin(); previousItInputMap != itInputMap; ++previousItInputMap)
   { // loop over previous arrays
-    for(Candidate *const &previousCandidate : *(previousItInputMap->second)) // loop over all candidates
+    for(const Candidate &previousCandidate : *previousItInputMap->second) // loop over all candidates
       if(fUseUniqueID)
       {
-        if(candidate->GetUniqueID() == previousCandidate->GetUniqueID()) return false;
+        if(candidate->GetUniqueID() == previousCandidate.GetUniqueID()) return false;
       }
-      else if(candidate->Overlaps(previousCandidate))
+      else if(candidate->Overlaps(&previousCandidate))
         return false;
   }
   return true;

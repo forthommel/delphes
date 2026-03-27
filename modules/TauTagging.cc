@@ -103,9 +103,9 @@ void TauTagging::Process()
   const std::vector<Candidate *> tauArray = fFilter->GetSubArray(fClassifier.get(), 0);
 
   // loop over all input jets
-  for(Candidate *const &jet : *fJetInputArray)
+  for(Candidate &jet : *fJetInputArray)
   {
-    const TLorentzVector &jetMomentum = jet->Momentum;
+    const TLorentzVector &jetMomentum = jet.Momentum;
     int pdgCode = 0;
     int charge = gRandom->Uniform() > 0.5 ? 1 : -1;
     const double eta = jetMomentum.Eta();
@@ -119,16 +119,14 @@ void TauTagging::Process()
       if(tau->D1 < 0) continue;
 
       if(tau->D1 >= static_cast<int>(fParticleInputArray->size()) || tau->D2 >= static_cast<int>(fParticleInputArray->size()))
-      {
-        throw runtime_error("tau's daughter index is greater than the ParticleInputArray size");
-      }
+        throw std::runtime_error("tau's daughter index is greater than the ParticleInputArray size");
 
       TLorentzVector tauMomentum;
       for(int i = tau->D1; i <= tau->D2; ++i)
       {
-        Candidate *const &daughter = static_cast<Candidate *>(fParticleInputArray->at(i));
-        if(std::abs(daughter->PID) == 16) continue;
-        tauMomentum += daughter->Momentum;
+        const Candidate &daughter = fParticleInputArray->at(i);
+        if(std::abs(daughter.PID) == 16) continue;
+        tauMomentum += daughter.Momentum;
       }
 
       if(jetMomentum.DeltaR(tauMomentum) <= fDeltaR)
@@ -142,13 +140,12 @@ void TauTagging::Process()
 
     if(pdgCode == 0)
     {
-
       double drMin = fDeltaR;
-      for(Candidate *const &part : *fPartonInputArray)
+      for(const Candidate &part : *fPartonInputArray)
       {
-        if(std::abs(part->PID) == 11 || std::abs(part->PID) == 13)
+        if(std::abs(part.PID) == 11 || std::abs(part.PID) == 13)
         {
-          TLorentzVector &tauMomentum = part->Momentum;
+          const TLorentzVector &tauMomentum = part.Momentum;
           if(tauMomentum.Pt() < fClassifier->fPTMin) continue;
           if(std::fabs(tauMomentum.Eta()) > fClassifier->fEtaMax) continue;
 
@@ -156,8 +153,8 @@ void TauTagging::Process()
           if(dr < drMin)
           {
             drMin = dr;
-            pdgCode = std::abs(part->PID);
-            charge = part->Charge;
+            pdgCode = std::abs(part.PID);
+            charge = part.Charge;
           }
         }
       }
@@ -169,12 +166,12 @@ void TauTagging::Process()
 
     // apply an efficency formula
     const double eff = formula->Eval(pt, eta, phi, e);
-    jet->TauFlavor = pdgCode;
-    jet->TauTag |= (gRandom->Uniform() <= eff) << fBitNumber;
-    jet->TauWeight = eff;
+    jet.TauFlavor = pdgCode;
+    jet.TauTag |= (gRandom->Uniform() <= eff) << fBitNumber;
+    jet.TauWeight = eff;
 
     // set tau charge
-    jet->Charge = charge;
+    jet.Charge = charge;
   }
 }
 

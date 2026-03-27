@@ -68,13 +68,13 @@ private:
 void CscClusterId::Process()
 {
   fOutputArray->clear();
-  for(Candidate *const &candidate : *fInputArray)
+  for(const Candidate &candidate : *fInputArray)
   {
-    const TLorentzVector &momentum = candidate->Momentum;
-    const TLorentzVector &candidateDecayPosition = candidate->DecayPosition;
+    const TLorentzVector &momentum = candidate.Momentum;
+    const TLorentzVector &candidateDecayPosition = candidate.DecayPosition;
     const double decayZ = std::fabs(candidateDecayPosition.Z());
     const double decayR = std::hypot(candidateDecayPosition.X(), candidateDecayPosition.Y());
-    const double Ehad = candidate->Ehad;
+    const double Ehad = candidate.Ehad;
 
     const double cosTheta = std::fabs(momentum.CosTheta());
     const double signPz = (momentum.Pz() >= 0.0) ? 1.0 : -1.0;

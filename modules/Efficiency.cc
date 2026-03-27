@@ -66,10 +66,10 @@ private:
 void Efficiency::Process()
 {
   fOutputArray->clear();
-  for(Candidate *const &candidate : *fInputArray)
+  for(const Candidate &candidate : *fInputArray)
   {
-    const TLorentzVector &candidatePosition = candidate->Position;
-    const TLorentzVector &candidateMomentum = candidate->Momentum;
+    const TLorentzVector &candidatePosition = candidate.Position;
+    const TLorentzVector &candidateMomentum = candidate.Momentum;
     double eta = candidatePosition.Eta();
     double phi = candidatePosition.Phi();
 
@@ -83,7 +83,7 @@ void Efficiency::Process()
     const double e = candidateMomentum.E();
 
     // apply an efficency formula
-    if(gRandom->Uniform() > fFormula->Eval(pt, eta, phi, e, candidate)) continue;
+    if(gRandom->Uniform() > fFormula->Eval(pt, eta, phi, e, &candidate)) continue;
 
     fOutputArray->emplace_back(candidate);
   }

@@ -416,26 +416,26 @@ void DelphesSTDHEPReader::AnalyzeParticles()
     fReader[6].ReadValue(&z, 8);
     fReader[6].ReadValue(&t, 8);
 
-    Candidate *candidate = GetFactory()->NewCandidate();
+    Candidate candidate;
 
-    candidate->PID = pid;
-    const int pdgCode = std::abs(candidate->PID);
+    candidate.PID = pid;
+    const int pdgCode = std::abs(candidate.PID);
 
-    candidate->Status = status;
+    candidate.Status = status;
 
-    candidate->M1 = m1 - 1;
-    candidate->M2 = m2 - 1;
+    candidate.M1 = m1 - 1;
+    candidate.M2 = m2 - 1;
 
-    candidate->D1 = d1 - 1;
-    candidate->D2 = d2 - 1;
+    candidate.D1 = d1 - 1;
+    candidate.D2 = d2 - 1;
 
     TParticlePDG *pdgParticle = fPDG->GetParticle(pid);
-    candidate->Charge = pdgParticle ? int(pdgParticle->Charge() / 3.0) : -999;
-    candidate->Mass = mass;
+    candidate.Charge = pdgParticle ? int(pdgParticle->Charge() / 3.0) : -999;
+    candidate.Mass = mass;
 
-    candidate->Momentum.SetPxPyPzE(px, py, pz, e);
+    candidate.Momentum.SetPxPyPzE(px, py, pz, e);
 
-    candidate->Position.SetXYZT(x, y, z, t);
+    candidate.Position.SetXYZT(x, y, z, t);
 
     fAllParticleOutputArray->emplace_back(candidate);
 

@@ -899,7 +899,8 @@ private:
   ClassDef(Candidate, 7)
 };
 
-using CandidatesCollection = std::shared_ptr<std::vector<Candidate *> >;
+using CandidatesCollection = std::shared_ptr<std::vector<Candidate> >;
+using CandidatesPtrCollection = std::shared_ptr<std::vector<Candidate *> >;
 //using CandidatesCollection = std::vector<Candidate *>;
 
 #endif // DelphesClasses_h

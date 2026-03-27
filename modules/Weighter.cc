@@ -91,16 +91,14 @@ void Weighter::Process()
 {
   fOutputArray->clear();
 
-  DelphesFactory *factory = GetFactory();
-
   // loop over all particles
   fCodeSet.clear();
-  for(Candidate *const &candidate : *fInputArray)
+  for(const Candidate &candidate : *fInputArray)
   {
-    if(candidate->Status != 3) continue;
-    if(fWeightSet.find(candidate->PID) == fWeightSet.end()) continue;
+    if(candidate.Status != 3) continue;
+    if(fWeightSet.find(candidate.PID) == fWeightSet.end()) continue;
 
-    fCodeSet.insert(candidate->PID);
+    fCodeSet.insert(candidate.PID);
   }
 
   // find default weight value
@@ -119,9 +117,8 @@ void Weighter::Process()
       weight = fWeightMap.at(index);
   }
 
-  Candidate *candidate = factory->NewCandidate();
-  candidate->Momentum.SetPtEtaPhiE(weight, 0.0, 0.0, weight);
-  fOutputArray->emplace_back(candidate);
+  Candidate &candidate = fOutputArray->emplace_back();
+  candidate.Momentum.SetPtEtaPhiE(weight, 0.0, 0.0, weight);
 }
 
 //------------------------------------------------------------------------------

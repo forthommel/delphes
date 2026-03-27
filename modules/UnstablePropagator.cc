@@ -59,13 +59,18 @@ public:
   void Process() override;
 
 private:
-  std::vector<int> DaughterIndices(Candidate *candidate);
-  void PrintPart(TString prefix, Candidate *candidate);
-  double FlightDistance(Candidate *mother, Candidate *daughter);
-  int Index(Candidate *candidate);
+  std::vector<int> DaughterIndices(const Candidate *candidate);
+  void PrintPart(TString prefix, const Candidate *candidate);
+  /// Returns flight distance in mm
+  double FlightDistance(const Candidate *mother, const Candidate *daughter)
+  {
+    TVector3 vector = mother->Position.Vect() - daughter->Position.Vect();
+    return vector.Mag();
+  }
+  int Index(const Candidate *candidate);
   void ComputeChainFlightDistances(TString prefix, Candidate *candidate);
   void PropagateAndUpdateChain(TString prefix, Candidate *candidate);
-  TLorentzVector PropagatedPosition(Candidate *candidate);
+  TLorentzVector PropagatedPosition(const Candidate *candidate);
 
   const double fRadius;
   const double fRadius2;
@@ -86,71 +91,58 @@ void UnstablePropagator::Process()
 {
   TLorentzVector particlePosition, particleMomentum;
   double pt2, q;
-  double lof, x, y, z;
+  double x, y, z;
 
   if(fDebug) cout << "-------------   new event -----------------" << endl;
 
-  for(Candidate *const &candidate : *fInputArray)
+  for(Candidate &candidate : *fInputArray)
   {
-    particlePosition = candidate->Position;
-    particleMomentum = candidate->Momentum;
+    particlePosition = candidate.Position;
+    particleMomentum = candidate.Momentum;
 
     x = particlePosition.X() * 1.0E-3;
     y = particlePosition.Y() * 1.0E-3;
     z = particlePosition.Z() * 1.0E-3;
     pt2 = particleMomentum.Perp2();
-    q = candidate->Charge;
+    q = candidate.Charge;
 
     //if (fDebug) PrintPart("", candidate);
 
     // check that particle position is inside the cylinder
     if(std::hypot(x, y) > fRadiusMax || std::fabs(z) > fHalfLengthMax)
-    {
       continue;
-    }
 
     if(std::fabs(q) < 1.0E-9 || std::fabs(fBz) < 1.0E-9)
-    {
       continue;
-    }
 
     if(pt2 < 1.0E-9)
-    {
       continue;
-    }
 
     // pass if particle already processed
-    if(candidate->L > 1.0E-9)
-    {
+    if(candidate.L > 1.0E-9)
       continue;
-    }
 
-    std::vector<int> daughters_indices = DaughterIndices(candidate);
-
+    const std::vector<int> daughters_indices = DaughterIndices(&candidate);
     if(daughters_indices.size() == 0)
-    {
       continue;
-    }
 
-    Candidate *daughter = static_cast<Candidate *>(fInputArray->at(daughters_indices.at(0)));
-    lof = FlightDistance(candidate, daughter) * 1.0E-3;
+    const Candidate &daughter = fInputArray->at(daughters_indices.at(0));
+    const double lof = FlightDistance(&candidate, &daughter) * 1.0E-3;
 
     //fLmin = 0.01;
     if(lof < fLmin)
-    {
       continue;
-    }
 
     if(fDebug) std::cout << " -- lof: " << lof << ", Lmin: " << fLmin << std::scientific << std::endl;
     TString prefix = " -- ";
-    ComputeChainFlightDistances(prefix, candidate);
-    PropagateAndUpdateChain(prefix, candidate);
+    ComputeChainFlightDistances(prefix, &candidate);
+    PropagateAndUpdateChain(prefix, &candidate);
   }
 }
 
 //------------------------------------------------------------------------------
 
-std::vector<int> UnstablePropagator::DaughterIndices(Candidate *candidate)
+std::vector<int> UnstablePropagator::DaughterIndices(const Candidate *candidate)
 {
   std::vector<int> indices;
 
@@ -161,13 +153,9 @@ std::vector<int> UnstablePropagator::DaughterIndices(Candidate *candidate)
   int mind = min(d1, d2);
 
   if(maxd < 0)
-  {
     indices.clear();
-  }
   else if(mind < 0)
-  {
     indices.push_back(maxd);
-  }
   else if(d1 > d2)
   {
     indices.push_back(d1);
@@ -176,28 +164,16 @@ std::vector<int> UnstablePropagator::DaughterIndices(Candidate *candidate)
   else
   {
     for(int i = d1; i <= d2; ++i)
-    {
       indices.push_back(i);
-    }
   }
   return indices;
 }
 
 //------------------------------------------------------------------------------
 
-// returns flight distance in mm
-double UnstablePropagator::FlightDistance(Candidate *mother, Candidate *daughter)
-{
-  TVector3 vector = mother->Position.Vect() - daughter->Position.Vect();
-  return vector.Mag();
-}
-
-//------------------------------------------------------------------------------
-
 void UnstablePropagator::ComputeChainFlightDistances(TString prefix, Candidate *candidate)
 {
-  Candidate *daughter = nullptr, *mother = nullptr;
-  mother = candidate;
+  Candidate *mother = candidate;
   std::vector<int> drange = DaughterIndices(mother);
 
   if(fDebug) cout << prefix << " computing chain flight distances" << endl;
@@ -211,13 +187,13 @@ void UnstablePropagator::ComputeChainFlightDistances(TString prefix, Candidate *
   }
   else
   {
-    daughter = static_cast<Candidate *>(fInputArray->at(drange.at(0)));
-    mother->L = FlightDistance(mother, daughter);
+    const Candidate &daughter = fInputArray->at(drange.at(0));
+    mother->L = FlightDistance(mother, &daughter);
     if(fDebug) cout << prefix << " flight distance: " << mother->L << endl;
     for(unsigned long i = 0; i < drange.size(); i++)
     {
-      daughter = static_cast<Candidate *>(fInputArray->at(drange.at(i)));
-      ComputeChainFlightDistances(prefix, daughter);
+      Candidate &daughter = fInputArray->at(drange.at(i));
+      ComputeChainFlightDistances(prefix, &daughter);
     }
   }
 }
@@ -226,9 +202,8 @@ void UnstablePropagator::ComputeChainFlightDistances(TString prefix, Candidate *
 
 void UnstablePropagator::PropagateAndUpdateChain(TString prefix, Candidate *candidate)
 {
-  Candidate *daughter = nullptr, *mother = nullptr;
   TLorentzVector updatedPosition;
-  mother = candidate;
+  Candidate *mother = candidate;
   std::vector<int> drange = DaughterIndices(mother);
 
   //if (fDebug) cout<<prefix<<" propagating and updating chain, mother:"<<endl;
@@ -247,24 +222,21 @@ void UnstablePropagator::PropagateAndUpdateChain(TString prefix, Candidate *cand
     updatedPosition = PropagatedPosition(mother);
     for(unsigned long i = 0; i < drange.size(); i++)
     {
-      daughter = static_cast<Candidate *>(fInputArray->at(drange.at(i)));
+      Candidate &daughter = fInputArray->at(drange.at(i));
       //  if (fDebug) cout<<prefix<<" propagating and updating chain, daughter:"<<endl;
-      if(fDebug) PrintPart(prefix, daughter);
-      daughter->Position = updatedPosition;
+      if(fDebug) PrintPart(prefix, &daughter);
+      daughter.Position = updatedPosition;
       //if (fDebug) cout<<prefix<<" propagated position: "<<daughter->Position.X()<<", "<<daughter->Position.Y()<<", "<<daughter->Position.Z()<<endl;
-      PropagateAndUpdateChain(prefix, daughter);
+      PropagateAndUpdateChain(prefix, &daughter);
     }
   }
 }
 
 //------------------------------------------------------------------------------
 
-TLorentzVector UnstablePropagator::PropagatedPosition(Candidate *candidate)
+TLorentzVector UnstablePropagator::PropagatedPosition(const Candidate *candidate)
 {
-
-  TLorentzVector particlePosition, particleMomentum, beamSpotPosition;
-  double px, py, pz, pt, e, q;
-  double x, y, z, t, r;
+  double t, r;
   double x_c, y_c, phi_0;
   double x_t, y_t, z_t, r_t, phi_t;
   double gammam, omega;
@@ -273,20 +245,20 @@ TLorentzVector UnstablePropagator::PropagatedPosition(Candidate *candidate)
 
   const double c_light = 2.99792458E8;
 
-  particlePosition = candidate->Position;
-  particleMomentum = candidate->Momentum;
+  TLorentzVector particlePosition = candidate->Position;
+  TLorentzVector particleMomentum = candidate->Momentum;
 
-  x = particlePosition.X() * 1.0E-3;
-  y = particlePosition.Y() * 1.0E-3;
-  z = particlePosition.Z() * 1.0E-3;
+  const double x = particlePosition.X() * 1.0E-3;
+  const double y = particlePosition.Y() * 1.0E-3;
+  const double z = particlePosition.Z() * 1.0E-3;
 
-  q = candidate->Charge;
+  const double q = candidate->Charge;
 
-  px = particleMomentum.Px();
-  py = particleMomentum.Py();
-  pz = particleMomentum.Pz();
-  pt = particleMomentum.Pt();
-  e = particleMomentum.E();
+  const double px = particleMomentum.Px();
+  const double py = particleMomentum.Py();
+  const double pz = particleMomentum.Pz();
+  const double pt = particleMomentum.Pt();
+  const double e = particleMomentum.E();
 
   // propagation flight and time of flight
   lof = candidate->L * 1.0E-3; // in meters
@@ -295,9 +267,7 @@ TLorentzVector UnstablePropagator::PropagatedPosition(Candidate *candidate)
   //if (fDebug) cout << "propagating from : "<<x<<", "<<y<<", "<<z<<",  lof:"<<lof<<", tof: "<<tof<<endl;
 
   if(std::hypot(x, y) > fRadius || std::fabs(z) > fHalfLength)
-  {
     return particlePosition;
-  }
 
   // neutral propagation
   else if(std::fabs(q) < 1.0E-9 || std::fabs(fBz) < 1.0E-9)
@@ -368,7 +338,7 @@ TLorentzVector UnstablePropagator::PropagatedPosition(Candidate *candidate)
 
 //------------------------------------------------------------------------------
 
-void UnstablePropagator::PrintPart(TString prefix, Candidate *candidate)
+void UnstablePropagator::PrintPart(TString prefix, const Candidate *candidate)
 {
   std::cout.precision(6);
   std::cout << prefix;
@@ -383,7 +353,7 @@ void UnstablePropagator::PrintPart(TString prefix, Candidate *candidate)
 
 //------------------------------------------------------------------------------
 
-int UnstablePropagator::Index(Candidate *particle)
+int UnstablePropagator::Index(const Candidate *particle)
 {
   /*int i=-1;
   fItInputArray->Reset();
@@ -400,10 +370,8 @@ int UnstablePropagator::Index(Candidate *particle)
   for(size_t i = 0; i < fInputArray->size(); i++)
   {
     j = i;
-    if(fInputArray->at(i)->GetUniqueID() == particle->GetUniqueID())
-    {
+    if(fInputArray->at(i).GetUniqueID() == particle->GetUniqueID())
       break;
-    }
   }
   return j;
 }

@@ -80,14 +80,14 @@ void PhotonConversions::Process()
 {
   fOutputArray->clear();
 
-  for(Candidate *const &candidate : *fInputArray)
+  for(const Candidate &candidate : *fInputArray)
   {
-    if(candidate->PID != 22)
+    if(candidate.PID != 22)
       fOutputArray->emplace_back(candidate);
     else
     {
-      const TLorentzVector &candidatePosition = candidate->Position,
-                           &candidateMomentum = candidate->Momentum;
+      const TLorentzVector &candidatePosition = candidate.Position,
+                           &candidateMomentum = candidate.Momentum;
       const double x = candidatePosition.X() * 1.0E-3,
                    y = candidatePosition.Y() * 1.0E-3,
                    z = candidatePosition.Z() * 1.0E-3;
@@ -160,26 +160,23 @@ void PhotonConversions::Process()
           // generate x1 and x2, the fraction of the photon energy taken resp. by e+ and e-
           const double x1 = fDecayXsec->GetRandom(), x2 = 1 - x1;
 
-          Candidate *ep = static_cast<Candidate *>(candidate->Clone());
-          Candidate *em = static_cast<Candidate *>(candidate->Clone());
+          Candidate &ep = fOutputArray->emplace_back(candidate);
+          Candidate &em = fOutputArray->emplace_back(candidate);
 
-          ep->Position.SetXYZT(x_i * 1.0E3, y_i * 1.0E3, z_i * 1.0E3, candidatePosition.T() + nsteps * dt * e * 1.0E3);
-          em->Position.SetXYZT(x_i * 1.0E3, y_i * 1.0E3, z_i * 1.0E3, candidatePosition.T() + nsteps * dt * e * 1.0E3);
+          ep.Position.SetXYZT(x_i * 1.0E3, y_i * 1.0E3, z_i * 1.0E3, candidatePosition.T() + nsteps * dt * e * 1.0E3);
+          em.Position.SetXYZT(x_i * 1.0E3, y_i * 1.0E3, z_i * 1.0E3, candidatePosition.T() + nsteps * dt * e * 1.0E3);
 
-          ep->Momentum.SetPtEtaPhiE(x1 * pt, eta, phi, x1 * e);
-          em->Momentum.SetPtEtaPhiE(x2 * pt, eta, phi, x2 * e);
+          ep.Momentum.SetPtEtaPhiE(x1 * pt, eta, phi, x1 * e);
+          em.Momentum.SetPtEtaPhiE(x2 * pt, eta, phi, x2 * e);
 
-          ep->PID = -11;
-          em->PID = 11;
+          ep.PID = -11;
+          em.PID = 11;
 
-          ep->Charge = 1.0;
-          em->Charge = -1.0;
+          ep.Charge = 1.0;
+          em.Charge = -1.0;
 
-          ep->IsFromConversion = 1;
-          em->IsFromConversion = 1;
-
-          fOutputArray->emplace_back(em);
-          fOutputArray->emplace_back(ep);
+          ep.IsFromConversion = 1;
+          em.IsFromConversion = 1;
 
           break;
         }

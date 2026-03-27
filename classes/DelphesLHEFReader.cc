@@ -257,29 +257,28 @@ void DelphesLHEFReader::SetProcessingTime(double procTime) { fEventInfo->ProcTim
 
 void DelphesLHEFReader::AnalyzeParticle()
 {
-  Candidate *candidate;
   TParticlePDG *pdgParticle;
   int pdgCode;
 
-  candidate = GetFactory()->NewCandidate();
+  Candidate candidate;
 
-  candidate->PID = fPID;
-  pdgCode = TMath::Abs(candidate->PID);
+  candidate.PID = fPID;
+  pdgCode = TMath::Abs(candidate.PID);
 
-  candidate->Status = fStatus;
+  candidate.Status = fStatus;
 
   pdgParticle = fPDG->GetParticle(fPID);
-  candidate->Charge = pdgParticle ? int(pdgParticle->Charge() / 3.0) : -999;
-  candidate->Mass = fMass;
+  candidate.Charge = pdgParticle ? int(pdgParticle->Charge() / 3.0) : -999;
+  candidate.Mass = fMass;
 
-  candidate->Momentum.SetPxPyPzE(fPx, fPy, fPz, fE);
-  candidate->Position.SetXYZT(0.0, 0.0, 0.0, 0.0);
+  candidate.Momentum.SetPxPyPzE(fPx, fPy, fPz, fE);
+  candidate.Position.SetXYZT(0.0, 0.0, 0.0, 0.0);
 
-  candidate->M1 = fM1 - 1;
-  candidate->M2 = fM2 - 1;
+  candidate.M1 = fM1 - 1;
+  candidate.M2 = fM2 - 1;
 
-  candidate->D1 = -1;
-  candidate->D2 = -1;
+  candidate.D1 = -1;
+  candidate.D2 = -1;
 
   fAllParticleOutputArray->emplace_back(candidate);
 

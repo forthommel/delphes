@@ -68,9 +68,9 @@ void AngularSmearing::Process()
   fOutputArray->clear();
   Double_t pt, eta, phi, e, m;
 
-  for(Candidate *const &candidate : *fInputArray)
+  for(const Candidate &candidate : *fInputArray)
   {
-    const TLorentzVector &candidateMomentum = candidate->Momentum;
+    const TLorentzVector &candidateMomentum = candidate.Momentum;
     eta = candidateMomentum.Eta();
     phi = candidateMomentum.Phi();
     pt = candidateMomentum.Pt();
@@ -78,16 +78,14 @@ void AngularSmearing::Process()
     m = candidateMomentum.M();
 
     // apply smearing formula for eta,phi
-    eta = gRandom->Gaus(eta, fFormulaEta->Eval(pt, eta, phi, e, candidate));
-    phi = gRandom->Gaus(phi, fFormulaPhi->Eval(pt, eta, phi, e, candidate));
+    eta = gRandom->Gaus(eta, fFormulaEta->Eval(pt, eta, phi, e, &candidate));
+    phi = gRandom->Gaus(phi, fFormulaPhi->Eval(pt, eta, phi, e, &candidate));
 
     if(pt <= 0.0) continue;
 
-    Candidate *new_candidate = static_cast<Candidate *>(candidate->Clone());
-    new_candidate->Momentum.SetPtEtaPhiM(pt, eta, phi, m);
-    new_candidate->AddCandidate(candidate);
-
-    fOutputArray->emplace_back(new_candidate);
+    Candidate &new_candidate = fOutputArray->emplace_back(candidate);
+    new_candidate.Momentum.SetPtEtaPhiM(pt, eta, phi, m);
+    new_candidate.AddCandidate(&candidate);
   }
 }
 

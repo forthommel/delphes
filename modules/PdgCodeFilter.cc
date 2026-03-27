@@ -75,16 +75,16 @@ void PdgCodeFilter::Process()
 {
   fOutputArray->clear();
 
-  for(Candidate *const &candidate : *fInputArray)
+  for(const Candidate &candidate : *fInputArray)
   {
-    const int pdgCode = candidate->PID;
-    const TLorentzVector &candidateMomentum = candidate->Momentum;
+    const int pdgCode = candidate.PID;
+    const TLorentzVector &candidateMomentum = candidate.Momentum;
     const double pt = candidateMomentum.Pt();
 
     if(pt < fPTMin) continue;
-    if(fRequireStatus && (candidate->Status != fStatus)) continue;
-    if(fRequireCharge && (candidate->Charge != fCharge)) continue;
-    if(fRequireNotPileup && (candidate->IsPU > 0)) continue;
+    if(fRequireStatus && (candidate.Status != fStatus)) continue;
+    if(fRequireCharge && (candidate.Charge != fCharge)) continue;
+    if(fRequireNotPileup && (candidate.IsPU > 0)) continue;
 
     bool pass = std::find(fPdgCodes.begin(), fPdgCodes.end(), pdgCode) == fPdgCodes.end();
     if(fInvert) pass = !pass;

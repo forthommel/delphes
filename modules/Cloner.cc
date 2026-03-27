@@ -37,12 +37,7 @@ public:
     fInputArray = ImportArray(Steer<std::string>("InputArray", "FastJetFinder/jets")); // import input array
     fOutputArray = ExportArray(Steer<std::string>("OutputArray", "jets")); // create output array
   }
-  void Process() override
-  {
-    fOutputArray->clear();
-    for(Candidate *const &candidate : *fInputArray) // loop over all input candidates
-      fOutputArray->emplace_back(static_cast<Candidate *>(candidate->Clone()));
-  }
+  void Process() override { *fOutputArray = *fInputArray; }
 
 private:
   CandidatesCollection fInputArray; //!

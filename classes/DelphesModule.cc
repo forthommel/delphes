@@ -40,7 +40,7 @@ CandidatesCollection DelphesModule::ImportArray(std::string_view name)
   DelphesFactory *factory = GetFactory();
   if(!factory)
     throw std::runtime_error("Failed to retrieve the Delphes objects factory for module '" + std::string{GetName()} + "'.");
-  return factory->Attach<std::vector<Candidate *> >(name);
+  return factory->Attach<std::vector<Candidate> >(name);
 }
 
 //------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ CandidatesCollection DelphesModule::ExportArray(std::string_view name)
     message << "Collection with name '" << name << "' and label '" << collectionLabel.str() << "'  was already booked in the memory slot.";
     throw std::runtime_error(message.str());
   }
-  return factory->Book<std::vector<Candidate *> >(collectionLabel.str(), false);
+  return factory->Book<std::vector<Candidate> >(collectionLabel.str(), false);
 }
 
 //------------------------------------------------------------------------------

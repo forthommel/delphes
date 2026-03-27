@@ -161,11 +161,11 @@ void JetFlavorAssociation::Process()
     partonLHEFArray = fParticleLHEFFilter->GetSubArray(fParticleLHEFClassifier.get(), 0); // get the filtered parton array
   }
   // loop over all input jets
-  for(Candidate *const &jet : *fJetInputArray)
+  for(Candidate &jet : *fJetInputArray)
   {
     // get standard flavor
-    GetAlgoFlavor(jet, partonArray, partonLHEFArray);
-    if(fParticleLHEFInputArray) GetPhysicsFlavor(jet, partonArray, partonLHEFArray);
+    GetAlgoFlavor(&jet, partonArray, partonLHEFArray);
+    if(fParticleLHEFInputArray) GetPhysicsFlavor(&jet, partonArray, partonLHEFArray);
   }
 }
 
@@ -177,8 +177,9 @@ void JetFlavorAssociation::GetAlgoFlavor(Candidate *jet, const std::vector<Candi
 {
   float maxPt = 0;
   int daughterCounter = 0;
-  Candidate *tempParton = 0, *tempPartonHighestPt = 0;
   int pdgCode, pdgCodeMax = -1;
+
+  const Candidate *tempParton = nullptr, *tempPartonHighestPt = nullptr;
 
   for(Candidate *const &parton : partonArray)
   {
@@ -202,10 +203,9 @@ void JetFlavorAssociation::GetAlgoFlavor(Candidate *jet, const std::vector<Candi
       if(parton->D1 != -1 || parton->D2 != -1)
       {
         // partons are only quarks || gluons
-        int daughterFlavor1 = -1;
-        int daughterFlavor2 = -1;
-        if(parton->D1 != -1) daughterFlavor1 = std::abs(static_cast<Candidate *>(fParticleInputArray->at(parton->D1))->PID);
-        if(parton->D2 != -1) daughterFlavor2 = std::abs(static_cast<Candidate *>(fParticleInputArray->at(parton->D2))->PID);
+        int daughterFlavor1 = -1, daughterFlavor2 = -1;
+        if(parton->D1 != -1) daughterFlavor1 = std::abs(fParticleInputArray->at(parton->D1).PID);
+        if(parton->D2 != -1) daughterFlavor2 = std::abs(fParticleInputArray->at(parton->D2).PID);
         if((daughterFlavor1 == 1 || daughterFlavor1 == 2 || daughterFlavor1 == 3 || daughterFlavor1 == 4 || daughterFlavor1 == 5 || daughterFlavor1 == 21)) daughterCounter++;
         if((daughterFlavor2 == 1 || daughterFlavor2 == 2 || daughterFlavor2 == 3 || daughterFlavor2 == 4 || daughterFlavor2 == 5 || daughterFlavor2 == 21)) daughterCounter++;
       }
@@ -239,19 +239,15 @@ void JetFlavorAssociation::GetPhysicsFlavor(Candidate *jet, const std::vector<Ca
 {
   int partonCounter = 0;
   float biggerConeSize = 0.7;
-  float dist;
-  bool isGoodCandidate;
   int contaminatingFlavor = 0;
   int motherCounter = 0;
-  Candidate *tempParton = nullptr;
-  vector<Candidate *> contaminations;
 
-  contaminations.clear();
+  const Candidate *tempParton = nullptr;
+  std::vector<const Candidate *> contaminations;
 
   for(Candidate *const &partonLHEF : partonLHEFArray)
   {
-    dist = jet->Momentum.DeltaR(partonLHEF->Momentum); // take the DR
-
+    const float dist = jet->Momentum.DeltaR(partonLHEF->Momentum); // take the DR
     if(partonLHEF->Status == 1 && dist <= fDeltaR)
     {
       tempParton = partonLHEF;
@@ -261,11 +257,13 @@ void JetFlavorAssociation::GetPhysicsFlavor(Candidate *jet, const std::vector<Ca
 
   for(Candidate *const &parton : partonArray)
   {
-    dist = jet->Momentum.DeltaR(parton->Momentum); // take the DR
-    isGoodCandidate = true;
+    const float dist = jet->Momentum.DeltaR(parton->Momentum); // take the DR
+    bool isGoodCandidate = true;
     for(Candidate *const &partonLHEF : partonLHEFArray)
     {
-      if(parton->Momentum.DeltaR(partonLHEF->Momentum) < 0.01 && parton->PID == partonLHEF->PID && partonLHEF->Charge == parton->Charge)
+      if(parton->Momentum.DeltaR(partonLHEF->Momentum) < 0.01
+        && parton->PID == partonLHEF->PID
+        && partonLHEF->Charge == parton->Charge)
       {
         isGoodCandidate = false;
         break;
@@ -293,22 +291,22 @@ void JetFlavorAssociation::GetPhysicsFlavor(Candidate *jet, const std::vector<Ca
   {
     jet->FlavorPhys = std::abs(tempParton->PID);
 
-    for(Candidate *const &parton : contaminations)
+    for(const Candidate *const &parton : contaminations)
     {
       contaminatingFlavor = std::abs(parton->PID);
       motherCounter = 0;
       if(parton->M1 != -1) motherCounter++;
       if(parton->M2 != -1) motherCounter++;
 
-      if(parton->M1 != -1)
+      if(parton->M1 != -1 && static_cast<int>(fParticleInputArray->size()) > parton->M1)
       {
-        if(const Candidate *mother1 = static_cast<Candidate *>(fParticleInputArray->at(parton->M1));
-          mother1 && motherCounter > 0 && mother1->Momentum.DeltaR(tempParton->Momentum) < 0.001) continue;
+        if(const Candidate &mother1 = fParticleInputArray->at(parton->M1);
+          motherCounter > 0 && mother1.Momentum.DeltaR(tempParton->Momentum) < 0.001) continue;
       }
-      if(parton->M2 != -1)
+      if(parton->M2 != -1 && static_cast<int>(fParticleInputArray->size()) > parton->M2)
       {
-        if(const Candidate *mother2 = static_cast<Candidate *>(fParticleInputArray->at(parton->M2));
-          mother2 && motherCounter > 0 && mother2->Momentum.DeltaR(tempParton->Momentum) < 0.001) continue;
+        if(const Candidate &mother2 = fParticleInputArray->at(parton->M2);
+          motherCounter > 0 && mother2.Momentum.DeltaR(tempParton->Momentum) < 0.001) continue;
       }
       // mother is the initialParton --> OK
       if(std::abs(tempParton->PID) == 4)

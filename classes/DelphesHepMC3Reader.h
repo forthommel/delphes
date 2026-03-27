@@ -77,7 +77,7 @@ private:
   int fParticleCode{0}, fPID{0}, fParticleStatus{0}, fOutVertexCode{0};
   double fPx{0.}, fPy{0.}, fPz{0.}, fE{0.}, fMass{0.};
 
-  std::vector<std::pair<std::shared_ptr<TLorentzVector>, CandidatesCollection> > fVertices;
+  std::vector<std::pair<std::shared_ptr<TLorentzVector>, CandidatesPtrCollection> > fVertices;
   std::vector<int> fParticles;
 
   std::map<int, int> fInVertexMap;

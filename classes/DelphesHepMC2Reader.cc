@@ -346,48 +346,44 @@ void DelphesHepMC2Reader::SetProcessingTime(double procTime) { fEventObject->Pro
 
 void DelphesHepMC2Reader::AnalyzeParticle()
 {
-  Candidate *candidate;
-  TParticlePDG *pdgParticle;
-  int pdgCode;
+  Candidate candidate;
 
-  candidate = GetFactory()->NewCandidate();
+  candidate.PID = fPID;
+  const int pdgCode = TMath::Abs(candidate.PID);
 
-  candidate->PID = fPID;
-  pdgCode = TMath::Abs(candidate->PID);
+  candidate.Status = fStatus;
 
-  candidate->Status = fStatus;
+  TParticlePDG *pdgParticle = fPDG->GetParticle(fPID);
+  candidate.Charge = pdgParticle ? int(pdgParticle->Charge() / 3.0) : -999;
+  candidate.Mass = fMass;
 
-  pdgParticle = fPDG->GetParticle(fPID);
-  candidate->Charge = pdgParticle ? int(pdgParticle->Charge() / 3.0) : -999;
-  candidate->Mass = fMass;
-
-  candidate->Momentum.SetPxPyPzE(fPx, fPy, fPz, fE);
+  candidate.Momentum.SetPxPyPzE(fPx, fPy, fPz, fE);
   if(fMomentumCoefficient != 1.0)
-    candidate->Momentum *= fMomentumCoefficient;
+    candidate.Momentum *= fMomentumCoefficient;
 
-  candidate->M2 = 1;
-  candidate->D2 = 1;
+  candidate.M2 = 1;
+  candidate.D2 = 1;
   if(fInCounter > 0)
   {
-    candidate->M1 = 1;
-    candidate->Position.SetXYZT(0.0, 0.0, 0.0, 0.0);
+    candidate.M1 = 1;
+    candidate.Position.SetXYZT(0.0, 0.0, 0.0, 0.0);
   }
   else
   {
-    candidate->M1 = fOutVertexCode;
-    candidate->Position.SetXYZT(fX, fY, fZ, fT);
+    candidate.M1 = fOutVertexCode;
+    candidate.Position.SetXYZT(fX, fY, fZ, fT);
     if(fPositionCoefficient != 1.0)
     {
-      candidate->Position *= fPositionCoefficient;
+      candidate.Position *= fPositionCoefficient;
     }
   }
   if(fInVertexCode < 0)
   {
-    candidate->D1 = fInVertexCode;
+    candidate.D1 = fInVertexCode;
   }
   else
   {
-    candidate->D1 = 1;
+    candidate.D1 = 1;
   }
 
   fAllParticleOutputArray->emplace_back(candidate);
@@ -408,56 +404,54 @@ void DelphesHepMC2Reader::AnalyzeParticle()
 
 void DelphesHepMC2Reader::FinalizeParticles()
 {
-  Candidate *candidate;
-  Candidate *candidateDaughter;
   std::map<int, std::pair<int, int> >::iterator itMotherMap;
   std::map<int, std::pair<int, int> >::iterator itDaughterMap;
 
   for(size_t i = 0; i < fAllParticleOutputArray->size(); ++i)
   {
-    candidate = static_cast<Candidate *>(fAllParticleOutputArray->at(i));
+    Candidate &candidate = fAllParticleOutputArray->at(i);
 
-    if(candidate->M1 > 0)
+    if(candidate.M1 > 0)
     {
-      candidate->M1 = -1;
-      candidate->M2 = -1;
+      candidate.M1 = -1;
+      candidate.M2 = -1;
     }
     else
     {
-      itMotherMap = fMotherMap.find(candidate->M1);
+      itMotherMap = fMotherMap.find(candidate.M1);
       if(itMotherMap == fMotherMap.end())
       {
-        candidate->M1 = -1;
-        candidate->M2 = -1;
+        candidate.M1 = -1;
+        candidate.M2 = -1;
       }
       else
       {
-        candidate->M1 = itMotherMap->second.first;
-        candidate->M2 = itMotherMap->second.second;
+        candidate.M1 = itMotherMap->second.first;
+        candidate.M2 = itMotherMap->second.second;
       }
     }
-    if(candidate->D1 > 0)
+    if(candidate.D1 > 0)
     {
-      candidate->D1 = -1;
-      candidate->D2 = -1;
+      candidate.D1 = -1;
+      candidate.D2 = -1;
     }
     else
     {
-      itDaughterMap = fDaughterMap.find(candidate->D1);
+      itDaughterMap = fDaughterMap.find(candidate.D1);
       if(itDaughterMap == fDaughterMap.end())
       {
-        candidate->D1 = -1;
-        candidate->D2 = -1;
-        const TLorentzVector &decayPosition = candidate->Position;
-        candidate->DecayPosition.SetXYZT(decayPosition.X(), decayPosition.Y(), decayPosition.Z(), decayPosition.T()); // decay position
+        candidate.D1 = -1;
+        candidate.D2 = -1;
+        const TLorentzVector &decayPosition = candidate.Position;
+        candidate.DecayPosition.SetXYZT(decayPosition.X(), decayPosition.Y(), decayPosition.Z(), decayPosition.T()); // decay position
       }
       else
       {
-        candidate->D1 = itDaughterMap->second.first;
-        candidate->D2 = itDaughterMap->second.second;
-        candidateDaughter = static_cast<Candidate *>(fAllParticleOutputArray->at(candidate->D1));
-        const TLorentzVector &decayPosition = candidateDaughter->Position;
-        candidate->DecayPosition.SetXYZT(decayPosition.X(), decayPosition.Y(), decayPosition.Z(), decayPosition.T()); // decay position
+        candidate.D1 = itDaughterMap->second.first;
+        candidate.D2 = itDaughterMap->second.second;
+        const Candidate &candidateDaughter = fAllParticleOutputArray->at(candidate.D1);
+        const TLorentzVector &decayPosition = candidateDaughter.Position;
+        candidate.DecayPosition.SetXYZT(decayPosition.X(), decayPosition.Y(), decayPosition.Z(), decayPosition.T()); // decay position
       }
     }
   }

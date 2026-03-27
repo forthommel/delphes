@@ -75,32 +75,30 @@ private:
 void TrackCountingBTagging::Process()
 {
   // loop over all input jets
-  for(Candidate *const &jet : *fJetInputArray)
+  for(Candidate &jet : *fJetInputArray)
   {
-    const TLorentzVector &jetMomentum = jet->Momentum;
+    const TLorentzVector &jetMomentum = jet.Momentum;
     const double jpx = jetMomentum.Px(), jpy = jetMomentum.Py(), jpz = jetMomentum.Pz();
 
     // loop over all input tracks
     int count = 0;
-    for(Candidate *const &track : *fTrackInputArray)
+    for(const Candidate &track : *fTrackInputArray)
     {
       if(count >= fNtracks) break; // stop once we have enough tracks
-      const TLorentzVector &trkMomentum = track->Momentum;
+      const TLorentzVector &trkMomentum = track.Momentum;
       const double tpt = trkMomentum.Pt();
       if(tpt < fPtMin) continue;
 
-      const double d0 = std::fabs(track->D0);
+      const double d0 = std::fabs(track.D0);
       if(d0 > fIPmax) continue;
 
       const double dr = jetMomentum.DeltaR(trkMomentum);
       if(dr > fDeltaR) continue;
 
-      const double xd = track->Xd,
-                   yd = track->Yd,
-                   zd = track->Zd;
-      const double dd0 = std::fabs(track->ErrorD0);
-      const double dz = std::fabs(track->DZ);
-      const double ddz = std::fabs(track->ErrorDZ);
+      const double xd = track.Xd, yd = track.Yd, zd = track.Zd;
+      const double dd0 = std::fabs(track.ErrorD0);
+      const double dz = std::fabs(track.DZ);
+      const double ddz = std::fabs(track.ErrorDZ);
 
       double sip = 0.;
       int sign = -1;
@@ -120,7 +118,7 @@ void TrackCountingBTagging::Process()
     }
 
     // set BTag flag to true if count >= Ntracks
-    jet->BTag |= (count >= fNtracks) << fBitNumber;
+    jet.BTag |= (count >= fNtracks) << fBitNumber;
   }
 }
 

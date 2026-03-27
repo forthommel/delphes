@@ -57,9 +57,9 @@ std::vector<Candidate *> DelphesFilter::GetSubArray(ExRootClassifier *classifier
   if(itMap->second.first)
   {
     itMap->second.first = false;
-    for(Candidate *const &element : *fCollection)
+    for(const Candidate &element : *fCollection)
     {
-      int result = classifier->GetCategory(element);
+      int result = classifier->GetCategory(const_cast<TObject *>(static_cast<const TObject *>(&element)));
       if(result < 0) continue;
       TCategoryMap::iterator itSubMap = itMap->second.second.find(result);
       if(itSubMap == itMap->second.second.end())
@@ -71,7 +71,7 @@ std::vector<Candidate *> DelphesFilter::GetSubArray(ExRootClassifier *classifier
 
         itSubMap = pairSubMap.first;
       }
-      itSubMap->second.emplace_back(element);
+      itSubMap->second.emplace_back(const_cast<Candidate *>(&element));
     }
   }
   TCategoryMap::iterator itSubMap = itMap->second.second.find(category);

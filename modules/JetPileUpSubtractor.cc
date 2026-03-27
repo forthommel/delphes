@@ -60,18 +60,18 @@ void JetPileUpSubtractor::Process()
   fOutputArray->clear();
 
   // loop over all input candidates
-  for(Candidate *const &candidate : *fJetInputArray)
+  for(const Candidate &candidate : *fJetInputArray)
   {
-    TLorentzVector momentum = candidate->Momentum;
-    const TLorentzVector area = candidate->Area;
+    TLorentzVector momentum = candidate.Momentum;
+    const TLorentzVector &area = candidate.Area;
     const double eta = momentum.Eta();
 
     // find rho
     double rho = 0.;
-    for(Candidate *const &object : *fRhoInputArray)
+    for(const Candidate &object : *fRhoInputArray)
     {
-      if(eta >= object->Edges[0] && eta < object->Edges[1])
-        rho = object->Momentum.Pt();
+      if(eta >= object.Edges[0] && eta < object.Edges[1])
+        rho = object.Momentum.Pt();
     }
 
     // apply pile-up correction
@@ -81,10 +81,8 @@ void JetPileUpSubtractor::Process()
 
     if(momentum.Pt() <= fJetPTMin) continue;
 
-    Candidate *new_candidate = static_cast<Candidate *>(candidate->Clone());
-    new_candidate->Momentum = momentum;
-
-    fOutputArray->emplace_back(new_candidate);
+    Candidate &new_candidate = fOutputArray->emplace_back(candidate);
+    new_candidate.Momentum = momentum;
   }
 }
 
