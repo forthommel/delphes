@@ -45,6 +45,7 @@ public:
   void SetFactory(DelphesFactory *factory) override;
 
   void LoadInputFile(std::string_view) override;
+  void Reset() override;
   void Clear() override;
   bool EventReady() override;
 
