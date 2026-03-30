@@ -45,6 +45,10 @@ public:
     for(const std::string &configCmd : Steer<std::vector<std::string> >("pythiaConfig"))
       fPythia->readString(configCmd);
   }
+  ~DelphesPythia8Reader()
+  {
+    if(fPythia) fPythia->stat();
+  }
 
   void SetFactory(DelphesFactory *factory) override
   {
