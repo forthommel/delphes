@@ -34,14 +34,7 @@
 #include <TLorentzVector.h>
 #include <TRandom3.h>
 
-#include <Pythia.h>
-
-#include <algorithm>
-#include <iostream>
-#include <sstream>
-#include <stdexcept>
-
-using namespace std;
+#include <Pythia8/Pythia.h>
 
 class PileUpMergerPythia8: public DelphesModule
 {
