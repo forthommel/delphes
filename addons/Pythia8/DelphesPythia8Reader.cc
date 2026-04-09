@@ -50,6 +50,8 @@ public:
     if(fPythia) fPythia->stat();
   }
 
+  std::unique_ptr<DelphesReader> Clone() const override { return std::make_unique<DelphesPythia8Reader>(GetParameters()); }
+
   void SetFactory(DelphesFactory *factory) override
   {
     DelphesReader::SetFactory(factory);
@@ -57,7 +59,7 @@ public:
     fWeightInfo = GetFactory()->Book<std::vector<Weight> >("Weights", true);
   }
 
-  bool ReadEvent() override;
+  bool ReadEvent(DelphesFactory &) override;
   void SetReadoutTime(double readoutTime) override
   {
     fEventInfo->ReadTime = readoutTime;
@@ -151,10 +153,11 @@ private:
 
 //---------------------------------------------------------------------------
 
-bool DelphesPythia8Reader::ReadEvent()
+bool DelphesPythia8Reader::ReadEvent(DelphesFactory &factory)
 {
   if(!fInitialised)
   {
+    BookCollections();
     // jet matching
 #if PYTHIA_VERSION_INTEGER < 8300
     Pythia8::CombineMatchingInput *combined = 0;
@@ -194,8 +197,8 @@ bool DelphesPythia8Reader::ReadEvent()
         fLHEReader = std::make_unique<DelphesLHEFReader>(DelphesParameters{});
         fLHEReader->LoadInputFile(inputFile);
 
-        fEventInfoLHEF = GetFactory()->Book<HepMCEvent>("EventLHEF", true);
-        fWeightsInfoLHEF = GetFactory()->Book<std::vector<Weight> >("WeightLHEF", true);
+        fEventInfoLHEF = factory.Book<HepMCEvent>("EventLHEF", true);
+        fWeightsInfoLHEF = factory.Book<std::vector<Weight> >("WeightLHEF", true);
 
         fAllParticleOutputArrayLHEF = ImportArray("Delphes/allParticlesLHEF");
         fStableParticleOutputArrayLHEF = ImportArray("Delphes/stableParticlesLHEF");
@@ -216,12 +219,10 @@ bool DelphesPythia8Reader::ReadEvent()
   else if(fLHEReader)
   {
     fLHEReader->Clear();
-    if(!fLHEReader->ReadEvent()) return false; // failed to read the next event in parallel to Pythia
+    if(!fLHEReader->ReadEvent(factory)) return false; // failed to read the next event in parallel to Pythia
   }
 
   if(!fPythia->next()) return false;
-
-  DelphesFactory *factory = GetFactory();
 
   fEventInfo->Number += 1;
 #if PYTHIA_VERSION_INTEGER > 8300
@@ -232,7 +233,7 @@ bool DelphesPythia8Reader::ReadEvent()
   for(int i = 1 /*skip the two-beam system*/; i < fPythia->event.size(); ++i)
   {
     Pythia8::Particle &pyPart = fPythia->event[i];
-    Candidate *candidate = factory->NewCandidate();
+    Candidate *candidate = factory.NewCandidate();
     candidate->PID = pyPart.id();
     candidate->Status = pyPart.statusHepMC();
     candidate->Charge = pyPart.charge();

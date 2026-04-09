@@ -72,12 +72,19 @@ public:
 
   Candidate *NewCandidate(); ///< Construct a new candidate to fill a collection
 
+  void SetReadoutTime(double readoutTime) { fReadoutTime = readoutTime; }
+  double GetReadoutTime() const { return fReadoutTime; }
+  void SetProcessingTime(double procTime) { fProcessingTime = procTime; }
+  double GetProcessingTime() const { return fProcessingTime; }
+
 private:
   void ThrowAttachingFailure(std::string_view collectionName) const;
 
   std::map<std::string, void *> fMemorySlots;
   std::vector<std::pair<std::string, const std::type_info *> > fExportCollections;
   std::vector<std::unique_ptr<Candidate> > fCandidates;
+  double fReadoutTime{-1.};
+  double fProcessingTime{-1.};
 };
 
 #endif /* DelphesFactory */

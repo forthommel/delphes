@@ -24,8 +24,10 @@
 
 #include "classes/DelphesClasses.h"
 #include "classes/DelphesFactory.h"
+#include "classes/DelphesMultiThreadedReader.h"
 #include "classes/DelphesStream.h"
 #include "classes/DelphesTCLConfReader.h"
+#include "classes/DelphesThreadWorker.h"
 
 #include "modules/Delphes.h"
 

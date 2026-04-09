@@ -27,7 +27,9 @@
 #include "classes/DelphesClasses.h"
 #include "classes/DelphesFactory.h"
 #include "classes/DelphesLHEFReader.h"
+#include "classes/DelphesMultiThreadedReader.h"
 #include "classes/DelphesTCLConfReader.h"
+#include "classes/DelphesThreadWorker.h"
 #include "modules/Delphes.h"
 
 using namespace std;
@@ -75,10 +77,11 @@ int main(int argc, char *argv[])
 
     const auto modularDelphes = std::make_unique<Delphes>("Delphes");
     modularDelphes->SetConfReader(confReader.get());
-    modularDelphes->SetReader(reader.get());
     modularDelphes->SetOutputFile(argv[2]);
 
     modularDelphes->InitTask();
+
+    modularDelphes->SetReader(reader.get());
 
     i = 3;
     do
@@ -100,8 +103,7 @@ int main(int argc, char *argv[])
 
       // Loop over all objects
       modularDelphes->Clear();
-      reader->Clear();
-      while(reader->ReadEvent() && !interrupted)
+      while(reader->ReadEvent(*modularDelphes->GetFactory()) && !interrupted)
       {
         modularDelphes->ProcessTask();
         modularDelphes->Clear();

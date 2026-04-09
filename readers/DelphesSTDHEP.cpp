@@ -20,8 +20,10 @@
 
 #include "classes/DelphesClasses.h"
 #include "classes/DelphesFactory.h"
+#include "classes/DelphesMultiThreadedReader.h"
 #include "classes/DelphesSTDHEPReader.h"
 #include "classes/DelphesTCLConfReader.h"
+#include "classes/DelphesThreadWorker.h"
 #include "modules/Delphes.h"
 
 #include <ExRootAnalysis/ExRootProgressBar.h>
@@ -96,7 +98,7 @@ int main(int argc, char *argv[])
       // Loop over all objects
       modularDelphes->Clear();
       reader->Clear();
-      while(reader->ReadEvent() && !interrupted)
+      while(reader->ReadEvent(*modularDelphes->GetFactory()) && !interrupted)
       {
         modularDelphes->ProcessTask();
         modularDelphes->Clear();

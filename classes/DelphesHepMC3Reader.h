@@ -40,6 +40,8 @@ class DelphesHepMC3Reader: public DelphesReader
 public:
   explicit DelphesHepMC3Reader(const DelphesParameters &);
 
+  std::unique_ptr<DelphesReader> Clone() const override { return std::make_unique<DelphesHepMC3Reader>(GetParameters()); }
+
   void SetFactory(DelphesFactory *factory) override;
 
   void LoadInputFile(std::string_view) override;

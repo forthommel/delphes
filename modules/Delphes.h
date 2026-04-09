@@ -31,7 +31,9 @@
 #include "classes/DelphesModule.h"
 
 class DelphesConfReader;
+class DelphesMultiThreadedReader;
 class DelphesReader;
+class DelphesThreadWorker;
 
 void LoadLibrary(std::string_view); ///< Load an external library into the runtime environment
 
@@ -41,12 +43,12 @@ public:
   explicit Delphes(const char *name = "Delphes");
 
   void Init() override;
-  DelphesFactory *GetFactory() const override;
 
+  DelphesFactory *GetFactory() const override;
   void SetConfReader(DelphesConfReader *conf) { fConfReader = conf; }
 
   virtual void SetReader(DelphesReader *reader);
-  virtual DelphesReader *GetReader() const { return fReader; }
+  const std::vector<DelphesThreadWorker> &GetWorkers() const { return fWorkers; }
 
   void InitTask();
   void ProcessTask();
@@ -58,16 +60,10 @@ public:
   void Reset(); ///< Reset the event reader to the beginning of its readout
   void Clear();
 
-protected:
-  void ClearModules() { fModules.clear(); }
-  void AddModule(std::string_view moduleName, std::unique_ptr<DelphesModule> &moduleObject);
-
 private:
-  std::unique_ptr<DelphesFactory> fDelphesFactory;
   DelphesConfReader *fConfReader{nullptr};
-  DelphesReader *fReader{nullptr};
-
-  std::vector<std::pair<std::string, std::unique_ptr<DelphesModule> > > fModules;
+  std::unique_ptr<DelphesMultiThreadedReader> fReader;
+  std::vector<DelphesThreadWorker> fWorkers;
 
   std::string fOutputFile;
 };

@@ -20,8 +20,10 @@
 
 #include "classes/DelphesClasses.h"
 #include "classes/DelphesFactory.h"
+#include "classes/DelphesMultiThreadedReader.h"
 #include "classes/DelphesReader.h"
 #include "classes/DelphesTCLConfReader.h"
+#include "classes/DelphesThreadWorker.h"
 #include "modules/Delphes.h"
 
 #include "ExRootAnalysis/ExRootProgressBar.h"
@@ -59,15 +61,22 @@ int main(int argc, char *argv[])
   {
     const auto confReader = std::make_unique<DelphesTCLConfReader>();
     confReader->ReadFile(argv[2]);
-
-    const auto reader = DelphesReaderFactory::Get().Build(argv[1]);
     const auto userParams = confReader->Parameters();
-    reader->SetMaxEvents(userParams.Get<int>("MaxEvents", 0));
-    reader->SetSkipEvents(userParams.Get<int>("SkipEvents", 0));
 
     const auto modularDelphes = std::make_unique<Delphes>("Delphes");
     modularDelphes->SetConfReader(confReader.get());
     modularDelphes->SetOutputFile(argv[3]);
+
+    std::unique_ptr<DelphesReader> singleReader = DelphesReaderFactory::Get().Build(argv[1]);
+    std::unique_ptr<DelphesReader> reader;
+    //if(const size_t numThreads = userParams.Get<size_t>("NumThreads"); numThreads > 1)
+    reader = std::make_unique<DelphesMultiThreadedReader>(modularDelphes->GetWorkers(), *singleReader);
+    /*else {
+      reader = std::move(singleReader);
+      reader->;
+    }*/
+    reader->SetMaxEvents(userParams.Get<int>("MaxEvents", 0));
+    reader->SetSkipEvents(userParams.Get<int>("SkipEvents", 0));
     modularDelphes->SetReader(reader.get());
 
     modularDelphes->InitTask();
@@ -92,8 +101,7 @@ int main(int argc, char *argv[])
 
       // Loop over all objects
       modularDelphes->Clear();
-      reader->Clear();
-      while(reader->ReadEvent() && !interrupted)
+      while(reader->ReadEvent(*modularDelphes->GetFactory()) && !interrupted)
       {
         modularDelphes->ProcessTask();
         modularDelphes->Clear();

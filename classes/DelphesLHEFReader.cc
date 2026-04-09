@@ -79,6 +79,7 @@ void DelphesLHEFReader::LoadInputFile(std::string_view inputFile)
 
 void DelphesLHEFReader::SetFactory(DelphesFactory *factory)
 {
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
   DelphesReader::SetFactory(factory);
   fEventInfo = GetFactory()->Book<LHEFEvent>("Event", true);
   fWeightInfo = GetFactory()->Book<std::vector<LHEFWeight> >("Weights", true);
@@ -96,6 +97,7 @@ void DelphesLHEFReader::Reset()
 
 void DelphesLHEFReader::Clear()
 {
+  std::cout << __PRETTY_FUNCTION__ << ":" << fEventInfo.get() << std::endl;
   fEventReady = false;
   fEventInfo->Number = -1;
   fEventInfo->CrossSection = 0.; //TODO: read this?

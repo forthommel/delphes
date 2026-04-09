@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
       factory->Clear();
       reader->Clear();
       CandidatesCollection stableParticleOutputArray = factory->Attach<std::vector<Candidate *> >("stableParticles");
-      while(reader->ReadEvent() && !interrupted)
+      while(reader->ReadEvent(*factory) && !interrupted)
       {
         for(const auto &candidate : *stableParticleOutputArray)
         {

@@ -66,6 +66,7 @@ protected:
   {
     return fModuleParams.Get<std::string>(std::string{keyName}, std::string{defaultValue});
   }
+  const DelphesParameters &GetParameters() const { return fModuleParams; }
 
 private:
   std::string fName;

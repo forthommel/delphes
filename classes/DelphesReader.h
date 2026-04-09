@@ -44,17 +44,19 @@ public:
   explicit DelphesReader(const DelphesParameters &readerParams = DelphesParameters{}) : DelphesModule(readerParams) {}
   virtual ~DelphesReader();
 
+  virtual std::unique_ptr<DelphesReader> Clone() const = 0;
+
+  void SetFactory(DelphesFactory *) override;
+
   virtual void LoadInputFile(std::string_view inputFile) {}
   virtual void Reset() {};
   virtual void Clear() = 0;
-
-  void SetFactory(DelphesFactory *) override;
 
   void SetSkipEvents(long long);
   void SetMaxEvents(long long);
   unsigned long long EventCounter() const { return fEventCounter; }
 
-  virtual bool ReadEvent();
+  virtual bool ReadEvent(DelphesFactory &);
   virtual void SetReadoutTime(double readoutTime) {} ///< Set the readout time for one event, in s
   virtual void SetProcessingTime(double procTime) {} ///< Set the processing time for one event, in s
 
@@ -64,6 +66,7 @@ public:
   bool IsReader() const override { return true; }
 
 protected:
+  void BookCollections();
   virtual bool EventReady() { return false; }
   virtual bool ReadBlock() { return false; }
 
@@ -75,6 +78,7 @@ protected:
 
   FILE *fInputFile{nullptr};
   std::unique_ptr<ExRootProgressBar> fProgressBar;
+  bool fInitialised{false};
 
   unsigned long long fEventCounter{0ll};
   long long fMaxEvents{-1ll};

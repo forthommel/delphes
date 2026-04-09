@@ -44,16 +44,6 @@ DelphesReader::~DelphesReader()
 
 //---------------------------------------------------------------------------
 
-void DelphesReader::SetFactory(DelphesFactory *factory)
-{
-  DelphesModule::SetFactory(factory);
-  fAllParticleOutputArray = GetFactory()->Book<std::vector<Candidate *> >("Delphes/allParticles", false);
-  fStableParticleOutputArray = GetFactory()->Book<std::vector<Candidate *> >("Delphes/stableParticles", false);
-  fPartonOutputArray = GetFactory()->Book<std::vector<Candidate *> >("Delphes/partons", false);
-}
-
-//---------------------------------------------------------------------------
-
 void DelphesReader::SetSkipEvents(long long skipEvents)
 {
   if(skipEvents < 0)
@@ -74,11 +64,35 @@ void DelphesReader::SetMaxEvents(long long maxEvents)
 
 //---------------------------------------------------------------------------
 
-bool DelphesReader::ReadEvent()
+void DelphesReader::SetFactory(DelphesFactory *factory)
+{
+  DelphesModule::SetFactory(factory);
+  BookCollections();
+}
+
+//---------------------------------------------------------------------------
+
+void DelphesReader::BookCollections()
+{
+  if(!fInitialised) // initialise the collections if not already done
+  {
+    fAllParticleOutputArray = GetFactory()->Book<std::vector<Candidate *> >("Delphes/allParticles", false);
+    fStableParticleOutputArray = GetFactory()->Book<std::vector<Candidate *> >("Delphes/stableParticles", false);
+    fPartonOutputArray = GetFactory()->Book<std::vector<Candidate *> >("Delphes/partons", false);
+    fInitialised = true;
+    return;
+  }
+  fAllParticleOutputArray = GetFactory()->Attach<std::vector<Candidate *> >("Delphes/allParticles");
+  fStableParticleOutputArray = GetFactory()->Attach<std::vector<Candidate *> >("Delphes/stableParticles");
+  fPartonOutputArray = GetFactory()->Attach<std::vector<Candidate *> >("Delphes/partons");
+}
+
+//---------------------------------------------------------------------------
+
+bool DelphesReader::ReadEvent(DelphesFactory &factory)
 {
   if(fMaxEvents > 0 && fEventCounter - fSkipEvents >= static_cast<unsigned long long>(fMaxEvents))
     return false;
-  // initialise the collections if not already done
 
   Clear();
   fAllParticleOutputArray->clear();

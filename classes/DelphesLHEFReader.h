@@ -40,6 +40,8 @@ class DelphesLHEFReader: public DelphesReader
 public:
   explicit DelphesLHEFReader(const DelphesParameters &);
 
+  std::unique_ptr<DelphesReader> Clone() const override { return std::make_unique<DelphesLHEFReader>(GetParameters()); }
+
   void SetFactory(DelphesFactory *factory) override;
 
   void LoadInputFile(std::string_view) override;

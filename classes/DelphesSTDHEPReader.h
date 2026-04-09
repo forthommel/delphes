@@ -49,6 +49,8 @@ public:
 
   explicit DelphesSTDHEPReader(const DelphesParameters &);
 
+  std::unique_ptr<DelphesReader> Clone() const override { return std::make_unique<DelphesSTDHEPReader>(GetParameters()); }
+
   void SetFactory(DelphesFactory *factory) override;
 
   void LoadInputFile(std::string_view) override;
