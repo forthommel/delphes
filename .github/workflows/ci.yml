@@ -17,12 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build Delphes using make
-        run: |
-          make distclean
-          make -j 8 HAS_PYTHIA8=true
-
-      - name: Build Delphes using cmake
+      - name: Build AgrippaSim using cmake
         run: |
           rm -rf build
           mkdir -p build
