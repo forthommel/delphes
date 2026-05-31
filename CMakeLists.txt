@@ -30,15 +30,24 @@ ENDIF(SET_RPATH)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
+# Declare yaml-cpp dependency
+find_package(yaml-cpp)
+if(NOT ${YAML_CPP_LIBRARIES})
+  include(FetchContent)
+  set(YAML_CPP_BUILD_TESTS OFF CACHE INTERNAL "")
+  set(YAML_CPP_BUILD_TOOLS OFF CACHE INTERNAL "")
+  set(YAML_CPP_BUILD_CONTRIB OFF CACHE INTERNAL "")
+  FetchContent_Declare(
+    yaml-cpp
+    GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
+    GIT_TAG        yaml-cpp-0.9.0
+  )
+  FetchContent_MakeAvailable(yaml-cpp)
+endif()
+
 # Declare ROOT dependency
 find_package(ROOT REQUIRED COMPONENTS EG Eve Gui GuiHtml)
 set(CMAKE_CXX_STANDARD ${ROOT_CXX_STANDARD})
-
-# Declare Pythia8 dependancy
-find_package(Pythia8)
-if(PYTHIA8_FOUND)
-  include_directories(${PYTHIA8_INCLUDE_DIRS})
-endif()
 
 if(NOT DEFINED CMAKE_INSTALL_LIBDIR)
   set(CMAKE_INSTALL_LIBDIR "lib")
@@ -75,11 +84,11 @@ add_library(Delphes SHARED
   $<TARGET_OBJECTS:TrackCovariance>
 )
 
-target_link_libraries(Delphes PUBLIC ROOT::Core ROOT::Hist ROOT::Tree ROOT::MathCore ROOT::Physics ROOT::EG)
+target_link_libraries(Delphes PUBLIC yaml-cpp::yaml-cpp ROOT::Core ROOT::Hist ROOT::Tree ROOT::MathCore ROOT::Physics ROOT::EG)
+target_link_libraries(Delphes PRIVATE ROOT::ROOTNTuple)
 
-if(PYTHIA8_FOUND)
-  target_link_libraries(Delphes PUBLIC ${PYTHIA8_LIBRARIES} ${CMAKE_DL_LIBS})
-endif()
+
+add_subdirectory(addons)
 
 add_library(DelphesDisplay SHARED
   $<TARGET_OBJECTS:display>

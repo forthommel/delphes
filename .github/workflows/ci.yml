@@ -17,15 +17,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build Delphes using make
-        run: |
-          make distclean
-          make -j 8 HAS_PYTHIA8=true
+      - name: Setup Ninja
+        uses: seanmiddleditch/gha-setup-ninja@v6
+        with:
+          version: 1.12.1
 
-      - name: Build Delphes using cmake
+      - name: Build AgrippaSim using cmake
         run: |
           rm -rf build
-          mkdir -p build
+          mkdir -p build install
           cd build
-          cmake ..
+          cmake -GNinja -DCMAKE_INSTALL_PREFIX=../install ..
           make -j 8
